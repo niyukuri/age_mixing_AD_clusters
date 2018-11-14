@@ -1,0 +1,88 @@
+# Wrapper function
+
+# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+
+
+work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD_clusters" # on PCHPC
+
+
+setwd(paste0(work.dir))
+
+
+pacman::p_load(snow, parallel, RSimpactCyan, RSimpactHelper, ape, Rsamtools)
+
+
+wrapper.age.mix <- function(inputvector=inputvector){
+  
+  # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
+  
+  work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD_clusters" # on CHPC
+  
+  
+  setwd(paste0(work.dir))
+  
+  library(RSimpactCyan)
+  library(RSimpactHelper)
+  library(Rcpp)
+  library(ape)
+  library(expoTree)
+  library(data.table)
+  library(readr)
+  library(phangorn)
+  library(lme4)
+  library(nlme)
+  library(dplyr)
+  library(adephylo)
+  library(treedater)
+  library(geiger)
+  library(picante)
+  library(igraph)
+  library(phyloTop)
+  library(phytools)
+  library(Rsamtools)
+  library(robustbase)
+  library(intergraph)
+  library(lubridate)
+  library(tidyr)
+  
+  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/needed.functions.RSimpactHelp.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/advanced.transmission.network.builder.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mixing.MCAR.fun.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mixing.MAR.fun.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mix.MCAR.MAR.comput.R")
+  
+  # source("~/phylosimpact_simulation_studies_2018/age_mix_final/test.MCAR.MAR.age.mix.R")
+  
+  
+  
+  results.f <- tryCatch(age.mix.MCAR.MAR.comput(inputvector = inputvector),
+                        error=function(e) return(rep(NA, 10366)))
+  
+  return(results.f)
+  
+}
+
+
+
+
+inputvector <- c(-0.52, -0.05, 2, 10, 5, 0.25, -0.3, -0.1,
+                 -1, -90, 0.5, 0.05, -0.14, 5, 7, 12, -1.7) 
+
+
+reps <- 24
+
+
+inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
+
+large.AD.age.mix <- simpact.parallel(model = wrapper.age.mix,
+                                     actual.input.matrix = inputmatrix,
+                                     seed_count = 777,
+                                     n_cluster = 24)
+
+write.csv(large.AD.age.mix, file = "Results.mcarmar.large.AD.csv")
+
+
+
+
+
+
