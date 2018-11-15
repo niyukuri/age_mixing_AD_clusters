@@ -1,4 +1,21 @@
-# Master model for simulation of age-mixing patterns
+# Master model for simulation and inferrence of age-mixing patterns in transmission clusters
+# The output is a vector of values of
+
+# 1. Epidemic and sexual behaviour statistics
+
+# "R.prev.15.25.w", "R.prev.15.25.m", "R.prev.25.40.w", "R.prev.25.40.m", "R.prev.40.50.w", "R.prev.40.50.m",
+# "R.AAD.male", "R.SDAD.male", "R.slope.male", "R.WSD.male", "R.BSD.male", "R.intercept.male"
+# "R.p.prev.6months.m", # "R.p.prev.6months.f",
+# "R.inc.15.25.m", "R.inc.15.25.w", "R.inc.25.40.m", "R.inc.25.40.w", "R.inc.40.50.m", "R.inc.40.50.w"
+
+
+# 2. With MCAR and MA (35:95, by 5) scenarios (13 * 4), each scenario returns measurements which are describbed
+# in age.mixing.MCAR.fun and age.mixing.MCAR.fun scripts):
+
+# Missing Completly at Random has 13 scenarios
+# Missing At Random has 39 scenarios, with 13 when we assume we have more women in the sample (seq.gender.ratio = 70%)
+# the second we have fewer women (seq.gender.ratio = 30%), and the third we have same amount of men and women (seq.gender.ratio = 50%)
+
 
 # Make sure you have seq-gen, FastTree, and comandline ClusterPicker_1.2.3 in you working directory
 
@@ -8,10 +25,6 @@
 
 # work.dir <- "/home/dniyukuri/lustre/agemix.25.10.2018.2" # on CHPC
 
-# work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
-
-
-# setwd(paste0(work.dir))
 
 
 
@@ -31,7 +44,6 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mixing.MAR.fun.R")
   
   # work.dir <- "/home/niyukuri/Dropbox/25.10.2018.age.mix2/age_mixing_large_AD_clusters/" # on PC
-  
   
   work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD_clusters" # on PCHPC
   
@@ -71,10 +83,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   # Step 1: Setup and running simpact      #
   ###########################################
   
-  
-  
-  
-  
+
   
   ## Run Simpact for specific parameter combination
   
