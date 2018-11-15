@@ -16,8 +16,13 @@
 #' @return GenderDon Gender of donor
 #' @return TOBRec time of birth of receiver
 #' @return TOBDon time of birth of donor
+#' @return cd4 CD4 count at sampling time
+#' @return vl Viral load at sampling time
+#' @return location.x Location at x-axis
+#' @return location.y Location at y-axis
 #'
 #'
+
 #' @examples
 #' transm.ls <- transmission.network.builder(datalist = datalist,endpoint = 40)
 #' @note
