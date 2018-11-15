@@ -1,6 +1,69 @@
+#' Computing age mixing measurements in transmission clusters in missing completly at random scenarios
+#'
+#' @param simpact.trans.net Transmission network and record produced by \code{\link{advanced.transmission.network.builder()}}
+#' @param datalist.agemix Data list of simpact output produced by \code{\link{readthedata()}}
+#' @param work.dir Working directory
+#' @param dirfasttree Directory where fastTree soaftware is called from
+#' @param sub.dir.rename Sub-directory where simpact output are stored
+#' @param limitTransmEvents Consider a transmission network which counts individuals more than the value (numeric)
+#' @param timewindow Time window in which the experience is carried out
+#' @param seq.cov Sequence coverage
+#' @param age.group.15.25 Consider individuals with age greater than 15 and less than 25
+#' @param age.group.25.40 Consider individuals with age greater than 25 and less than 40
+#' @param age.group.40.50 Consider individuals with age greater than 40 and less than 50
+#' @param cut.off Cut off value for constructing pairings based on tMRCA
+#' @export
 
 
+# The outputs of the function are
 
+# (i) as observed in transmisison network constructed from transmission clusters
+
+# - table of numbers of age structured pairings between female/male across different age groups from the transmission clusters
+# - table of proportion of men in a give age group who are paired to women of a given age group
+# - table of proportion of women in a give age group who are paired to men of a given age group
+# - numbers of men, and women in the three age groups
+# - mean, median, and standard deviation of age gap between individuals in different age groups 
+#   (e.g.: women aged between 15 and 25 who are paired to men regardless age group of men)
+
+# table.cl.age.str, table.cl.age.str.prop.men, table.cl.age.str.prop.women, 
+# numbers.individuals.age.groups.cl,
+# mean.AD.age.groups.cl, med.AD.age.groups.cl,
+# sd.AD.age.groups.cl
+
+
+# (ii) true values of the above mentioned measurements as observed in transmission network record
+
+# table.cl.true.age.str, table.cl.true.age.str.prop.men, table.cl.true.age.str.prop.women, 
+# numbers.individuals.age.groups.true.cl,
+# mean.AD.age.groups.true.cl, med.AD.age.groups.true.cl,
+# sd.AD.age.groups.true.cl
+
+# (iii) true values of the above mentioned measurements as observed in transmission network record but for the entire phylogenetic tree
+#     note: not all leaves of a phylogenetic tree belong to transmisison clusters!
+
+# Directorinality is counted with label "MtoW" for infection from man to womand and "WtoM" for vice versa
+
+# - table of numbers of age structured pairings between female/male across different age groups
+# - table of numbers of age structured pairings between female/male across different age groups with men to women infections
+# - table of numbers of age structured pairings between female/male across different age groups with women to men infections
+# - table of proportion of men in a give age group who are paired to women of a given age group
+# - table of proportion of men in a give age group who are paired to women of a given age group  with men to women infections
+# - table of proportion of men in a give age group who are paired to women of a given age group  with women to men infections
+# - table of proportion of women in a give age group who are paired to men of a given age group
+# - numbers of men, and women in the three age groups
+# - mean, median, and standard deviation of age gap between individuals in different age groups 
+#   (e.g.: women aged between 15 and 25 who are paired to men regardless age group of men)
+
+# table.tree.tra.age.str, table.tree.tra.age.str.MtoW, table.tree.tra.age.str.WtoM,
+# table.tree.trans.true.age.str.prop.men, table.tree.trans.true.age.str.MtoW.prop.men,
+# table.tree.trans.true.age.str.WtoM.prop.men, table.tree.trans.true.age.str.prop.women,
+# numbers.individuals.age.groups.net, mean.AD.age.groups.net, med.AD.age.groups.net, sd.AD.age.groups.net
+
+
+# (iv) Transmission clusters
+
+# - mean, median, and standard devation of transmission cluster sizes
 
 
 age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv, 
