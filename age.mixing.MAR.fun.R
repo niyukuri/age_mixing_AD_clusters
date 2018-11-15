@@ -310,7 +310,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     names(summary.epidemic.transm.df) <- c("T.prev.15.25.w", "T.prev.15.25.m", "T.prev.25.40.w", "T.prev.25.40.m", "T.prev.40.50.w", "T.prev.40.50.m",
                                            names(mix.rels.transm.dat), 
                                            "T.p.prev.6months.m", # "T.p.prev.6months.f",
-                                           "T.inc.15.25.w", "T.inc.15.25.m", "T.inc.25.40.w", "T.inc.25.40.m", "T.inc.40.50.w", "T.inc.40.50.m")
+                                           "T.inc.15.25.m", "T.inc.15.25.w", "T.inc.25.40.m", "T.inc.25.40.w", "T.inc.40.50.m", "T.inc.40.50.w")
     
     
     
