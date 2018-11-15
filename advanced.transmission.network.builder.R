@@ -24,7 +24,7 @@
 #'
 
 #' @examples
-#' transm.ls <- transmission.network.builder(datalist = datalist,endpoint = 40)
+#' transm.ls <- advanced.transmission.network.builder(datalist = datalist,endpoint = 40)
 #' @note
 #' transm.ls[[1]] is the transmission network (epi object) of the first seed
 #' @importFrom igraph subcomponent
