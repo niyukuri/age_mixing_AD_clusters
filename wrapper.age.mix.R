@@ -1,4 +1,5 @@
-# Wrapper function
+# Wrapper function which source all others and the main computatinal age.mix.MCAR.MAR.comput script 
+# which is the master model
 
 # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
@@ -50,10 +51,7 @@ wrapper.age.mix <- function(inputvector=inputvector){
   source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mixing.MCAR.fun.R")
   source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mixing.MAR.fun.R")
   source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mix.MCAR.MAR.comput.R")
-  
-  # source("~/phylosimpact_simulation_studies_2018/age_mix_final/test.MCAR.MAR.age.mix.R")
-  
-  
+
   
   results.f <- tryCatch(age.mix.MCAR.MAR.comput(inputvector = inputvector),
                         error=function(e) return(rep(NA, 10366)))
