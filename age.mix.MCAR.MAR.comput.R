@@ -82,8 +82,8 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   #
   cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
                                    population.simtime = 45, 
-                                   population.nummen = 20000, 
-                                   population.numwomen = 20000,
+                                   population.nummen = 15000, 
+                                   population.numwomen = 15000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 40, 
