@@ -570,7 +570,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
         names(summary.epidemic.rels.df) <- c("R.prev.15.25.w", "R.prev.15.25.m", "R.prev.25.40.w", "R.prev.25.40.m", "R.prev.40.50.w", "R.prev.40.50.m",
                                              names(mix.rels.dat), 
                                              "R.p.prev.6months.m", # "R.p.prev.6months.f",
-                                             "R.inc.15.25.w", "R.inc.15.25.m", "R.inc.25.40.w", "R.inc.25.40.m", "R.inc.40.50.w", "R.inc.40.50.m")
+                                             "R.inc.15.25.m", "R.inc.15.25.w", "R.inc.25.40.m", "R.inc.25.40.w", "R.inc.40.50.m", "R.inc.40.50.w")
         
         
         
