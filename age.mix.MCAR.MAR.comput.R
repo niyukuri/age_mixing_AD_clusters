@@ -8,8 +8,9 @@
 # "R.p.prev.6months.m", # "R.p.prev.6months.f",
 # "R.inc.15.25.m", "R.inc.15.25.w", "R.inc.25.40.m", "R.inc.25.40.w", "R.inc.40.50.m", "R.inc.40.50.w"
 
+# 2. What is produced by age.mixing.MCAR.fun at 100% of coverage
 
-# 2. With MCAR and MA (35:95, by 5) scenarios (13 * 4), each scenario returns measurements which are describbed
+# 3. With MCAR and MA (35:95, by 5) scenarios (13 * 4), each scenario returns measurements which are describbed
 # in age.mixing.MCAR.fun and age.mixing.MCAR.fun scripts):
 
 # Missing Completly at Random has 13 scenarios
