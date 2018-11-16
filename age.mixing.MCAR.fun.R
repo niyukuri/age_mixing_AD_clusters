@@ -60,6 +60,10 @@
 # table.tree.trans.true.age.str.WtoM.prop.men, table.tree.trans.true.age.str.prop.women,
 # numbers.individuals.age.groups.net, mean.AD.age.groups.net, med.AD.age.groups.net, sd.AD.age.groups.net
 
+# (iv) True age mixing patterns in relationships
+
+# "T.AAD.male", "T.SDAD.male", "T.slope.male", "T.WSD.male", "T.BSD.male", "T.intercept.male"
+# "T.p.prev.6months.m", # "T.p.prev.6months.f",
 
 # (iv) Transmission clusters
 
