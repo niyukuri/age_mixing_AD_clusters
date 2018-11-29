@@ -314,7 +314,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     epi.transm.incidence.df.15.24.men <- incidence.calculator(datalist = datalist.agemix,
                                                               agegroup = c(15, 25),
-                                                              timewindow = c(39, 40),
+                                                              timewindow = timewindow,
                                                               only.active = "No") %>%
       dplyr::select(incidence) %>%
       dplyr::slice(1) %>%
@@ -322,7 +322,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     epi.transm.incidence.df.15.24.women <- incidence.calculator(datalist = datalist.agemix,
                                                                 agegroup = c(15, 25),
-                                                                timewindow = c(39, 40),
+                                                                timewindow = timewindow,
                                                                 only.active = "No") %>%
       dplyr::select(incidence) %>%
       dplyr::slice(2) %>%
@@ -332,7 +332,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     epi.transm.incidence.df.25.39.men <- incidence.calculator(datalist = datalist.agemix,
                                                               agegroup = c(25, 40),
-                                                              timewindow = c(39, 40),
+                                                              timewindow = timewindow,
                                                               only.active = "No") %>%
       dplyr::select(incidence) %>%
       dplyr::slice(1) %>%
@@ -340,7 +340,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     epi.transm.incidence.df.25.39.women <- incidence.calculator(datalist = datalist.agemix,
                                                                 agegroup = c(25, 40),
-                                                                timewindow = c(39, 40),
+                                                                timewindow = timewindow,
                                                                 only.active = "No") %>%
       dplyr::select(incidence) %>%
       dplyr::slice(2) %>%
@@ -349,7 +349,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     epi.transm.incidence.df.40.49.men <- incidence.calculator(datalist = datalist.agemix,
                                                               agegroup = c(40, 50),
-                                                              timewindow = c(39, 40),
+                                                              timewindow = timewindow,
                                                               only.active = "No") %>%
       dplyr::select(incidence) %>%
       dplyr::slice(1) %>%
@@ -357,7 +357,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     epi.transm.incidence.df.40.49.women <- incidence.calculator(datalist = datalist.agemix,
                                                                 agegroup = c(40, 50),
-                                                                timewindow = c(39, 40),
+                                                                timewindow = timewindow,
                                                                 only.active = "No") %>%
       dplyr::select(incidence) %>%
       dplyr::slice(2) %>%
