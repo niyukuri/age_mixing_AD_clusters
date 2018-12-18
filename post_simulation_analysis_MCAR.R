@@ -82,11 +82,20 @@ quant.med <- function(input){
 # Reading simulation ouput ------------------------------------------------
 
 
-dr = read.csv("Results.mcarmar.large.AD.csv")
+# dr = read.csv("Results.mcarmar.large.AD.csv")
+
+dr1 = read.csv("/home/david/age_mixing_AD_clusters/Results.mcarmar.large.AD_280_111.csv")
+dr2 = read.csv("/home/david/age_mixing_AD_clusters/Results.mcarmar.large.AD_280_777.csv")
+
+dr1.names <- names(dr1)
+
+# dr = rbind(dr1, dr2)
 
 # dr = na.omit(dr)
 
+dr1.1 <- as.matrix(dr1)
 
+dr <- dr1
 
 # Population level epidemic metrics ---------------------------------------
 
@@ -560,20 +569,20 @@ rownames(cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50"
 
 
 
-CI.cov.100.age.groups.table <- matrix(c(paste(M.15.25.F.15.25.cov.100[2], "[", M.15.25.F.15.25.cov.100[1], "-", M.15.25.F.15.25.cov.100[3], "]"), 
-                                        paste(M.15.25.F.25.40.cov.100[2], "[", M.15.25.F.25.40.cov.100[1], "-", M.15.25.F.25.40.cov.100[3], "]"), 
-                                        paste(M.15.25.F.40.50.cov.100[2], "[", M.15.25.F.40.50.cov.100[1], "-", M.15.25.F.25.40.cov.100[3], "]"),
-                                        paste(M.25.40.F.15.25.cov.100[2], "[", M.25.40.F.15.25.cov.100[1], "-", M.25.40.F.15.25.cov.100[3], "]"), 
-                                        paste(M.25.40.F.25.40.cov.100[2], "[", M.25.40.F.25.40.cov.100[1], "-", M.25.40.F.25.40.cov.100[3], "]"), 
-                                        paste(M.25.40.F.40.50.cov.100[2], "[", M.25.40.F.40.50.cov.100[1], "-", M.25.40.F.40.50.cov.100[3], "]"),
-                                        paste(M.40.50.F.15.25.cov.100[2], "[", M.40.50.F.15.25.cov.100[1], "-", M.40.50.F.15.25.cov.100[3], "]"), 
-                                        paste(M.40.50.F.25.40.cov.100[2], "[", M.40.50.F.25.40.cov.100[1], "-", M.40.50.F.25.40.cov.100[3], "]"), 
-                                        paste(M.40.50.F.40.50.cov.100[2], "[", M.40.50.F.40.50.cov.100[1], "-", M.40.50.F.40.50.cov.100[3], "]")),
-                                      ncol = 3,
-                                      byrow = TRUE)
-
-colnames(CI.cov.100.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
-rownames(CI.cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+# CI.cov.100.age.groups.table <- matrix(c(paste(M.15.25.F.15.25.cov.100[2], "[", M.15.25.F.15.25.cov.100[1], "-", M.15.25.F.15.25.cov.100[3], "]"), 
+#                                         paste(M.15.25.F.25.40.cov.100[2], "[", M.15.25.F.25.40.cov.100[1], "-", M.15.25.F.25.40.cov.100[3], "]"), 
+#                                         paste(M.15.25.F.40.50.cov.100[2], "[", M.15.25.F.40.50.cov.100[1], "-", M.15.25.F.25.40.cov.100[3], "]"),
+#                                         paste(M.25.40.F.15.25.cov.100[2], "[", M.25.40.F.15.25.cov.100[1], "-", M.25.40.F.15.25.cov.100[3], "]"), 
+#                                         paste(M.25.40.F.25.40.cov.100[2], "[", M.25.40.F.25.40.cov.100[1], "-", M.25.40.F.25.40.cov.100[3], "]"), 
+#                                         paste(M.25.40.F.40.50.cov.100[2], "[", M.25.40.F.40.50.cov.100[1], "-", M.25.40.F.40.50.cov.100[3], "]"),
+#                                         paste(M.40.50.F.15.25.cov.100[2], "[", M.40.50.F.15.25.cov.100[1], "-", M.40.50.F.15.25.cov.100[3], "]"), 
+#                                         paste(M.40.50.F.25.40.cov.100[2], "[", M.40.50.F.25.40.cov.100[1], "-", M.40.50.F.25.40.cov.100[3], "]"), 
+#                                         paste(M.40.50.F.40.50.cov.100[2], "[", M.40.50.F.40.50.cov.100[1], "-", M.40.50.F.40.50.cov.100[3], "]")),
+#                                       ncol = 3,
+#                                       byrow = TRUE)
+# 
+# colnames(CI.cov.100.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+# rownames(CI.cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
 
 
 # Cov 35
@@ -1859,6 +1868,7 @@ d.MCAR.cov.95.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.men[,1
 d.MCAR.cov.95.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.women[,1])
 
 d.MCAR.cov.95.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.men[,2])
+
 d.MCAR.cov.95.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.women[,2])
 
 d.MCAR.cov.95.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.men[,3])
@@ -2644,7 +2654,7 @@ cl.prop.women40.50.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
                                                d.MCAR.cov.95.cl.prop.women40.50.M.40.50[3], d.MCAR.true.cov.100.prop.women40.50.M.40.50[3]))
 
 
-cl.prop.women40.50.M.40.50 <- ggplot(cl.prop.women40.50.M.40.50, aes(x = x, y = F)) +
+plot.cl.prop.women40.50.M.40.50 <- ggplot(cl.prop.women40.50.M.40.50, aes(x = x, y = F)) +
   geom_point(size = 4) +
   geom_errorbar(aes(ymax = U, ymin = L)) +
   ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 40 - 50 - MCAR") +
@@ -2653,7 +2663,7 @@ cl.prop.women40.50.M.40.50 <- ggplot(cl.prop.women40.50.M.40.50, aes(x = x, y = 
 
 
 ggsave(filename = "cl.prop.women40.50.M.40.50.png",
-       plot = cl.prop.women40.50.M.40.50,
+       plot = plot.cl.prop.women40.50.M.40.50,
        path = "~/age_mixing_AD_clusters",
        width = 10, height = 8, units = "cm")
 
@@ -3048,6 +3058,7 @@ d.MCAR.cov.90.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.90.cl.true
 
 d.MCAR.cov.95.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.men[,1])
 d.MCAR.cov.95.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.women[,1])
+
 
 d.MCAR.cov.95.cl.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.men[,2])
 d.MCAR.cov.95.cl.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.women[,2])
@@ -11245,37 +11256,46 @@ error.infer.clust.cov.100.men.40.50.cov.35.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.35.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.35.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.35.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.35.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.35 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.35.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.35.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.35.mean)
+
 
 
 error.infer.clust.cov.100.women.40.50.cov.35.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.35.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.35.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.35.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.35.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.35.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.35.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.35.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.35.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.35.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.35.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.35.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.35.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.35.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.35.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.35.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.35 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.35.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.35.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.35.med)
+
 
 
 error.infer.clust.cov.100.women.40.50.cov.35.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.35.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.35.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.35.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.35.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.35.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.35.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.35.AD.women.cl.40.50)
-
+MRE.error.infer.clust.cov.100.women.40.50.cov.35.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.35.med)
 
 # Standard deviation
 error.infer.clust.cov.100.men.40.50.cov.35.sd <- as.numeric(vector.sd.AD.num.men.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.35.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.35.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.35.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.35.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.35.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.35 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.35.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.35.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.35.sd)
+
 
 
 error.infer.clust.cov.100.women.40.50.cov.35.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.35.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.35.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.35.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.35.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.35.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.35.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.35.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.35.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.35.sd)
 
 
 # Cov 40
@@ -11287,24 +11307,29 @@ error.infer.clust.cov.100.men.15.25.cov.40.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.40.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.40.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.40.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.40.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.40 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.40.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.40.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.40.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.40.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.40.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.40.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.40.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.40.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.40.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.40.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.40.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.40.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.40.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.40.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.40.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.40.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.40.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.40.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.40.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.40 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.40.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.40.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.40.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.40.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.40.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.40.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.40.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.40.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.40.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.40.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.40.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.40.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.40.med)
 
 
 # Standard deviation
@@ -11312,12 +11337,14 @@ error.infer.clust.cov.100.men.15.25.cov.40.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.40.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.40.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.40.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.40.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.40 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.40.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.40.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.40.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.40.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.40.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.40.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.40.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.40.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.40.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.40.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.40.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.40.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.40.sd)
 
 
 # 25.40
@@ -11327,24 +11354,29 @@ error.infer.clust.cov.100.men.25.40.cov.40.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.40.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.40.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.40.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.40.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.40 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.40.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.40.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.40.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.40.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.40.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.40.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.40.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.40.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.40.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.40.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.40.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.40.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.40.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.40.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.40.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.40.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.40.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.40.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.40.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.40 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.40.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.40.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.40.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.40.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.40.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.40.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.40.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.40.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.40.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.40.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.40.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.40.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.40.med)
 
 
 # Standard deviation
@@ -11352,12 +11384,14 @@ error.infer.clust.cov.100.men.25.40.cov.40.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.40.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.40.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.40.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.40.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.40 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.40.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.40.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.40.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.40.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.40.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.40.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.40.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.40.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.40.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.40.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.40.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.40.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.40.sd)
 
 
 # 40.50
@@ -11367,24 +11401,29 @@ error.infer.clust.cov.100.men.40.50.cov.40.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.40.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.40.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.40.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.40.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.40 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.40.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.40.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.40.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.40.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.40.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.40.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.40.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.40.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.40.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.40.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.40.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.40.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.40.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.40.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.40.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.40.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.40.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.40.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.40.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.40 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.40.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.40.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.40.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.40.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.40.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.40.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.40.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.40.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.40.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.40.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.40.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.40.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.40.med)
 
 
 # Standard deviation
@@ -11392,12 +11431,14 @@ error.infer.clust.cov.100.men.40.50.cov.40.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.40.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.40.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.40.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.40.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.40 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.40.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.40.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.40.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.40.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.40.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.40.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.40.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.40.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.40.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.40.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.40.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.40.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.40.sd)
 
 
 # Cov 45
@@ -11409,24 +11450,29 @@ error.infer.clust.cov.100.men.15.25.cov.45.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.45.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.45.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.45.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.45.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.45 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.45.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.45.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.45.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.45.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.45.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.45.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.45.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.45.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.45.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.45.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.45.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.45.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.45.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.45.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.45.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.45.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.45.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.45.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.45.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.45 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.45.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.45.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.45.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.45.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.45.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.45.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.45.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.45.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.45.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.45.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.45.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.45.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.45.med)
 
 
 # Standard deviation
@@ -11434,12 +11480,14 @@ error.infer.clust.cov.100.men.15.25.cov.45.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.45.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.45.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.45.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.45.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.45 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.45.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.45.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.45.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.45.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.45.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.45.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.45.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.45.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.45.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.45.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.45.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.45.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.45.sd)
 
 
 # 25.40
@@ -11449,24 +11497,29 @@ error.infer.clust.cov.100.men.25.40.cov.45.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.45.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.45.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.45.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.45.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.45 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.45.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.45.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.45.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.45.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.45.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.45.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.45.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.45.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.45.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.45.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.45.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.45.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.45.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.45.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.45.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.45.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.45.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.45.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.45.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.45 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.45.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.45.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.45.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.45.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.45.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.45.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.45.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.45.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.45.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.45.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.45.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.45.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.45.med)
 
 
 # Standard deviation
@@ -11474,12 +11527,14 @@ error.infer.clust.cov.100.men.25.40.cov.45.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.45.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.45.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.45.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.45.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.45 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.45.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.45.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.45.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.45.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.45.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.45.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.45.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.45.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.45.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.45.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.45.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.45.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.45.sd)
 
 
 # 40.50
@@ -11489,24 +11544,29 @@ error.infer.clust.cov.100.men.40.50.cov.45.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.45.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.45.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.45.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.45.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.45 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.45.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.45.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.45.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.45.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.45.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.45.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.45.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.45.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.45.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.45.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.45.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.45.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.45.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.45.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.45.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.45.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.45.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.45.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.45.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.45 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.45.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.45.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.45.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.45.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.45.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.45.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.45.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.45.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.45.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.45.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.45.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.45.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.45.med)
 
 
 # Standard deviation
@@ -11514,12 +11574,14 @@ error.infer.clust.cov.100.men.40.50.cov.45.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.45.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.45.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.45.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.45.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.45 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.45.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.45.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.45.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.45.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.45.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.45.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.45.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.45.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.45.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.45.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.45.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.45.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.45.sd)
 
 
 # Cov 50
@@ -11531,24 +11593,29 @@ error.infer.clust.cov.100.men.15.25.cov.50.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.50.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.50.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.50.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.50.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.50 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.50.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.50.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.50.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.50.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.50.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.50.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.50.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.50.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.50.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.50.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.50.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.50.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.50.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.50.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.50.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.50.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.50.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.50.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.50.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.50 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.50.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.50.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.50.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.50.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.50.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.50.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.50.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.50.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.50.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.50.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.50.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.50.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.50.med)
 
 
 # Standard deviation
@@ -11556,12 +11623,14 @@ error.infer.clust.cov.100.men.15.25.cov.50.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.50.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.50.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.50.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.50.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.50 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.50.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.50.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.50.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.50.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.50.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.50.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.50.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.50.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.50.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.50.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.50.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.50.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.50.sd)
 
 
 # 25.40
@@ -11571,24 +11640,29 @@ error.infer.clust.cov.100.men.25.40.cov.50.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.50.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.50.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.50.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.50.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.50 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.50.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.50.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.50.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.50.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.50.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.50.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.50.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.50.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.50.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.50.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.50.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.50.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.50.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.50.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.50.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.50.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.50.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.50.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.50.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.50 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.50.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.50.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.50.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.50.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.50.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.50.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.50.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.50.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.50.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.50.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.50.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.50.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.50.med)
 
 
 # Standard deviation
@@ -11596,12 +11670,14 @@ error.infer.clust.cov.100.men.25.40.cov.50.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.50.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.50.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.50.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.50.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.50 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.50.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.50.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.50.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.50.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.50.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.50.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.50.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.50.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.50.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.50.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.50.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.50.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.50.sd)
 
 
 # 40.50
@@ -11611,24 +11687,29 @@ error.infer.clust.cov.100.men.40.50.cov.50.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.50.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.50.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.50.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.50.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.50 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.50.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.50.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.50.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.50.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.50.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.50.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.50.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.50.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.50.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.50.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.50.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.50.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.50.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.50.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.50.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.50.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.50.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.50.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.50.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.50 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.50.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.50.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.50.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.50.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.50.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.50.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.50.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.50.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.50.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.50.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.50.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.50.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.50.med)
 
 
 # Standard deviation
@@ -11636,12 +11717,14 @@ error.infer.clust.cov.100.men.40.50.cov.50.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.50.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.50.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.50.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.50.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.50 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.50.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.50.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.50.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.50.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.50.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.50.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.50.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.50.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.50.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.50.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.50.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.50.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.50.sd)
 
 
 
@@ -11654,24 +11737,29 @@ error.infer.clust.cov.100.men.15.25.cov.55.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.55.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.55.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.55.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.55.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.55 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.55.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.55.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.55.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.55.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.55.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.55.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.55.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.55.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.55.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.55.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.55.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.55.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.55.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.55.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.55.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.55.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.55.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.55.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.55.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.55 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.55.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.55.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.55.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.55.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.55.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.55.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.55.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.55.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.55.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.55.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.55.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.55.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.55.med)
 
 
 # Standard deviation
@@ -11679,12 +11767,14 @@ error.infer.clust.cov.100.men.15.25.cov.55.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.55.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.55.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.55.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.55.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.55 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.55.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.55.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.55.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.55.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.55.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.55.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.55.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.55.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.55.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.55.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.55.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.55.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.55.sd)
 
 
 # 25.40
@@ -11694,24 +11784,29 @@ error.infer.clust.cov.100.men.25.40.cov.55.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.55.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.55.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.55.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.55.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.55 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.55.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.55.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.55.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.55.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.55.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.55.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.55.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.55.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.55.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.55.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.55.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.55.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.55.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.55.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.55.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.55.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.55.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.55.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.55.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.55 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.55.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.55.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.55.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.55.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.55.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.55.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.55.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.55.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.55.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.55.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.55.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.55.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.55.med)
 
 
 # Standard deviation
@@ -11719,12 +11814,14 @@ error.infer.clust.cov.100.men.25.40.cov.55.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.55.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.55.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.55.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.55.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.55 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.55.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.55.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.55.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.55.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.55.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.55.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.55.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.55.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.55.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.55.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.55.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.55.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.55.sd)
 
 
 # 40.50
@@ -11734,24 +11831,29 @@ error.infer.clust.cov.100.men.40.50.cov.55.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.55.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.55.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.55.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.55.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.55 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.55.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.55.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.55.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.55.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.55.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.55.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.55.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.55.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.55.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.55.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.55.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.55.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.55.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.55.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.55.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.55.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.55.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.55.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.55.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.55 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.55.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.55.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.55.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.55.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.55.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.55.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.55.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.55.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.55.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.55.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.55.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.55.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.55.med)
 
 
 # Standard deviation
@@ -11759,12 +11861,14 @@ error.infer.clust.cov.100.men.40.50.cov.55.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.55.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.55.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.55.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.55.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.55 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.55.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.55.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.55.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.55.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.55.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.55.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.55.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.55.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.55.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.55.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.55.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.55.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.55.sd)
 
 
 # Cov 60
@@ -11776,24 +11880,28 @@ error.infer.clust.cov.100.men.15.25.cov.60.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.60.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.60.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.60.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.60.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.60 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.60.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.60.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.60.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.60.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.60.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.60.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.60.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.60.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.60.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.60.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.60.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.60.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.60.mean)
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.60.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.60.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.60.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.60.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.60.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.60.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.60 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.60.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.60.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.60.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.60.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.60.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.60.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.60.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.60.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.60.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.60.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.60.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.60.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.60.med)
 
 
 # Standard deviation
@@ -11801,12 +11909,14 @@ error.infer.clust.cov.100.men.15.25.cov.60.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.60.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.60.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.60.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.60.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.60 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.60.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.60.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.60.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.60.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.60.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.60.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.60.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.60.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.60.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.60.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.60.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.60.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.60.sd)
 
 
 # 25.40
@@ -11816,24 +11926,29 @@ error.infer.clust.cov.100.men.25.40.cov.60.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.60.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.60.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.60.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.60.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.60 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.60.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.60.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.60.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.60.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.60.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.60.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.60.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.60.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.60.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.60.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.60.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.60.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.60.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.60.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.60.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.60.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.60.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.60.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.60.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.60 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.60.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.60.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.60.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.60.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.60.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.60.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.60.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.60.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.60.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.60.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.60.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.60.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.60.med)
 
 
 # Standard deviation
@@ -11841,12 +11956,14 @@ error.infer.clust.cov.100.men.25.40.cov.60.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.60.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.60.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.60.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.60.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.60 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.60.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.60.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.60.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.60.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.60.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.60.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.60.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.60.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.60.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.60.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.60.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.60.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.60.sd)
 
 
 # 40.50
@@ -11856,24 +11973,29 @@ error.infer.clust.cov.100.men.40.50.cov.60.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.60.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.60.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.60.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.60.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.60 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.60.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.60.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.60.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.60.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.60.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.60.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.60.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.60.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.60.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.60.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.60.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.60.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.60.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.60.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.60.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.60.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.60.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.60.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.60.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.60 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.60.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.60.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.60.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.60.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.60.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.60.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.60.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.60.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.60.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.60.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.60.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.60.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.60.med)
 
 
 # Standard deviation
@@ -11881,12 +12003,14 @@ error.infer.clust.cov.100.men.40.50.cov.60.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.60.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.60.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.60.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.60.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.60 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.60.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.60.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.60.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.60.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.60.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.60.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.60.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.60.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.60.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.60.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.60.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.60.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.60.sd)
 
 
 
@@ -11899,24 +12023,30 @@ error.infer.clust.cov.100.men.15.25.cov.65.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.65.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.65.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.65.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.65.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.65 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.65.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.65.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.65.mean)
+
 
 
 error.infer.clust.cov.100.women.15.25.cov.65.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.65.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.65.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.65.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.65.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.65.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.65.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.65.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.65.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.65.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.65.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.65.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.65.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.65.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.65.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.65.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.65 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.65.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.65.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.65.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.65.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.65.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.65.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.65.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.65.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.65.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.65.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.65.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.65.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.65.med)
 
 
 # Standard deviation
@@ -11924,12 +12054,14 @@ error.infer.clust.cov.100.men.15.25.cov.65.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.65.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.65.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.65.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.65.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.65 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.65.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.65.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.65.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.65.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.65.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.65.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.65.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.65.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.65.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.65.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.65.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.65.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.65.sd)
 
 
 # 25.40
@@ -11939,24 +12071,29 @@ error.infer.clust.cov.100.men.25.40.cov.65.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.65.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.65.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.65.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.65.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.65 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.65.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.65.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.65.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.65.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.65.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.65.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.65.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.65.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.65.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.65.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.65.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.65.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.65.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.65.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.65.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.65.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.65.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.65.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.65.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.65 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.65.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.65.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.65.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.65.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.65.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.65.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.65.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.65.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.65.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.65.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.65.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.65.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.65.med)
 
 
 # Standard deviation
@@ -11964,12 +12101,14 @@ error.infer.clust.cov.100.men.25.40.cov.65.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.65.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.65.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.65.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.65.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.65 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.65.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.65.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.65.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.65.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.65.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.65.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.65.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.65.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.65.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.65.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.65.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.65.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.65.sd)
 
 
 # 40.50
@@ -11979,24 +12118,29 @@ error.infer.clust.cov.100.men.40.50.cov.65.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.65.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.65.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.65.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.65.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.65 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.65.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.65.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.65.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.65.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.65.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.65.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.65.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.65.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.65.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.65.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.65.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.65.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.65.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.65.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.65.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.65.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.65.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.65.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.65.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.65 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.65.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.65.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.65.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.65.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.65.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.65.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.65.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.65.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.65.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.65.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.65.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.65.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.65.med)
 
 
 # Standard deviation
@@ -12004,12 +12148,14 @@ error.infer.clust.cov.100.men.40.50.cov.65.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.65.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.65.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.65.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.65.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.65 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.65.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.65.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.65.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.65.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.65.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.65.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.65.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.65.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.65.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.65.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.65.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.65.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.65.sd)
 
 
 
@@ -12022,24 +12168,29 @@ error.infer.clust.cov.100.men.15.25.cov.70.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.70.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.70.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.70.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.70.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.70 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.70.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.70.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.70.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.70.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.70.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.70.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.70.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.70.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.70.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.70.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.70.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.70.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.70.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.70.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.70.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.70.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.70.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.70.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.70.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.70 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.70.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.70.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.70.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.70.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.70.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.70.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.70.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.70.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.70.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.70.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.70.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.70.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.70.med)
 
 
 # Standard deviation
@@ -12047,12 +12198,13 @@ error.infer.clust.cov.100.men.15.25.cov.70.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.70.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.70.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.70.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.70.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.70 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.70.AD.men.cl.15.25)
-
+MRE.error.infer.clust.cov.100.men.15.25.cov.70.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.70.sd)
 
 error.infer.clust.cov.100.women.15.25.cov.70.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.70.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.70.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.70.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.70.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.70.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.70.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.70.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.70.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.70.sd)
 
 
 # 25.40
@@ -12062,24 +12214,29 @@ error.infer.clust.cov.100.men.25.40.cov.70.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.70.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.70.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.70.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.70.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.70 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.70.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.70.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.70.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.70.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.70.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.70.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.70.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.70.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.70.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.70.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.70.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.70.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.70.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.70.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.70.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.70.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.70.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.70.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.70.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.70 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.70.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.70.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.70.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.70.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.70.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.70.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.70.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.70.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.70.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.70.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.70.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.70.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.70.med)
 
 
 # Standard deviation
@@ -12087,12 +12244,14 @@ error.infer.clust.cov.100.men.25.40.cov.70.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.70.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.70.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.70.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.70.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.70 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.70.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.70.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.70.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.70.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.70.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.70.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.70.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.70.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.70.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.70.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.70.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.70.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.70.sd)
 
 
 # 40.50
@@ -12102,24 +12261,30 @@ error.infer.clust.cov.100.men.40.50.cov.70.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.70.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.70.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.70.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.70.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.70 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.70.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.70.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.70.mean)
+
 
 
 error.infer.clust.cov.100.women.40.50.cov.70.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.70.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.70.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.70.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.70.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.70.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.70.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.70.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.70.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.70.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.70.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.70.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.70.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.70.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.70.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.70.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.70 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.70.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.70.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.70.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.70.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.70.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.70.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.70.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.70.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.70.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.70.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.70.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.70.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.70.med)
 
 
 # Standard deviation
@@ -12127,12 +12292,14 @@ error.infer.clust.cov.100.men.40.50.cov.70.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.70.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.70.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.70.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.70.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.70 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.70.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.70.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.70.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.70.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.70.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.70.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.70.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.70.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.70.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.70.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.70.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.70.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.70.sd)
 
 
 # Cov 75
@@ -12145,24 +12312,29 @@ error.infer.clust.cov.100.men.15.25.cov.75.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.75.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.75.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.75.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.75.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.75 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.75.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.75.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.75.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.75.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.75.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.75.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.75.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.75.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.75.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.75.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.75.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.75.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.75.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.75.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.75.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.75.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.75.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.75.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.75.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.75 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.75.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.75.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.75.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.75.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.75.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.75.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.75.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.75.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.75.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.75.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.75.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.75.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.75.med)
 
 
 # Standard deviation
@@ -12170,12 +12342,14 @@ error.infer.clust.cov.100.men.15.25.cov.75.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.75.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.75.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.75.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.75.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.75 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.75.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.75.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.75.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.75.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.75.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.75.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.75.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.75.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.75.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.75.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.75.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.75.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.75.sd)
 
 
 # 25.40
@@ -12185,24 +12359,29 @@ error.infer.clust.cov.100.men.25.40.cov.75.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.75.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.75.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.75.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.75.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.75 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.75.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.75.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.75.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.75.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.75.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.75.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.75.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.75.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.75.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.75.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.75.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.75.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.75.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.75.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.75.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.75.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.75.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.75.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.75.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.75 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.75.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.75.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.75.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.75.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.75.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.75.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.75.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.75.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.75.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.75.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.75.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.75.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.75.med)
 
 
 # Standard deviation
@@ -12210,12 +12389,14 @@ error.infer.clust.cov.100.men.25.40.cov.75.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.75.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.75.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.75.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.75.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.75 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.75.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.75.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.75.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.75.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.75.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.75.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.75.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.75.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.75.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.75.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.75.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.75.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.75.sd)
 
 
 # 40.50
@@ -12225,24 +12406,29 @@ error.infer.clust.cov.100.men.40.50.cov.75.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.75.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.75.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.75.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.75.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.75 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.75.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.75.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.75.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.75.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.75.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.75.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.75.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.75.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.75.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.75.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.75.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.75.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.75.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.75.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.75.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.75.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.75.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.75.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.75.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.75 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.75.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.75.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.75.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.75.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.75.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.75.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.75.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.75.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.75.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.75.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.75.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.75.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.75.med)
 
 
 # Standard deviation
@@ -12250,12 +12436,14 @@ error.infer.clust.cov.100.men.40.50.cov.75.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.75.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.75.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.75.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.75.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.75 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.75.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.75.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.75.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.75.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.75.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.75.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.75.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.75.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.75.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.75.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.75.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.75.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.75.sd)
 
 
 # Cov 80
@@ -12268,24 +12456,29 @@ error.infer.clust.cov.100.men.15.25.cov.80.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.80.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.80.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.80.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.80.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.80 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.80.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.80.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.80.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.80.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.80.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.80.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.80.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.80.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.80.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.80.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.80.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.80.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.80.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.80.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.80.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.80.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.80.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.80.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.80.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.80 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.80.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.80.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.80.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.80.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.80.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.80.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.80.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.80.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.80.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.80.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.80.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.80.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.80.med)
 
 
 # Standard deviation
@@ -12293,12 +12486,14 @@ error.infer.clust.cov.100.men.15.25.cov.80.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.80.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.80.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.80.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.80.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.80 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.80.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.80.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.80.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.80.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.80.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.80.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.80.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.80.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.80.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.80.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.80.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.80.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.80.sd)
 
 
 # 25.40
@@ -12308,24 +12503,29 @@ error.infer.clust.cov.100.men.25.40.cov.80.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.80.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.80.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.80.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.80.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.80 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.80.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.80.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.80.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.80.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.80.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.80.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.80.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.80.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.80.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.80.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.80.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.80.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.80.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.80.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.80.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.80.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.80.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.80.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.80.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.80 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.80.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.80.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.80.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.80.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.80.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.80.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.80.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.80.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.80.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.80.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.80.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.80.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.80.med)
 
 
 # Standard deviation
@@ -12333,12 +12533,14 @@ error.infer.clust.cov.100.men.25.40.cov.80.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.80.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.80.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.80.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.80.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.80 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.80.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.80.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.80.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.80.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.80.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.80.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.80.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.80.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.80.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.80.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.80.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.80.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.80.sd)
 
 
 # 40.50
@@ -12348,24 +12550,29 @@ error.infer.clust.cov.100.men.40.50.cov.80.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.80.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.80.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.80.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.80.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.80 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.80.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.80.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.80.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.80.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.80.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.80.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.80.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.80.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.80.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.80.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.80.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.80.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.80.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.80.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.80.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.80.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.80.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.80.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.80.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.80 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.80.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.80.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.80.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.80.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.80.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.80.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.80.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.80.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.80.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.80.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.80.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.80.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.80.med)
 
 
 # Standard deviation
@@ -12373,12 +12580,14 @@ error.infer.clust.cov.100.men.40.50.cov.80.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.80.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.80.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.80.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.80.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.80 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.80.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.80.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.80.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.80.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.80.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.80.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.80.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.80.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.80.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.80.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.80.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.80.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.80.sd)
 
 
 # Cov 85
@@ -12390,24 +12599,29 @@ error.infer.clust.cov.100.men.15.25.cov.85.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.85.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.85.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.85.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.85.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.85 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.85.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.85.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.85.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.85.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.85.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.85.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.85.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.85.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.85.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.85.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.85.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.85.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.85.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.85.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.85.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.85.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.85.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.85.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.85.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.85 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.85.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.85.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.85.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.85.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.85.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.85.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.85.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.85.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.85.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.85.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.85.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.85.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.85.med)
 
 
 # Standard deviation
@@ -12415,12 +12629,14 @@ error.infer.clust.cov.100.men.15.25.cov.85.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.85.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.85.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.85.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.85.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.85 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.85.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.85.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.85.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.85.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.85.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.85.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.85.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.85.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.85.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.85.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.85.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.85.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.85.sd)
 
 
 # 25.40
@@ -12430,24 +12646,29 @@ error.infer.clust.cov.100.men.25.40.cov.85.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.85.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.85.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.85.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.85.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.85 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.85.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.85.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.85.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.85.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.85.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.85.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.85.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.85.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.85.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.85.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.85.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.85.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.85.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.85.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.85.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.85.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.85.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.85.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.85.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.85 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.85.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.85.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.85.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.85.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.85.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.85.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.85.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.85.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.85.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.85.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.85.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.85.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.85.med)
 
 
 # Standard deviation
@@ -12455,12 +12676,14 @@ error.infer.clust.cov.100.men.25.40.cov.85.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.85.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.85.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.85.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.85.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.85 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.85.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.85.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.85.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.85.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.85.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.85.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.85.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.85.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.85.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.85.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.85.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.85.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.85.sd)
 
 
 # 40.50
@@ -12470,24 +12693,29 @@ error.infer.clust.cov.100.men.40.50.cov.85.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.85.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.85.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.85.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.85.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.85 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.85.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.85.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.85.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.85.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.85.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.85.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.85.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.85.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.85.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.85.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.85.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.85.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.85.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.85.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.85.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.85.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.85.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.85.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.85.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.85 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.85.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.85.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.85.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.85.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.85.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.85.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.85.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.85.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.85.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.85.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.85.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.85.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.85.med)
 
 
 # Standard deviation
@@ -12495,12 +12723,14 @@ error.infer.clust.cov.100.men.40.50.cov.85.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.85.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.85.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.85.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.85.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.85 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.85.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.85.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.85.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.85.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.85.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.85.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.85.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.85.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.85.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.85.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.85.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.85.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.85.sd)
 
 
 # Cov 90
@@ -12512,24 +12742,29 @@ error.infer.clust.cov.100.men.15.25.cov.90.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.90.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.90.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.90.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.90.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.90 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.90.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.90.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.90.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.90.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.90.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.90.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.90.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.90.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.90.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.90.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.90.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.90.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.90.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.90.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.90.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.90.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.90.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.90.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.90.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.90 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.90.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.90.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.90.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.90.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.90.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.90.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.90.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.90.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.90.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.90.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.90.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.90.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.90.med)
 
 
 # Standard deviation
@@ -12537,12 +12772,14 @@ error.infer.clust.cov.100.men.15.25.cov.90.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.90.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.90.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.90.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.90.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.90 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.90.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.90.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.90.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.90.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.90.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.90.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.90.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.90.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.90.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.90.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.90.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.90.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.90.sd)
 
 
 # 25.40
@@ -12552,24 +12789,29 @@ error.infer.clust.cov.100.men.25.40.cov.90.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.90.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.90.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.90.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.90.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.90 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.90.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.90.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.90.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.90.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.90.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.90.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.90.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.90.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.90.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.90.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.90.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.90.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.90.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.90.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.90.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.90.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.90.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.90.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.90.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.90 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.90.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.90.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.90.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.90.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.90.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.90.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.90.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.90.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.90.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.90.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.90.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.90.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.90.med)
 
 
 # Standard deviation
@@ -12577,12 +12819,14 @@ error.infer.clust.cov.100.men.25.40.cov.90.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.90.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.90.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.90.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.90.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.90 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.90.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.90.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.90.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.90.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.90.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.90.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.90.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.90.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.90.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.90.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.90.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.90.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.90.sd)
 
 
 # 40.50
@@ -12592,24 +12836,29 @@ error.infer.clust.cov.100.men.40.50.cov.90.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.90.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.90.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.90.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.90.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.90 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.90.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.90.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.90.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.90.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.90.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.90.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.90.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.90.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.90.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.90.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.90.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.90.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.90.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.90.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.90.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.90.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.90.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.90.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.90.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.90 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.90.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.90.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.90.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.90.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.90.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.90.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.90.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.90.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.90.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.90.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.90.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.90.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.90.med)
 
 
 # Standard deviation
@@ -12617,12 +12866,14 @@ error.infer.clust.cov.100.men.40.50.cov.90.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.90.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.90.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.90.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.90.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.90 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.90.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.90.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.90.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.90.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.90.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.90.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.90.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.90.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.90.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.90.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.90.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.90.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.90.sd)
 
 
 
@@ -12635,24 +12886,29 @@ error.infer.clust.cov.100.men.15.25.cov.95.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.15.25.cov.95.mean <- RMSE(error.infer.clust.cov.100.men.15.25.cov.95.mean)
 MAE.error.infer.clust.cov.100.men.15.25.cov.95.mean <- MAE(error.infer.clust.cov.100.men.15.25.cov.95.mean)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.95 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.15.25, v2=vector.mean.MCAR.cov.95.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.95.mean <- MRE(error.infer.clust.cov.100.men.15.25.cov.95.mean)
 
 
 error.infer.clust.cov.100.women.15.25.cov.95.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.15.25) - as.numeric(vector.mean.MCAR.cov.95.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.95.mean <- RMSE(error.infer.clust.cov.100.women.15.25.cov.95.mean)
 MAE.error.infer.clust.cov.100.women.15.25.cov.95.mean <- MAE(error.infer.clust.cov.100.women.15.25.cov.95.mean)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.95.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.15.25, v2=vector.mean.MCAR.cov.95.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.95.mean <- MRE(error.infer.clust.cov.100.women.15.25.cov.95.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.15.25.cov.95.med <- as.numeric(vector.med.AD.num.men.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.95.AD.men.cl.15.25)
 RMSE.error.infer.clust.cov.100.men.15.25.cov.95.med <- RMSE(error.infer.clust.cov.100.men.15.25.cov.95.med)
 MAE.error.infer.clust.cov.100.men.15.25.cov.95.med <- MAE(error.infer.clust.cov.100.men.15.25.cov.95.med)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.95 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.15.25, v2=vector.med.MCAR.cov.95.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.95.med <- MRE(error.infer.clust.cov.100.men.15.25.cov.95.med)
 
 
 error.infer.clust.cov.100.women.15.25.cov.95.med <- as.numeric(vector.med.AD.num.women.true.cov.100.15.25) - as.numeric(vector.med.MCAR.cov.95.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.95.med <- RMSE(error.infer.clust.cov.100.women.15.25.cov.95.med)
 MAE.error.infer.clust.cov.100.women.15.25.cov.95.med <- MAE(error.infer.clust.cov.100.women.15.25.cov.95.med)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.95.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.15.25, v2=vector.med.MCAR.cov.95.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.95.med <- MRE(error.infer.clust.cov.100.women.15.25.cov.95.med)
 
 
 # Standard deviation
@@ -12660,12 +12916,14 @@ error.infer.clust.cov.100.men.15.25.cov.95.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.15.25.cov.95.sd <- RMSE(error.infer.clust.cov.100.men.15.25.cov.95.sd)
 MAE.error.infer.clust.cov.100.men.15.25.cov.95.sd <- MAE(error.infer.clust.cov.100.men.15.25.cov.95.sd)
 ARMSE.error.infer.clust.cov.100.men.15.25.cov.95 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.15.25, v2=vector.sd.MCAR.cov.95.AD.men.cl.15.25)
+MRE.error.infer.clust.cov.100.men.15.25.cov.95.sd <- MRE(error.infer.clust.cov.100.men.15.25.cov.95.sd)
 
 
 error.infer.clust.cov.100.women.15.25.cov.95.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.15.25) - as.numeric(vector.sd.MCAR.cov.95.AD.women.cl.15.25)
 RMSE.error.infer.clust.cov.100.women.15.25.cov.95.sd <- RMSE(error.infer.clust.cov.100.women.15.25.cov.95.sd)
 MAE.error.infer.clust.cov.100.women.15.25.cov.95.sd <- MAE(error.infer.clust.cov.100.women.15.25.cov.95.sd)
 ARMSE.error.infer.clust.cov.100.women.15.25.cov.95.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.15.25, v2=vector.sd.MCAR.cov.95.AD.women.cl.15.25)
+MRE.error.infer.clust.cov.100.women.15.25.cov.95.sd <- MRE(error.infer.clust.cov.100.women.15.25.cov.95.sd)
 
 
 # 25.40
@@ -12675,24 +12933,29 @@ error.infer.clust.cov.100.men.25.40.cov.95.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.25.40.cov.95.mean <- RMSE(error.infer.clust.cov.100.men.25.40.cov.95.mean)
 MAE.error.infer.clust.cov.100.men.25.40.cov.95.mean <- MAE(error.infer.clust.cov.100.men.25.40.cov.95.mean)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.95 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.25.40, v2=vector.mean.MCAR.cov.95.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.95.mean <- MRE(error.infer.clust.cov.100.men.25.40.cov.95.mean)
 
 
 error.infer.clust.cov.100.women.25.40.cov.95.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.25.40) - as.numeric(vector.mean.MCAR.cov.95.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.95.mean <- RMSE(error.infer.clust.cov.100.women.25.40.cov.95.mean)
 MAE.error.infer.clust.cov.100.women.25.40.cov.95.mean <- MAE(error.infer.clust.cov.100.women.25.40.cov.95.mean)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.95.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.25.40, v2=vector.mean.MCAR.cov.95.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.95.mean <- MRE(error.infer.clust.cov.100.women.25.40.cov.95.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.25.40.cov.95.med <- as.numeric(vector.med.AD.num.men.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.95.AD.men.cl.25.40)
 RMSE.error.infer.clust.cov.100.men.25.40.cov.95.med <- RMSE(error.infer.clust.cov.100.men.25.40.cov.95.med)
 MAE.error.infer.clust.cov.100.men.25.40.cov.95.med <- MAE(error.infer.clust.cov.100.men.25.40.cov.95.med)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.95 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.25.40, v2=vector.med.MCAR.cov.95.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.95.med <- MRE(error.infer.clust.cov.100.men.25.40.cov.95.med)
 
 
 error.infer.clust.cov.100.women.25.40.cov.95.med <- as.numeric(vector.med.AD.num.women.true.cov.100.25.40) - as.numeric(vector.med.MCAR.cov.95.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.95.med <- RMSE(error.infer.clust.cov.100.women.25.40.cov.95.med)
 MAE.error.infer.clust.cov.100.women.25.40.cov.95.med <- MAE(error.infer.clust.cov.100.women.25.40.cov.95.med)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.95.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.25.40, v2=vector.med.MCAR.cov.95.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.95.med <- MRE(error.infer.clust.cov.100.women.25.40.cov.95.med)
 
 
 # Standard deviation
@@ -12700,12 +12963,14 @@ error.infer.clust.cov.100.men.25.40.cov.95.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.25.40.cov.95.sd <- RMSE(error.infer.clust.cov.100.men.25.40.cov.95.sd)
 MAE.error.infer.clust.cov.100.men.25.40.cov.95.sd <- MAE(error.infer.clust.cov.100.men.25.40.cov.95.sd)
 ARMSE.error.infer.clust.cov.100.men.25.40.cov.95 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.25.40, v2=vector.sd.MCAR.cov.95.AD.men.cl.25.40)
+MRE.error.infer.clust.cov.100.men.25.40.cov.95.sd <- MRE(error.infer.clust.cov.100.men.25.40.cov.95.sd)
 
 
 error.infer.clust.cov.100.women.25.40.cov.95.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.25.40) - as.numeric(vector.sd.MCAR.cov.95.AD.women.cl.25.40)
 RMSE.error.infer.clust.cov.100.women.25.40.cov.95.sd <- RMSE(error.infer.clust.cov.100.women.25.40.cov.95.sd)
 MAE.error.infer.clust.cov.100.women.25.40.cov.95.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.95.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.95.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.95.AD.women.cl.25.40)
+MRE.error.infer.clust.cov.100.women.25.40.cov.95.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.95.sd)
 
 
 # 40.50
@@ -12715,24 +12980,29 @@ error.infer.clust.cov.100.men.40.50.cov.95.mean <- as.numeric(vector.mean.AD.num
 RMSE.error.infer.clust.cov.100.men.40.50.cov.95.mean <- RMSE(error.infer.clust.cov.100.men.40.50.cov.95.mean)
 MAE.error.infer.clust.cov.100.men.40.50.cov.95.mean <- MAE(error.infer.clust.cov.100.men.40.50.cov.95.mean)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.95 <- ARMSE(v1=vector.mean.AD.num.men.true.cov.100.40.50, v2=vector.mean.MCAR.cov.95.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.95.mean <- MRE(error.infer.clust.cov.100.men.40.50.cov.95.mean)
 
 
 error.infer.clust.cov.100.women.40.50.cov.95.mean <- as.numeric(vector.mean.AD.num.women.true.cov.100.40.50) - as.numeric(vector.mean.MCAR.cov.95.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.95.mean <- RMSE(error.infer.clust.cov.100.women.40.50.cov.95.mean)
 MAE.error.infer.clust.cov.100.women.40.50.cov.95.mean <- MAE(error.infer.clust.cov.100.women.40.50.cov.95.mean)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.95.mean <- ARMSE(v1=vector.mean.AD.num.women.true.cov.100.40.50, v2=vector.mean.MCAR.cov.95.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.95.mean <- MRE(error.infer.clust.cov.100.women.40.50.cov.95.mean)
+
 
 # Median
 error.infer.clust.cov.100.men.40.50.cov.95.med <- as.numeric(vector.med.AD.num.men.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.95.AD.men.cl.40.50)
 RMSE.error.infer.clust.cov.100.men.40.50.cov.95.med <- RMSE(error.infer.clust.cov.100.men.40.50.cov.95.med)
 MAE.error.infer.clust.cov.100.men.40.50.cov.95.med <- MAE(error.infer.clust.cov.100.men.40.50.cov.95.med)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.95 <- ARMSE(v1=vector.med.AD.num.men.true.cov.100.40.50, v2=vector.med.MCAR.cov.95.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.95.med <- MRE(error.infer.clust.cov.100.men.40.50.cov.95.med)
 
 
 error.infer.clust.cov.100.women.40.50.cov.95.med <- as.numeric(vector.med.AD.num.women.true.cov.100.40.50) - as.numeric(vector.med.MCAR.cov.95.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.95.med <- RMSE(error.infer.clust.cov.100.women.40.50.cov.95.med)
 MAE.error.infer.clust.cov.100.women.40.50.cov.95.med <- MAE(error.infer.clust.cov.100.women.40.50.cov.95.med)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.95.med <- ARMSE(v1=vector.med.AD.num.women.true.cov.100.40.50, v2=vector.med.MCAR.cov.95.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.95.med <- MRE(error.infer.clust.cov.100.women.40.50.cov.95.med)
 
 
 # Standard deviation
@@ -12740,13 +13010,471 @@ error.infer.clust.cov.100.men.40.50.cov.95.sd <- as.numeric(vector.sd.AD.num.men
 RMSE.error.infer.clust.cov.100.men.40.50.cov.95.sd <- RMSE(error.infer.clust.cov.100.men.40.50.cov.95.sd)
 MAE.error.infer.clust.cov.100.men.40.50.cov.95.sd <- MAE(error.infer.clust.cov.100.men.40.50.cov.95.sd)
 ARMSE.error.infer.clust.cov.100.men.40.50.cov.95 <- ARMSE(v1=vector.sd.AD.num.men.true.cov.100.40.50, v2=vector.sd.MCAR.cov.95.AD.men.cl.40.50)
+MRE.error.infer.clust.cov.100.men.40.50.cov.95.sd <- MRE(error.infer.clust.cov.100.men.40.50.cov.95.sd)
 
 
 error.infer.clust.cov.100.women.40.50.cov.95.sd <- as.numeric(vector.sd.AD.num.women.true.cov.100.40.50) - as.numeric(vector.sd.MCAR.cov.95.AD.women.cl.40.50)
 RMSE.error.infer.clust.cov.100.women.40.50.cov.95.sd <- RMSE(error.infer.clust.cov.100.women.40.50.cov.95.sd)
 MAE.error.infer.clust.cov.100.women.40.50.cov.95.sd <- MAE(error.infer.clust.cov.100.women.40.50.cov.95.sd)
 ARMSE.error.infer.clust.cov.100.women.40.50.cov.95.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.40.50, v2=vector.sd.MCAR.cov.95.AD.women.cl.40.50)
+MRE.error.infer.clust.cov.100.women.40.50.cov.95.sd <- MRE(error.infer.clust.cov.100.women.40.50.cov.95.sd)
 
 
+
+
+
+
+# Visualization AD statistics errors --------------------------------------
+
+
+# 15 - 25
+
+MRE.error.infer.clust.cov.100.women.15.25.AD.mean <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                                
+                                                                F = c(MRE.error.infer.clust.cov.100.women.15.25.cov.35.mean, MRE.error.infer.clust.cov.100.women.15.25.cov.40.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.15.25.cov.45.mean, MRE.error.infer.clust.cov.100.women.15.25.cov.50.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.15.25.cov.55.mean, MRE.error.infer.clust.cov.100.women.15.25.cov.60.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.15.25.cov.65.mean, MRE.error.infer.clust.cov.100.women.15.25.cov.70.mean, 
+                                                                      MRE.error.infer.clust.cov.100.women.15.25.cov.75.mean, MRE.error.infer.clust.cov.100.women.15.25.cov.80.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.15.25.cov.85.mean, MRE.error.infer.clust.cov.100.women.15.25.cov.90.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.15.25.cov.95.mean))
+
+
+plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean <- ggplot(MRE.error.infer.clust.cov.100.women.15.25.AD.mean, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for mean age difference for women in 15 - 25 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+
+MRE.error.infer.clust.cov.100.men.15.25.AD.mean <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                              
+                                                              F = c(MRE.error.infer.clust.cov.100.men.15.25.cov.35.mean, MRE.error.infer.clust.cov.100.men.15.25.cov.40.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.15.25.cov.45.mean, MRE.error.infer.clust.cov.100.men.15.25.cov.50.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.15.25.cov.55.mean, MRE.error.infer.clust.cov.100.men.15.25.cov.60.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.15.25.cov.65.mean, MRE.error.infer.clust.cov.100.men.15.25.cov.70.mean, 
+                                                                    MRE.error.infer.clust.cov.100.men.15.25.cov.75.mean, MRE.error.infer.clust.cov.100.men.15.25.cov.80.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.15.25.cov.85.mean, MRE.error.infer.clust.cov.100.men.15.25.cov.90.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.15.25.cov.95.mean))
+
+
+plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean <- ggplot(MRE.error.infer.clust.cov.100.men.15.25.AD.mean, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for mean age difference for men in 15 - 25 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+
+MRE.error.infer.clust.cov.100.women.15.25.AD.med <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                               
+                                                               F = c(MRE.error.infer.clust.cov.100.women.15.25.cov.35.med, MRE.error.infer.clust.cov.100.women.15.25.cov.40.med,
+                                                                     MRE.error.infer.clust.cov.100.women.15.25.cov.45.med, MRE.error.infer.clust.cov.100.women.15.25.cov.50.med,
+                                                                     MRE.error.infer.clust.cov.100.women.15.25.cov.55.med, MRE.error.infer.clust.cov.100.women.15.25.cov.60.med,
+                                                                     MRE.error.infer.clust.cov.100.women.15.25.cov.65.med, MRE.error.infer.clust.cov.100.women.15.25.cov.70.med, 
+                                                                     MRE.error.infer.clust.cov.100.women.15.25.cov.75.med, MRE.error.infer.clust.cov.100.women.15.25.cov.80.med,
+                                                                     MRE.error.infer.clust.cov.100.women.15.25.cov.85.med, MRE.error.infer.clust.cov.100.women.15.25.cov.90.med,
+                                                                     MRE.error.infer.clust.cov.100.women.15.25.cov.95.med))
+
+
+plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med <- ggplot(MRE.error.infer.clust.cov.100.women.15.25.AD.med, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for median age difference for women in 15 - 25 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.men.15.25.AD.med <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                             
+                                                             F = c(MRE.error.infer.clust.cov.100.men.15.25.cov.35.med, MRE.error.infer.clust.cov.100.men.15.25.cov.40.med,
+                                                                   MRE.error.infer.clust.cov.100.men.15.25.cov.45.med, MRE.error.infer.clust.cov.100.men.15.25.cov.50.med,
+                                                                   MRE.error.infer.clust.cov.100.men.15.25.cov.55.med, MRE.error.infer.clust.cov.100.men.15.25.cov.60.med,
+                                                                   MRE.error.infer.clust.cov.100.men.15.25.cov.65.med, MRE.error.infer.clust.cov.100.men.15.25.cov.70.med, 
+                                                                   MRE.error.infer.clust.cov.100.men.15.25.cov.75.med, MRE.error.infer.clust.cov.100.men.15.25.cov.80.med,
+                                                                   MRE.error.infer.clust.cov.100.men.15.25.cov.85.med, MRE.error.infer.clust.cov.100.men.15.25.cov.90.med,
+                                                                   MRE.error.infer.clust.cov.100.men.15.25.cov.95.med))
+
+
+plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med <- ggplot(MRE.error.infer.clust.cov.100.men.15.25.AD.med, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for median age difference for men in 15 - 25 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.women.15.25.AD.sd <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                              
+                                                              F = c(MRE.error.infer.clust.cov.100.women.15.25.cov.35.sd, MRE.error.infer.clust.cov.100.women.15.25.cov.40.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.15.25.cov.45.sd, MRE.error.infer.clust.cov.100.women.15.25.cov.50.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.15.25.cov.55.sd, MRE.error.infer.clust.cov.100.women.15.25.cov.60.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.15.25.cov.65.sd, MRE.error.infer.clust.cov.100.women.15.25.cov.70.sd, 
+                                                                    MRE.error.infer.clust.cov.100.women.15.25.cov.75.sd, MRE.error.infer.clust.cov.100.women.15.25.cov.80.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.15.25.cov.85.sd, MRE.error.infer.clust.cov.100.women.15.25.cov.90.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.15.25.cov.95.sd))
+
+
+plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd <- ggplot(MRE.error.infer.clust.cov.100.women.15.25.AD.sd, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for sdian age difference for women in 15 - 25 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.men.15.25.AD.sd <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                            
+                                                            F = c(MRE.error.infer.clust.cov.100.men.15.25.cov.35.sd, MRE.error.infer.clust.cov.100.men.15.25.cov.40.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.15.25.cov.45.sd, MRE.error.infer.clust.cov.100.men.15.25.cov.50.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.15.25.cov.55.sd, MRE.error.infer.clust.cov.100.men.15.25.cov.60.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.15.25.cov.65.sd, MRE.error.infer.clust.cov.100.men.15.25.cov.70.sd, 
+                                                                  MRE.error.infer.clust.cov.100.men.15.25.cov.75.sd, MRE.error.infer.clust.cov.100.men.15.25.cov.80.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.15.25.cov.85.sd, MRE.error.infer.clust.cov.100.men.15.25.cov.90.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.15.25.cov.95.sd))
+
+
+plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd <- ggplot(MRE.error.infer.clust.cov.100.men.15.25.AD.sd, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for sdian age difference for men in 15 - 25 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+# 25 - 40
+
+MRE.error.infer.clust.cov.100.women.25.40.AD.mean <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                                
+                                                                F = c(MRE.error.infer.clust.cov.100.women.25.40.cov.35.mean, MRE.error.infer.clust.cov.100.women.25.40.cov.40.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.25.40.cov.45.mean, MRE.error.infer.clust.cov.100.women.25.40.cov.50.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.25.40.cov.55.mean, MRE.error.infer.clust.cov.100.women.25.40.cov.60.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.25.40.cov.65.mean, MRE.error.infer.clust.cov.100.women.25.40.cov.70.mean, 
+                                                                      MRE.error.infer.clust.cov.100.women.25.40.cov.75.mean, MRE.error.infer.clust.cov.100.women.25.40.cov.80.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.25.40.cov.85.mean, MRE.error.infer.clust.cov.100.women.25.40.cov.90.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.25.40.cov.95.mean))
+
+
+plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean <- ggplot(MRE.error.infer.clust.cov.100.women.25.40.AD.mean, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for mean age difference for women in 25 - 40 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+
+MRE.error.infer.clust.cov.100.men.25.40.AD.mean <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                              
+                                                              F = c(MRE.error.infer.clust.cov.100.men.25.40.cov.35.mean, MRE.error.infer.clust.cov.100.men.25.40.cov.40.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.25.40.cov.45.mean, MRE.error.infer.clust.cov.100.men.25.40.cov.50.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.25.40.cov.55.mean, MRE.error.infer.clust.cov.100.men.25.40.cov.60.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.25.40.cov.65.mean, MRE.error.infer.clust.cov.100.men.25.40.cov.70.mean, 
+                                                                    MRE.error.infer.clust.cov.100.men.25.40.cov.75.mean, MRE.error.infer.clust.cov.100.men.25.40.cov.80.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.25.40.cov.85.mean, MRE.error.infer.clust.cov.100.men.25.40.cov.90.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.25.40.cov.95.mean))
+
+
+plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean <- ggplot(MRE.error.infer.clust.cov.100.men.25.40.AD.mean, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for mean age difference for men in 25 - 40 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+
+MRE.error.infer.clust.cov.100.women.25.40.AD.med <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                               
+                                                               F = c(MRE.error.infer.clust.cov.100.women.25.40.cov.35.med, MRE.error.infer.clust.cov.100.women.25.40.cov.40.med,
+                                                                     MRE.error.infer.clust.cov.100.women.25.40.cov.45.med, MRE.error.infer.clust.cov.100.women.25.40.cov.50.med,
+                                                                     MRE.error.infer.clust.cov.100.women.25.40.cov.55.med, MRE.error.infer.clust.cov.100.women.25.40.cov.60.med,
+                                                                     MRE.error.infer.clust.cov.100.women.25.40.cov.65.med, MRE.error.infer.clust.cov.100.women.25.40.cov.70.med, 
+                                                                     MRE.error.infer.clust.cov.100.women.25.40.cov.75.med, MRE.error.infer.clust.cov.100.women.25.40.cov.80.med,
+                                                                     MRE.error.infer.clust.cov.100.women.25.40.cov.85.med, MRE.error.infer.clust.cov.100.women.25.40.cov.90.med,
+                                                                     MRE.error.infer.clust.cov.100.women.25.40.cov.95.med))
+
+
+plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med <- ggplot(MRE.error.infer.clust.cov.100.women.25.40.AD.med, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for median age difference for women in 25 - 40 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.men.25.40.AD.med <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                             
+                                                             F = c(MRE.error.infer.clust.cov.100.men.25.40.cov.35.med, MRE.error.infer.clust.cov.100.men.25.40.cov.40.med,
+                                                                   MRE.error.infer.clust.cov.100.men.25.40.cov.45.med, MRE.error.infer.clust.cov.100.men.25.40.cov.50.med,
+                                                                   MRE.error.infer.clust.cov.100.men.25.40.cov.55.med, MRE.error.infer.clust.cov.100.men.25.40.cov.60.med,
+                                                                   MRE.error.infer.clust.cov.100.men.25.40.cov.65.med, MRE.error.infer.clust.cov.100.men.25.40.cov.70.med, 
+                                                                   MRE.error.infer.clust.cov.100.men.25.40.cov.75.med, MRE.error.infer.clust.cov.100.men.25.40.cov.80.med,
+                                                                   MRE.error.infer.clust.cov.100.men.25.40.cov.85.med, MRE.error.infer.clust.cov.100.men.25.40.cov.90.med,
+                                                                   MRE.error.infer.clust.cov.100.men.25.40.cov.95.med))
+
+
+plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med <- ggplot(MRE.error.infer.clust.cov.100.men.25.40.AD.med, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for median age difference for men in 25 - 40 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.women.25.40.AD.sd <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                              
+                                                              F = c(MRE.error.infer.clust.cov.100.women.25.40.cov.35.sd, MRE.error.infer.clust.cov.100.women.25.40.cov.40.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.25.40.cov.45.sd, MRE.error.infer.clust.cov.100.women.25.40.cov.50.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.25.40.cov.55.sd, MRE.error.infer.clust.cov.100.women.25.40.cov.60.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.25.40.cov.65.sd, MRE.error.infer.clust.cov.100.women.25.40.cov.70.sd, 
+                                                                    MRE.error.infer.clust.cov.100.women.25.40.cov.75.sd, MRE.error.infer.clust.cov.100.women.25.40.cov.80.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.25.40.cov.85.sd, MRE.error.infer.clust.cov.100.women.25.40.cov.90.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.25.40.cov.95.sd))
+
+
+plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd <- ggplot(MRE.error.infer.clust.cov.100.women.25.40.AD.sd, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for sdian age difference for women in 25 - 40 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.men.25.40.AD.sd <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                            
+                                                            F = c(MRE.error.infer.clust.cov.100.men.25.40.cov.35.sd, MRE.error.infer.clust.cov.100.men.25.40.cov.40.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.25.40.cov.45.sd, MRE.error.infer.clust.cov.100.men.25.40.cov.50.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.25.40.cov.55.sd, MRE.error.infer.clust.cov.100.men.25.40.cov.60.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.25.40.cov.65.sd, MRE.error.infer.clust.cov.100.men.25.40.cov.70.sd, 
+                                                                  MRE.error.infer.clust.cov.100.men.25.40.cov.75.sd, MRE.error.infer.clust.cov.100.men.25.40.cov.80.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.25.40.cov.85.sd, MRE.error.infer.clust.cov.100.men.25.40.cov.90.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.25.40.cov.95.sd))
+
+
+plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd <- ggplot(MRE.error.infer.clust.cov.100.men.25.40.AD.sd, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for sdian age difference for men in 25 - 40 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+# 40 - 50
+
+MRE.error.infer.clust.cov.100.women.40.50.AD.mean <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                                
+                                                                F = c(MRE.error.infer.clust.cov.100.women.40.50.cov.35.mean, MRE.error.infer.clust.cov.100.women.40.50.cov.40.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.40.50.cov.45.mean, MRE.error.infer.clust.cov.100.women.40.50.cov.50.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.40.50.cov.55.mean, MRE.error.infer.clust.cov.100.women.40.50.cov.60.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.40.50.cov.65.mean, MRE.error.infer.clust.cov.100.women.40.50.cov.70.mean, 
+                                                                      MRE.error.infer.clust.cov.100.women.40.50.cov.75.mean, MRE.error.infer.clust.cov.100.women.40.50.cov.80.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.40.50.cov.85.mean, MRE.error.infer.clust.cov.100.women.40.50.cov.90.mean,
+                                                                      MRE.error.infer.clust.cov.100.women.40.50.cov.95.mean))
+
+
+plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean <- ggplot(MRE.error.infer.clust.cov.100.women.40.50.AD.mean, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for mean age difference for women in 40 - 50 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+
+MRE.error.infer.clust.cov.100.men.40.50.AD.mean <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                              
+                                                              F = c(MRE.error.infer.clust.cov.100.men.40.50.cov.35.mean, MRE.error.infer.clust.cov.100.men.40.50.cov.40.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.40.50.cov.45.mean, MRE.error.infer.clust.cov.100.men.40.50.cov.50.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.40.50.cov.55.mean, MRE.error.infer.clust.cov.100.men.40.50.cov.60.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.40.50.cov.65.mean, MRE.error.infer.clust.cov.100.men.40.50.cov.70.mean, 
+                                                                    MRE.error.infer.clust.cov.100.men.40.50.cov.75.mean, MRE.error.infer.clust.cov.100.men.40.50.cov.80.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.40.50.cov.85.mean, MRE.error.infer.clust.cov.100.men.40.50.cov.90.mean,
+                                                                    MRE.error.infer.clust.cov.100.men.40.50.cov.95.mean))
+
+
+plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean <- ggplot(MRE.error.infer.clust.cov.100.men.40.50.AD.mean, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for mean age difference for men in 40 - 50 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+
+
+MRE.error.infer.clust.cov.100.women.40.50.AD.med <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                               
+                                                               F = c(MRE.error.infer.clust.cov.100.women.40.50.cov.35.med, MRE.error.infer.clust.cov.100.women.40.50.cov.40.med,
+                                                                     MRE.error.infer.clust.cov.100.women.40.50.cov.45.med, MRE.error.infer.clust.cov.100.women.40.50.cov.50.med,
+                                                                     MRE.error.infer.clust.cov.100.women.40.50.cov.55.med, MRE.error.infer.clust.cov.100.women.40.50.cov.60.med,
+                                                                     MRE.error.infer.clust.cov.100.women.40.50.cov.65.med, MRE.error.infer.clust.cov.100.women.40.50.cov.70.med, 
+                                                                     MRE.error.infer.clust.cov.100.women.40.50.cov.75.med, MRE.error.infer.clust.cov.100.women.40.50.cov.80.med,
+                                                                     MRE.error.infer.clust.cov.100.women.40.50.cov.85.med, MRE.error.infer.clust.cov.100.women.40.50.cov.90.med,
+                                                                     MRE.error.infer.clust.cov.100.women.40.50.cov.95.med))
+
+
+plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med <- ggplot(MRE.error.infer.clust.cov.100.women.40.50.AD.med, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for median age difference for women in 40 - 50 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.men.40.50.AD.med <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                             
+                                                             F = c(MRE.error.infer.clust.cov.100.men.40.50.cov.35.med, MRE.error.infer.clust.cov.100.men.40.50.cov.40.med,
+                                                                   MRE.error.infer.clust.cov.100.men.40.50.cov.45.med, MRE.error.infer.clust.cov.100.men.40.50.cov.50.med,
+                                                                   MRE.error.infer.clust.cov.100.men.40.50.cov.55.med, MRE.error.infer.clust.cov.100.men.40.50.cov.60.med,
+                                                                   MRE.error.infer.clust.cov.100.men.40.50.cov.65.med, MRE.error.infer.clust.cov.100.men.40.50.cov.70.med, 
+                                                                   MRE.error.infer.clust.cov.100.men.40.50.cov.75.med, MRE.error.infer.clust.cov.100.men.40.50.cov.80.med,
+                                                                   MRE.error.infer.clust.cov.100.men.40.50.cov.85.med, MRE.error.infer.clust.cov.100.men.40.50.cov.90.med,
+                                                                   MRE.error.infer.clust.cov.100.men.40.50.cov.95.med))
+
+
+plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med <- ggplot(MRE.error.infer.clust.cov.100.men.40.50.AD.med, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for median age difference for men in 40 - 50 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.women.40.50.AD.sd <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                              
+                                                              F = c(MRE.error.infer.clust.cov.100.women.40.50.cov.35.sd, MRE.error.infer.clust.cov.100.women.40.50.cov.40.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.40.50.cov.45.sd, MRE.error.infer.clust.cov.100.women.40.50.cov.50.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.40.50.cov.55.sd, MRE.error.infer.clust.cov.100.women.40.50.cov.60.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.40.50.cov.65.sd, MRE.error.infer.clust.cov.100.women.40.50.cov.70.sd, 
+                                                                    MRE.error.infer.clust.cov.100.women.40.50.cov.75.sd, MRE.error.infer.clust.cov.100.women.40.50.cov.80.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.40.50.cov.85.sd, MRE.error.infer.clust.cov.100.women.40.50.cov.90.sd,
+                                                                    MRE.error.infer.clust.cov.100.women.40.50.cov.95.sd))
+
+
+plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd <- ggplot(MRE.error.infer.clust.cov.100.women.40.50.AD.sd, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for sdian age difference for women in 40 - 50 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd.png",
+       plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
+
+
+
+MRE.error.infer.clust.cov.100.men.40.50.AD.sd <- data.frame(x=c(seq(from=35, to=95, by=5)),
+                                                            
+                                                            F = c(MRE.error.infer.clust.cov.100.men.40.50.cov.35.sd, MRE.error.infer.clust.cov.100.men.40.50.cov.40.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.40.50.cov.45.sd, MRE.error.infer.clust.cov.100.men.40.50.cov.50.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.40.50.cov.55.sd, MRE.error.infer.clust.cov.100.men.40.50.cov.60.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.40.50.cov.65.sd, MRE.error.infer.clust.cov.100.men.40.50.cov.70.sd, 
+                                                                  MRE.error.infer.clust.cov.100.men.40.50.cov.75.sd, MRE.error.infer.clust.cov.100.men.40.50.cov.80.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.40.50.cov.85.sd, MRE.error.infer.clust.cov.100.men.40.50.cov.90.sd,
+                                                                  MRE.error.infer.clust.cov.100.men.40.50.cov.95.sd))
+
+
+plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd <- ggplot(MRE.error.infer.clust.cov.100.men.40.50.AD.sd, aes(x = x, y = F)) +
+  geom_point(size = 4) +
+  ggtitle("Average relative error for sdian age difference for men in 40 - 50 - MCAR") +
+  xlab("Sequence coverage scenarios") + ylab("Error value")
+
+
+ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd.png",
+       plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd,
+       path = "~/age_mixing_AD_clusters",
+       width = 10, height = 8, units = "cm")
 
 
