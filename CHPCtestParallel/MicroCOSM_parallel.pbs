@@ -1,0 +1,29 @@
+#!/bin/bash 
+#PBS -N Ca_waning_latent
+#PBS -P HEAL1049
+#PBS -q large
+#PBS -W group_list=largeq
+#PBS -l select=30:ncpus=24:mpiprocs=24
+#PBS -l walltime=50:00:00
+#PBS -m be
+#PBS -M carivs@sun.ac.za
+#PBS -o /mnt/lustre/users/cvanschalkwyk/code/Microsimulation_latent/stdout.txt
+#PBS -e /mnt/lustre/users/cvanschalkwyk/code/Microsimulation_latent/stderr.txt
+
+ulimit -s unlimited
+
+module add gcc/5.1.0
+module add chpc/gnu/parallel-20160422
+
+NP=`cat ${PBS_NODEFILE} | wc -l`
+START=1
+((END=720))
+
+echo "Starting job..."
+echo "Starting job..." 1>&2
+
+seq ${START} ${END} | parallel --jobs 25 --sshdelay 0.2 --sshloginfile ${PBS_NODEFILE} "echo \"\$( date ): running on \${HOSTNAME}\"; cd /mnt/lustre/users/cvanschalkwyk/code/Microsimulation_latent/; ./Microsimulation {}"
+
+echo "Ending job..."
+echo "Ending job..." 1>&2
+

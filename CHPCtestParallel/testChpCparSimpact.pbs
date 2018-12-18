@@ -1,0 +1,32 @@
+#!/bin/bash 
+#PBS -N testpar
+#PBS -P CBBI1106
+#PBS -q bigmem
+#PBS -W group_list=bigmemq
+#PBS -l select=3:ncpus=56:mpiprocs=56:nodetype=haswell_fat
+#PBS -l walltime=01:00:00
+#PBS -m be
+#PBS -M niyukuri@aims.ac.za
+#PBS -o /mnt/lustre/users/dniyukuri/CHPCtestParallel/stdout.txt
+#PBS -e /mnt/lustre/users/dniyukuri/CHPCtestParallel/stderr.txt
+
+ulimit -s unlimited
+
+module add gcc/5.1.0
+module add chpc/gnu/parallel-20160422
+module add /apps/chpc/scripts/modules/bio/app/simpact-cyan/0.21.0
+module add /apps/chpc/scripts/modules/bio/app/Seq-Gen/1.3.4
+module add /apps/chpc/scripts/modules/bio/app/FastTree/2.1.10
+module add chpc/R/3.4.4-gcc7.2.0
+
+NP=`cat ${PBS_NODEFILE} | wc -l`
+START=1
+((END=168))
+
+echo "Starting job..."
+echo "Starting job..." 1>&2
+
+seq ${START} ${END} | parallel --jobs 56 --sshdelay 0.2 --sshloginfile ${PBS_NODEFILE} "echo \"\$( date ): running on \${HOSTNAME}\"; cd /mnt/lustre/users/dniyukuri/CHPCtestParallel/; ./wrapper.master.epic.metrics.R {}"
+
+echo "Ending job..."
+echo "Ending job..." 1>&2

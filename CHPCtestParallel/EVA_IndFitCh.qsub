@@ -1,0 +1,23 @@
+#PBS -l select=3:ncpus=8:mpiprocs=8:jobtype=nehalem,place=excl
+#PBS -l walltime=20:00:00
+#PBS -q workq
+#PBS -M ujeneva@gmail.com
+#PBS -m be
+#PBS -V
+#PBS -e /lustre/SCRATCH5/users/lujeneza/output/Chstd_err1.txt
+#PBS -o /lustre/SCRATCH5/users/lujeneza/output/Chstd_out1.txt
+#PBS -N Real1_Ch
+#PBS -mb
+ 
+MODULEPATH=/opt/gridware/bioinformatics/modules:$MODULEPATH
+source /etc/profile.d/modules.sh
+module add R/3.2.0
+ 
+NP=`cat ${PBS_NODEFILE} | wc -l`
+ 
+cd /lustre/SCRATCH5/users/lujeneza/codes/
+
+ARGS="MakeIndFits.R ChildrenCHPC.csv ChildrenIndFitData.v5.csv 5 5"
+
+mpirun -np ${NP} -machinefile ${PBS_NODEFILE} Rscript ${ARGS}
+
