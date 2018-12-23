@@ -140,9 +140,12 @@ dr.cov.100 <- dr %>%
 
 
 d.MCAR <- dr %>%
-  select(contains("MCAR"))
+  select(contains("MCAR."))
 
 
+# length(names(dr1)[72:10170]) 
+# 1st : "cov.MCAR.35.cl.M.15.25.F.15.25"
+# last: "cov.MAR.c.95.sd.cl.size"
 
 d.MCAR.cov.35 <- d.MCAR %>%
   select(contains("cov.MCAR.35.")) 
@@ -170,12 +173,11 @@ d.MCAR.cov.90 <- d.MCAR %>%
   select(contains("cov.MCAR.90.")) 
 d.MCAR.cov.95 <- d.MCAR %>%
   select(contains("cov.MCAR.95.")) 
-
-
+d.MCAR.cov.100 <- d.MCAR %>%
+  select(contains("cov.MCAR.100.")) 
 
 
 # Age mixing statistics in transmission networks --------------------------
-
 
 
 # True age mix in different age mix scenarios
