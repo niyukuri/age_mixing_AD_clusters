@@ -4,7 +4,7 @@
 # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
 
 
-work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD_clusters" # on PCHPC
+work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD" # on PCHPC
 
 
 setwd(paste0(work.dir))
@@ -17,7 +17,7 @@ wrapper.age.mix <- function(inputvector=inputvector){
   
   # work.dir <- "/home/niyukuri/Desktop/mastermodeltest" # on PC
   
-  work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD_clusters" # on CHPC
+  work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD" # on CHPC
   
   
   setwd(paste0(work.dir))
@@ -46,15 +46,15 @@ wrapper.age.mix <- function(inputvector=inputvector){
   library(lubridate)
   library(tidyr)
   
-  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/needed.functions.RSimpactHelp.R")
-  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/advanced.transmission.network.builder.R")
-  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mixing.MCAR.fun.R")
-  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mixing.MAR.fun.R")
-  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/age.mix.MCAR.MAR.comput.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD/needed.functions.RSimpactHelp.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD/advanced.transmission.network.builder.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD/age.mixing.MCAR.fun.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD/age.mixing.MAR.fun.R")
+  source("/home/dniyukuri/lustre/age_mixing_large_AD/age.mix.MCAR.MAR.comput.R")
 
   
   results.f <- tryCatch(age.mix.MCAR.MAR.comput(inputvector = inputvector),
-                        error=function(e) return(rep(NA, 10366)))
+                        error=function(e) return(rep(NA, 10513)))
   
   return(results.f)
   
@@ -74,10 +74,10 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 
 large.AD.age.mix <- simpact.parallel(model = wrapper.age.mix,
                                      actual.input.matrix = inputmatrix,
-                                     seed_count = 111,
+                                     seed_count = 777,
                                      n_cluster = 56)
 
-write.csv(large.AD.age.mix, file = "Results.mcarmar.large.AD_280_111.csv")
+write.csv(large.AD.age.mix, file = "Results.mcarmar.large.AD_280_777.csv")
 
 
 

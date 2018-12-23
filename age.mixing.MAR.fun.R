@@ -91,11 +91,11 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
   
   # source("~/phylosimpact_simulation_studies_2018/stress_testing/needed.functions.RSimpactHelp.R")
   
-  # source("/home/niyukuri/Dropbox/25.10.2018.age.mix2/age_mixing_large_AD_clusters/needed.functions.RSimpactHelp.R")
+  # source("/home/niyukuri/Dropbox/25.10.2018.age.mix2/age_mixing_large_AD/needed.functions.RSimpactHelp.R")
   
-  source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/needed.functions.RSimpactHelp.R")  
+  source("/home/dniyukuri/lustre/age_mixing_large_AD/needed.functions.RSimpactHelp.R")  
   
-  # sys.source("/home/dniyukuri/lustre/age_mixing_large_AD_clusters/needed.functions.RSimpactHelp.R", env = .GlobalEnv, keep.source = TRUE)
+  # sys.source("/home/dniyukuri/lustre/age_mixing_large_AD/needed.functions.RSimpactHelp.R", env = .GlobalEnv, keep.source = TRUE)
   
   
   

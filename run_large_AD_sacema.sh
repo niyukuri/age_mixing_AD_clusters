@@ -22,7 +22,7 @@ module add /apps/chpc/scripts/modules/bio/app/FastTree/2.1.10
 module add chpc/R/3.4.4-gcc7.2.0
 
 
-cd /mnt/lustre/users/dniyukuri/age_mixing_large_AD_clusters
+cd /mnt/lustre/users/dniyukuri/age_mixing_large_AD
 
 
 Rscript wrapper.age.mix.R
