@@ -49,6 +49,9 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   work.dir <- "/home/dniyukuri/lustre/age_mixing_large_AD" # on PCHPC
   
   
+  # work.dir <- "/home/david/age_mixing_AD_clusters" # on PCHPC
+  
+  
   setwd(paste0(work.dir))
   
   
