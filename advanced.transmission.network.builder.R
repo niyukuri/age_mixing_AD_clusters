@@ -20,8 +20,10 @@
 #' @return vl Viral load at sampling time
 #' @return location.x Location at x-axis
 #' @return location.y Location at y-axis
-#'
-#'
+#' @return StartART time when starts treatment
+#' @return CD4StartART CD4 count when starts treatment
+#' 
+#' 
 
 #' @examples
 #' transm.ls <- advanced.transmission.network.builder(datalist = datalist,endpoint = 40)
@@ -498,11 +500,15 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
   
   
   
-  ### CD4,  viral load, and geographical location
+  ### CD4,  viral load, and geographical location + ART initiation time and CD4
+  # 
+  # cd4.vl.loc.df.list <- vector("list", length(seeds.id)) # CD4table
+  # 
+  # cd4.vl.loc.i.list <- list()
   
-  cd4.vl.loc.df.list <- vector("list", length(seeds.id)) # CD4table
+  cd4.vl.loc.ART.df.list <- vector("list", length(seeds.id)) # CD4table
   
-  cd4.vl.loc.i.list <- list()
+  cd4.vl.loc.ART.i.list <- list()
   
   for(i in 1:length(seeds.id)){
     
@@ -514,28 +520,47 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     
     infection.time <- dat.recdontime[[i]][,5]
     
-    cd4.dat <- dplyr::filter(datalist$ptable, datalist$ptable$ID%in%ids) # X
+    cd4.at.infec <- dplyr::filter(datalist$ptable, datalist$ptable$ID%in%ids) # ART: cd4.at.infec$TreatTime
     
-    cd4.at.infec <- dplyr::filter(datalist$ptable, datalist$ptable$ID%in%ids)
-    
-    cd4.at.ARTstart <- dplyr::filter(datalist$ttable, datalist$ttable$ID%in%ids)
+    cd4.at.ARTstart <- dplyr::filter(datalist$ttable, datalist$ttable$ID%in%ids) # ART: cd4.at.ARTstart$CD4atARTstart, 
+                                                                                 #      cd4.at.ARTstart$TStart
+                                                                                 #      cd4.at.ARTstart$TEnd
     
     cd4.at.Death <- dplyr::filter(cd4.at.infec, cd4.at.infec$TOD!="Inf")
     
     
     vl.dat <- dplyr::filter(datalist$vltable, datalist$vltable$ID%in%ids)
+
     
     # location.x.y.dat <-  dplyr::filter(datalist$ptable, datalist$ptable$ID%in%ids)
     
-    cd4 <- vector()
-    vl <- vector()
+    cd4 <- vector() # at sampling time
+    vl <- vector() # at sampling time
     location.x <- vector()
     location.y <- vector()
+    
+    ART.start.time <- vector()
+    CD4.ART.start <- vector()
     
     for (j in 1:length(ids)) {
       
       ids.j <- ids[j]
       
+      # For ART and CD4 at starting ART
+      ids.j.ptable <- dplyr::filter(cd4.at.infec, cd4.at.infec$ID==ids.j)
+      ART.start.time <- c(ART.start.time, ids.j.ptable$TreatTime)
+      
+      if(ids.j%in%cd4.at.ARTstart$ID){ # if someone is in the treatment table
+        
+        ids.j.cd4.table <- dplyr::filter(cd4.at.ARTstart, cd4.at.ARTstart$ID==ids.j)
+        CD4.ART.start <- c(CD4.ART.start, ids.j.cd4.table$CD4atARTstart)
+        
+      }else{
+        CD4.ART.start <- c(CD4.ART.start, NA)
+      }
+      
+      
+      # For CD4 and VL at sampling
       if(sampling.types[j]==0){ # diagnosed individuals (0)
         
         cd4.val <- as.numeric(cd4.at.ARTstart[cd4.at.ARTstart$ID==ids.j,][6])
@@ -572,15 +597,27 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
       
     }
     
-    cd4.vl.loc.i.list$ids <- ids
-    cd4.vl.loc.i.list$sampling.time <- sampling.time
-    cd4.vl.loc.i.list$cd4 <- cd4
-    cd4.vl.loc.i.list$location.x <- location.x
-    cd4.vl.loc.i.list$location.y <- location.y
-    cd4.vl.loc.i.list$vl <- vl
+    # cd4.vl.loc.i.list$ids <- ids
+    # cd4.vl.loc.i.list$sampling.time <- sampling.time
+    # cd4.vl.loc.i.list$cd4 <- cd4
+    # cd4.vl.loc.i.list$location.x <- location.x
+    # cd4.vl.loc.i.list$location.y <- location.y
+    # cd4.vl.loc.i.list$vl <- vl
+    # 
+    # cd4.vl.loc.df.list[[i]] <- cd4.vl.loc.i.list
     
-    cd4.vl.loc.df.list[[i]] <- cd4.vl.loc.i.list
+    cd4.vl.loc.ART.i.list$ids <- ids
+    cd4.vl.loc.ART.i.list$sampling.time <- sampling.time
+    cd4.vl.loc.ART.i.list$cd4 <- cd4
+    cd4.vl.loc.ART.i.list$location.x <- location.x
+    cd4.vl.loc.ART.i.list$location.y <- location.y
+    cd4.vl.loc.ART.i.list$vl <- vl
     
+    cd4.vl.loc.ART.i.list$StartART <- ART.start.time
+    cd4.vl.loc.ART.i.list$CD4StartART <- CD4.ART.start
+    
+    cd4.vl.loc.ART.df.list[[i]] <- cd4.vl.loc.ART.i.list
+
   }
   
   
@@ -623,12 +660,15 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     # cd4.vl.loc.i.list$location.y <- location.y
     # cd4.vl.loc.i.list$vl <- vl
     
-    cd4.vl.loc.tab <- cd4.vl.loc.df.list[[i]]
+    cd4.vl.loc.ART.tab <- cd4.vl.loc.ART.df.list[[i]] # cd4.vl.loc.df.list[[i]]
     
-    transNet$cd4 <- cd4.vl.loc.tab$cd4
-    transNet$vl <- cd4.vl.loc.tab$vl
-    transNet$location.x <- cd4.vl.loc.tab$location.x
-    transNet$location.y <- cd4.vl.loc.tab$location.y
+    transNet$cd4 <- cd4.vl.loc.ART.tab$cd4
+    transNet$vl <- cd4.vl.loc.ART.tab$vl
+    transNet$location.x <- cd4.vl.loc.ART.tab$location.x
+    transNet$location.y <- cd4.vl.loc.ART.tab$location.y
+    
+    transNet$StartART <- cd4.vl.loc.ART.tab$StartART
+    transNet$CD4StartART <- cd4.vl.loc.ART.tab$CD4StartART
     
     transm.ls[[i]] <- transNet
   }
