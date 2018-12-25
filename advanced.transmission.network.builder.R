@@ -542,14 +542,17 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     ART.start.time <- vector()
     CD4.ART.start <- vector()
     
+    vl.ART <- vector()
+    
     for (j in 1:length(ids)) {
       
       ids.j <- ids[j]
       
       # For ART and CD4 at starting ART
       ids.j.ptable <- dplyr::filter(cd4.at.infec, cd4.at.infec$ID==ids.j)
-      ART.start.time <- c(ART.start.time, ids.j.ptable$TreatTime)
-      
+      ART.start.time.j <- ids.j.ptable$TreatTime
+      ART.start.time <- c(ART.start.time, ART.start.time.j)
+
       if(ids.j%in%cd4.at.ARTstart$ID){ # if someone is in the treatment table
         
         ids.j.cd4.table <- dplyr::filter(cd4.at.ARTstart, cd4.at.ARTstart$ID==ids.j)
@@ -581,11 +584,27 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
       location.y.val <- as.numeric(cd4.at.infec[cd4.at.infec$ID==ids.j,][16])
       
       vl.table.j <- dplyr::filter(vl.dat, vl.dat$ID==ids.j) 
+      
       sampling.time.j <- sampling.time[j]
       
       vec.index <- which(vl.table.j$Time <= sampling.time.j) 
       
       vl.val <- vl.table.j$Log10VL[length(vec.index)]
+      
+      
+      if(ART.start.time.j != "Inf"){
+        
+        vec.index.ART <- which(vl.table.j$Time <= ART.start.time.j) 
+        
+        vl.ART <- c(vl.ART, vl.table.j$Log10VL[length(vec.index.ART)])
+        
+      }else{
+        
+        vl.ART <- c(vl.ART, NA)
+        
+      }
+      
+
       
       
       
@@ -615,6 +634,8 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     
     cd4.vl.loc.ART.i.list$StartART <- ART.start.time
     cd4.vl.loc.ART.i.list$CD4StartART <- CD4.ART.start
+    
+    cd4.vl.loc.ART.i.list$vl.ART <- vl.ART
     
     cd4.vl.loc.ART.df.list[[i]] <- cd4.vl.loc.ART.i.list
 
@@ -669,6 +690,7 @@ advanced.transmission.network.builder <- function(datalist = datalist, endpoint 
     
     transNet$StartART <- cd4.vl.loc.ART.tab$StartART
     transNet$CD4StartART <- cd4.vl.loc.ART.tab$CD4StartART
+    transNet$vl.ART <- cd4.vl.loc.ART.tab$vl.ART
     
     transm.ls[[i]] <- transNet
   }
