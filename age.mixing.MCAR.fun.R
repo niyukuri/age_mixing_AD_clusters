@@ -22,7 +22,7 @@
 # - table of numbers of age structured pairings between female/male across different age groups from the transmission clusters
 # - table of proportion of men in a give age group who are paired to women of a given age group
 # - table of proportion of women in a give age group who are paired to men of a given age group
-# - numbers of men, and women in the three age groups
+# - numbers of men, and women in same age groups
 # - mean, median, and standard deviation of age gap between individuals in different age groups 
 #   (e.g.: women aged between 15 and 25 who are paired to men regardless age group of men)
 

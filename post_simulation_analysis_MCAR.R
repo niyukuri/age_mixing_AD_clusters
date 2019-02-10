@@ -1,4 +1,10 @@
 
+# d.MCAR.cov.100
+
+# Clean working encironment
+
+rm(list=ls())
+
 
 # Setting working directory
 
@@ -6,14 +12,7 @@ setwd("~/age_mixing_AD_clusters/")
 
 
 
-
-# Clean working encironment
-
-rm(list=ls())
-
-
 # Loading libraries -------------------------------------------------------
-
 
 
 library(dplyr)
@@ -77,6 +76,23 @@ quant.med <- function(input){
 }
 
 
+min.max.sd.mean <- function(input){
+  
+  input <- na.omit(input)
+  
+  min.v <- min(input)
+  max.v <- max(input)
+  mean.v <- mean(input)
+  sd.v <- sd(input)
+  
+  
+  min.max.sd.mean.v <- c(min.v, max.v, mean.v, sd.v)
+  
+  return(min.max.sd.mean.v)
+  
+}
+
+
 
 
 # Reading simulation ouput ------------------------------------------------
@@ -87,8 +103,10 @@ quant.med <- function(input){
 
 dr1 <- read.csv("/home/david/age_mixing_AD_clusters/results/large_AD/Results.mcarmar.large.AD_280_111.csv")
 dr2 <- read.csv("/home/david/age_mixing_AD_clusters/results/large_AD/Results.mcarmar.large.AD_280_777.csv")
+dr3 <- read.csv("/home/david/age_mixing_AD_clusters/results/large_AD/Results.mcarmar.large.AD_280_2000.csv")
+dr4 <- read.csv("/home/david/age_mixing_AD_clusters/results/large_AD/Results.mcarmar.large.AD_280_3000.csv")
 
-dr <- rbind(dr1, dr2)
+dr <- rbind(dr1, dr2, dr3, dr4)
 
 
 # Narrow AD
@@ -149,11 +167,11 @@ dr.epi.rels.agemix_data <- dr.epi.rels.agemix %>%
             sum.R.inc.40.50.w = sum(R.inc.40.50.w, na.rm = TRUE))
 
 # nationwide
-plot.sum.R.inc.40.50.w <- ggplot(data = dr.epi.rels.agemix_data, aes(x = x, y = sum.R.inc.40.50.w))+
-  geom_line() +
-  xlab("Simulation number")+
-  ylab("Incidence for women between 40 and 50 of age") +
-  theme_bw()
+# plot.sum.R.inc.40.50.w <- ggplot(data = dr.epi.rels.agemix_data, aes(x = x, y = sum.R.inc.40.50.w))+
+#   geom_line() +
+#   xlab("Simulation number")+
+#   ylab("Incidence for women between 40 and 50 of age") +
+#   theme_bw()
 
 
 
@@ -212,6 +230,12 @@ plot.prev.men.women <- ggplot(prev_data, aes(x=x, y=F, colour=Gender, group = Ge
   xlab("Age groups") + ylab("HIV prevalence")
 # ggtitle("HIV pevalence") 
 
+ggsave(filename = "plot.prev.men.women.MCAR.pdf",
+       plot = plot.prev.men.women,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR",
+       width = 12, height = 8, units = "cm")
+
+
 
 # Relationship concurent prevalence
 
@@ -226,12 +250,12 @@ pop.concur.partner <- quant.med(dr.conc.prev$R.p.prev.6months.m)
 dr.agemixstat <- dr.epi.rels.agemix %>% 
   select("R.AAD.male", "R.SDAD.male",  "R.slope.male",  "R.WSD.male", "R.BSD.male" , "R.intercept.male" )
 
-pop.R.AAD.male <- quant.med(dr.agemixstat$R.AAD.male) 
-pop.R.SDAD.male <- quant.med(dr.agemixstat$R.SDAD.male)
-pop.R.slope.male <- quant.med(dr.agemixstat$R.slope.male)
-pop.R.WSD.male <- quant.med(dr.agemixstat$R.WSD.male)
-pop.R.BSD.male <- quant.med(dr.agemixstat$R.BSD.male)
-pop.R.intercept.male <- quant.med(dr.agemixstat$R.intercept.male)
+pop.R.AAD.male <- round(quant.med(dr.agemixstat$R.AAD.male), digits = 2) 
+pop.R.SDAD.male <- round(quant.med(dr.agemixstat$R.SDAD.male), digits = 2) 
+pop.R.slope.male <- round(quant.med(dr.agemixstat$R.slope.male), digits = 2) 
+pop.R.WSD.male <- round(quant.med(dr.agemixstat$R.WSD.male), digits = 2) 
+pop.R.BSD.male <- round(quant.med(dr.agemixstat$R.BSD.male), digits = 2) 
+pop.R.intercept.male <- round(quant.med(dr.agemixstat$R.intercept.male), digits = 2) 
 
 
 
@@ -467,7 +491,7 @@ age.mix.stats <- matrix(c(T.35.AAD.male[2], T.40.AAD.male[2],
 ncol = 14,
 byrow = TRUE)
 
-
+age.mix.stats <- round(age.mix.stats, digits = 2)
 
 colnames(age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
                              "cov.50", "cov.55", "cov.60",
@@ -477,7 +501,7 @@ colnames(age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
 
 rownames(age.mix.stats) <- c("AAD.male", "SDAD.male",  "slope.male",  "WSD.male", "BSD.male" , "intercept.male") 
 
-write.csv(age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/age.mixing.statistics.csv")
+write.csv(age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/age.mixing.statistics_MCAR.csv")
 
 
 CI.age.mix.stats <- matrix(c(paste(T.35.AAD.male[2], "[", T.35.AAD.male[1], "-", T.35.AAD.male[3], "]"), 
@@ -574,7 +598,7 @@ CI.age.mix.stats <- matrix(c(paste(T.35.AAD.male[2], "[", T.35.AAD.male[1], "-",
 ncol = 14,
 byrow = TRUE)
 
-
+CI.age.mix.stats <- round(CI.age.mix.stats, digits = 2)
 
 colnames(CI.age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
                                 "cov.50", "cov.55", "cov.60",
@@ -584,7 +608,8 @@ colnames(CI.age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
 
 rownames(CI.age.mix.stats) <- c("AAD.male", "SDAD.male",  "slope.male",  "WSD.male", "BSD.male" , "intercept.male") 
 
-write.csv(CI.age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/age.mixing.statistics_CI.csv")
+
+write.csv(CI.age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/age.mixing.statistics_CI_MCAR.csv")
 
 
 
@@ -797,6 +822,11 @@ plot.age.mix.stats.df <- ggplot(age.mix.stats.df, aes(x=x, y=F, colour=parameter
   xlab("Sample size") + ylab("Value") +
   ggtitle("Partnership age mixing statistics in infected and general populations")
 
+ggsave(filename = "plot.age.mix.stats.df.MCAR.pdf",
+       plot = plot.age.mix.stats.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR",
+       width = 12, height = 8, units = "cm")
+
 
 
 
@@ -834,11 +864,187 @@ dr.cl.size.MCAR.cov.90 <- d.MCAR.cov.90 %>%
 dr.cl.size.MCAR.cov.95 <- d.MCAR.cov.95 %>% 
   select(contains("cl.size"))
 
+dr.cl.size.MCAR.cov.100 <- d.MCAR.cov.100 %>% 
+  select(contains("cl.size"))
+
+
+cl.size.mean.35 <- quant.med(dr.cl.size.MCAR.cov.35$cov.MCAR.35.mean.cl.size)
+cl.size.med.35 <- quant.med(dr.cl.size.MCAR.cov.35$cov.MCAR.35.med.cl.size)
+cl.size.sd.35 <- quant.med(dr.cl.size.MCAR.cov.35$cov.MCAR.35.sd.cl.size)
+
+cl.size.mean.40 <- quant.med(dr.cl.size.MCAR.cov.40$cov.MCAR.40.mean.cl.size)
+cl.size.med.40 <- quant.med(dr.cl.size.MCAR.cov.40$cov.MCAR.40.med.cl.size)
+cl.size.sd.40 <- quant.med(dr.cl.size.MCAR.cov.40$cov.MCAR.40.sd.cl.size)
+
+cl.size.mean.45 <- quant.med(dr.cl.size.MCAR.cov.45$cov.MCAR.45.mean.cl.size)
+cl.size.med.45 <- quant.med(dr.cl.size.MCAR.cov.45$cov.MCAR.45.med.cl.size)
+cl.size.sd.45 <- quant.med(dr.cl.size.MCAR.cov.45$cov.MCAR.45.sd.cl.size)
+
+cl.size.mean.50 <- quant.med(dr.cl.size.MCAR.cov.50$cov.MCAR.50.mean.cl.size)
+cl.size.med.50 <- quant.med(dr.cl.size.MCAR.cov.50$cov.MCAR.50.med.cl.size)
+cl.size.sd.50 <- quant.med(dr.cl.size.MCAR.cov.50$cov.MCAR.50.sd.cl.size)
+
+cl.size.mean.55 <- quant.med(dr.cl.size.MCAR.cov.55$cov.MCAR.55.mean.cl.size)
+cl.size.med.55 <- quant.med(dr.cl.size.MCAR.cov.55$cov.MCAR.55.med.cl.size)
+cl.size.sd.55 <- quant.med(dr.cl.size.MCAR.cov.55$cov.MCAR.55.sd.cl.size)
+
+cl.size.mean.60 <- quant.med(dr.cl.size.MCAR.cov.60$cov.MCAR.60.mean.cl.size)
+cl.size.med.60 <- quant.med(dr.cl.size.MCAR.cov.60$cov.MCAR.60.med.cl.size)
+cl.size.sd.60 <- quant.med(dr.cl.size.MCAR.cov.60$cov.MCAR.60.sd.cl.size)
+
+cl.size.mean.65 <- quant.med(dr.cl.size.MCAR.cov.65$cov.MCAR.65.mean.cl.size)
+cl.size.med.65 <- quant.med(dr.cl.size.MCAR.cov.65$cov.MCAR.65.med.cl.size)
+cl.size.sd.65 <- quant.med(dr.cl.size.MCAR.cov.65$cov.MCAR.65.sd.cl.size)
+
+cl.size.mean.70 <- quant.med(dr.cl.size.MCAR.cov.70$cov.MCAR.70.mean.cl.size)
+cl.size.med.70 <- quant.med(dr.cl.size.MCAR.cov.70$cov.MCAR.70.med.cl.size)
+cl.size.sd.70 <- quant.med(dr.cl.size.MCAR.cov.70$cov.MCAR.70.sd.cl.size)
+
+cl.size.mean.75 <- quant.med(dr.cl.size.MCAR.cov.75$cov.MCAR.75.mean.cl.size)
+cl.size.med.75 <- quant.med(dr.cl.size.MCAR.cov.75$cov.MCAR.75.med.cl.size)
+cl.size.sd.75 <- quant.med(dr.cl.size.MCAR.cov.75$cov.MCAR.75.sd.cl.size)
+
+cl.size.mean.80 <- quant.med(dr.cl.size.MCAR.cov.80$cov.MCAR.80.mean.cl.size)
+cl.size.med.80 <- quant.med(dr.cl.size.MCAR.cov.80$cov.MCAR.80.med.cl.size)
+cl.size.sd.80 <- quant.med(dr.cl.size.MCAR.cov.80$cov.MCAR.80.sd.cl.size)
+
+cl.size.mean.85 <- quant.med(dr.cl.size.MCAR.cov.85$cov.MCAR.85.mean.cl.size)
+cl.size.med.85 <- quant.med(dr.cl.size.MCAR.cov.85$cov.MCAR.85.med.cl.size)
+cl.size.sd.85 <- quant.med(dr.cl.size.MCAR.cov.85$cov.MCAR.85.sd.cl.size)
+
+cl.size.mean.90 <- quant.med(dr.cl.size.MCAR.cov.90$cov.MCAR.90.mean.cl.size)
+cl.size.med.90 <- quant.med(dr.cl.size.MCAR.cov.90$cov.MCAR.90.med.cl.size)
+cl.size.sd.90 <- quant.med(dr.cl.size.MCAR.cov.90$cov.MCAR.90.sd.cl.size)
+
+cl.size.mean.95 <- quant.med(dr.cl.size.MCAR.cov.95$cov.MCAR.95.mean.cl.size)
+cl.size.med.95 <- quant.med(dr.cl.size.MCAR.cov.95$cov.MCAR.95.med.cl.size)
+cl.size.sd.95 <- quant.med(dr.cl.size.MCAR.cov.95$cov.MCAR.95.sd.cl.size)
+
+
+cl.size.mean.100 <- quant.med(dr.cl.size.MCAR.cov.100$cov.MCAR.100.mean.cl.size)
+cl.size.med.100 <- quant.med(dr.cl.size.MCAR.cov.100$cov.MCAR.100.med.cl.size)
+cl.size.sd.100 <- quant.med(dr.cl.size.MCAR.cov.100$cov.MCAR.100.sd.cl.size)
+
+
+cl.size.mean.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
+                                  "cov.50", "cov.55", "cov.60",
+                                  "cov.65", "cov.70", "cov.75",
+                                  "cov.80", "cov.85", "cov.90",
+                                  "cov.95", "cov.100"),
+                              
+                              F = c(cl.size.mean.35[2], cl.size.mean.40[2], 
+                                    cl.size.mean.45[2], cl.size.mean.50[2], 
+                                    cl.size.mean.55[2], cl.size.mean.60[2], 
+                                    cl.size.mean.65[2], cl.size.mean.70[2], 
+                                    cl.size.mean.75[2], cl.size.mean.80[2], 
+                                    cl.size.mean.85[2], cl.size.mean.90[2], 
+                                    cl.size.mean.95[2], cl.size.mean.100[2]),
+                              
+                              L = c(cl.size.mean.35[1], cl.size.mean.40[1], 
+                                    cl.size.mean.45[1], cl.size.mean.50[1], 
+                                    cl.size.mean.55[1], cl.size.mean.60[1], 
+                                    cl.size.mean.65[1], cl.size.mean.70[1], 
+                                    cl.size.mean.75[1], cl.size.mean.80[1], 
+                                    cl.size.mean.85[1], cl.size.mean.90[1], 
+                                    cl.size.mean.95[1], cl.size.mean.100[1]),
+                              
+                              U = c(cl.size.mean.35[3], cl.size.mean.40[3], 
+                                    cl.size.mean.45[3], cl.size.mean.50[3], 
+                                    cl.size.mean.55[3], cl.size.mean.60[3], 
+                                    cl.size.mean.65[3], cl.size.mean.70[3], 
+                                    cl.size.mean.75[3], cl.size.mean.80[3], 
+                                    cl.size.mean.85[3], cl.size.mean.90[3], 
+                                    cl.size.mean.95[3], cl.size.mean.100[3]))
+
+cl.size.mean.df$param <- "mean"
+
+
+cl.size.med.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
+                                 "cov.50", "cov.55", "cov.60",
+                                 "cov.65", "cov.70", "cov.75",
+                                 "cov.80", "cov.85", "cov.90",
+                                 "cov.95", "cov.100"),
+                             
+                             F = c(cl.size.med.35[2], cl.size.med.40[2], 
+                                   cl.size.med.45[2], cl.size.med.50[2], 
+                                   cl.size.med.55[2], cl.size.med.60[2], 
+                                   cl.size.med.65[2], cl.size.med.70[2], 
+                                   cl.size.med.75[2], cl.size.med.80[2], 
+                                   cl.size.med.85[2], cl.size.med.90[2], 
+                                   cl.size.med.95[2], cl.size.med.100[2]),
+                             
+                             L = c(cl.size.med.35[1], cl.size.med.40[1], 
+                                   cl.size.med.45[1], cl.size.med.50[1], 
+                                   cl.size.med.55[1], cl.size.med.60[1], 
+                                   cl.size.med.65[1], cl.size.med.70[1], 
+                                   cl.size.med.75[1], cl.size.med.80[1], 
+                                   cl.size.med.85[1], cl.size.med.90[1], 
+                                   cl.size.med.95[1], cl.size.med.100[1]),
+                             
+                             U = c(cl.size.med.35[3], cl.size.med.40[3], 
+                                   cl.size.med.45[3], cl.size.med.50[3], 
+                                   cl.size.med.55[3], cl.size.med.60[3], 
+                                   cl.size.med.65[3], cl.size.med.70[3], 
+                                   cl.size.med.75[3], cl.size.med.80[3], 
+                                   cl.size.med.85[3], cl.size.med.90[3], 
+                                   cl.size.med.95[3], cl.size.med.100[3]))
+
+cl.size.med.df$param <- "med"
+
+
+cl.size.sd.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
+                                "cov.50", "cov.55", "cov.60",
+                                "cov.65", "cov.70", "cov.75",
+                                "cov.80", "cov.85", "cov.90",
+                                "cov.95", "cov.100"),
+                            
+                            F = c(cl.size.sd.35[2], cl.size.sd.40[2], 
+                                  cl.size.sd.45[2], cl.size.sd.50[2], 
+                                  cl.size.sd.55[2], cl.size.sd.60[2], 
+                                  cl.size.sd.65[2], cl.size.sd.70[2], 
+                                  cl.size.sd.75[2], cl.size.sd.80[2], 
+                                  cl.size.sd.85[2], cl.size.sd.90[2], 
+                                  cl.size.sd.95[2], cl.size.sd.100[2]),
+                            
+                            L = c(cl.size.sd.35[1], cl.size.sd.40[1], 
+                                  cl.size.sd.45[1], cl.size.sd.50[1], 
+                                  cl.size.sd.55[1], cl.size.sd.60[1], 
+                                  cl.size.sd.65[1], cl.size.sd.70[1], 
+                                  cl.size.sd.75[1], cl.size.sd.80[1], 
+                                  cl.size.sd.85[1], cl.size.sd.90[1], 
+                                  cl.size.sd.95[1], cl.size.sd.100[1]),
+                            
+                            U = c(cl.size.sd.35[3], cl.size.sd.40[3], 
+                                  cl.size.sd.45[3], cl.size.sd.50[3], 
+                                  cl.size.sd.55[3], cl.size.sd.60[3], 
+                                  cl.size.sd.65[3], cl.size.sd.70[3], 
+                                  cl.size.sd.75[3], cl.size.sd.80[3], 
+                                  cl.size.sd.85[3], cl.size.sd.90[3], 
+                                  cl.size.sd.95[3], cl.size.sd.100[3]))
+
+cl.size.sd.df$param <- "sd"
+
+
+clust.size.stats <- rbind(cl.size.mean.df, cl.size.med.df, cl.size.sd.df)
+
+
+plot.clust.size.stats <- ggplot(clust.size.stats, aes(x=x, y=F, colour=param, group = param)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") +
+  ggtitle("Statistics  of transmission clusters")
+
+ggsave(filename = "plot.clust.size.stats.pdf",
+       plot = plot.age.mix.stats.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR",
+       width = 12, height = 8, units = "cm")
 
 
 
 
-# Age mixing meausrements inferred in transmission clusters -----------------
+
+# Age mixing measurements inferred in transmission clusters -----------------
 
 
 
@@ -1157,7 +1363,7 @@ cov.100.age.groups.table <- matrix(c((M.15.25.F.15.25.cov.100[2]), (M.15.25.F.25
 colnames(cov.100.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
 rownames(cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
 
-write.csv(cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/true.agregated.pairings100.cov.csv")
+write.csv(cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.agregated.pairings100.cov_MCAR.csv")
 
 
 
@@ -1176,8 +1382,7 @@ CI.cov.100.age.groups.table <- matrix(c(paste(M.15.25.F.15.25.cov.100[2], "[", M
 colnames(CI.cov.100.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
 rownames(CI.cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
 
-
-write.csv(CI.cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/true.agregated.pairings100_CI.cov")
+write.csv(CI.cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.agregated.pairings100.cov_CI_MCAR.csv")
 
 
 
@@ -1477,7 +1682,7 @@ rownames(agreggated.pairings.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", "M.
                                        "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
                                        "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
 
-write.csv(agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/true.agreggated.pairings.phylogeny.csv")
+write.csv(agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.agreggated.pairings.phylogeny.MCAR.csv")
 
 
 
@@ -1621,17 +1826,17 @@ CI.agreggated.pairings.mat <- matrix(c(paste(M.15.25.F.15.25.MCAR.cov.35[2], "["
 
 
 colnames(CI.agreggated.pairings.mat) <- c("Cov.35", "Cov.40", "Cov.45",
-                                       "Cov.50", "Cov.55", "Cov.60",
-                                       "Cov.65", "Cov.70", "Cov.75",
-                                       "Cov.80", "Cov.85", "Cov.90",
-                                       "Cov.95", "Cov.100")
+                                          "Cov.50", "Cov.55", "Cov.60",
+                                          "Cov.65", "Cov.70", "Cov.75",
+                                          "Cov.80", "Cov.85", "Cov.90",
+                                          "Cov.95", "Cov.100")
 
 rownames(CI.agreggated.pairings.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", "M.40.50.F.15.25",
-                                       "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
-                                       "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
+                                          "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
+                                          "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
 
 
-write.csv(CI.agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/true.agreggated.pairings.phylogeny_CI.csv")
+write.csv(CI.agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.agreggated.pairings.phylogeny_CI.MCAR.csv")
 
 
 
@@ -1978,79 +2183,79 @@ rownames(MCAR.cov.95.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male
 # Agregated table of pairings in transmission clusters  ---------------------
 
 agreggated.pairings.cl.mat <- matrix(c(M.15.25.F.15.25.MCAR.cov.cl.35[2], M.15.25.F.15.25.MCAR.cov.cl.40[2], 
-                                    M.15.25.F.15.25.MCAR.cov.cl.45[2], M.15.25.F.15.25.MCAR.cov.cl.50[2], 
-                                    M.15.25.F.15.25.MCAR.cov.cl.55[2], M.15.25.F.15.25.MCAR.cov.cl.60[2], 
-                                    M.15.25.F.15.25.MCAR.cov.cl.65[2], M.15.25.F.15.25.MCAR.cov.cl.70[2], 
-                                    M.15.25.F.15.25.MCAR.cov.cl.75[2], M.15.25.F.15.25.MCAR.cov.cl.80[2], 
-                                    M.15.25.F.15.25.MCAR.cov.cl.85[2], M.15.25.F.15.25.MCAR.cov.cl.90[2], 
-                                    M.15.25.F.15.25.MCAR.cov.cl.95[2], M.15.25.F.15.25.cov.100[2],
-                                    
-                                    M.25.40.F.15.25.MCAR.cov.cl.35[2], M.25.40.F.15.25.MCAR.cov.cl.40[2], 
-                                    M.25.40.F.15.25.MCAR.cov.cl.45[2], M.25.40.F.15.25.MCAR.cov.cl.50[2], 
-                                    M.25.40.F.15.25.MCAR.cov.cl.55[2], M.25.40.F.15.25.MCAR.cov.cl.60[2], 
-                                    M.25.40.F.15.25.MCAR.cov.cl.65[2], M.25.40.F.15.25.MCAR.cov.cl.70[2], 
-                                    M.25.40.F.15.25.MCAR.cov.cl.75[2], M.25.40.F.15.25.MCAR.cov.cl.80[2], 
-                                    M.25.40.F.15.25.MCAR.cov.cl.85[2], M.25.40.F.15.25.MCAR.cov.cl.90[2], 
-                                    M.25.40.F.15.25.MCAR.cov.cl.95[2], M.25.40.F.15.25.cov.100[2],
-                                    
-                                    M.40.50.F.15.25.MCAR.cov.cl.35[2], M.40.50.F.15.25.MCAR.cov.cl.40[2], 
-                                    M.40.50.F.15.25.MCAR.cov.cl.45[2], M.40.50.F.15.25.MCAR.cov.cl.50[2], 
-                                    M.40.50.F.15.25.MCAR.cov.cl.55[2], M.40.50.F.15.25.MCAR.cov.cl.60[2], 
-                                    M.40.50.F.15.25.MCAR.cov.cl.65[2], M.40.50.F.15.25.MCAR.cov.cl.70[2], 
-                                    M.40.50.F.15.25.MCAR.cov.cl.75[2], M.40.50.F.15.25.MCAR.cov.cl.80[2], 
-                                    M.40.50.F.15.25.MCAR.cov.cl.85[2], M.40.50.F.15.25.MCAR.cov.cl.90[2], 
-                                    M.40.50.F.15.25.MCAR.cov.cl.95[2], M.40.50.F.15.25.cov.100[2],
-                                    
-                                    M.15.25.F.25.40.MCAR.cov.cl.35[2], M.15.25.F.25.40.MCAR.cov.cl.40[2], 
-                                    M.15.25.F.25.40.MCAR.cov.cl.45[2], M.15.25.F.25.40.MCAR.cov.cl.50[2], 
-                                    M.15.25.F.25.40.MCAR.cov.cl.55[2], M.15.25.F.25.40.MCAR.cov.cl.60[2], 
-                                    M.15.25.F.25.40.MCAR.cov.cl.65[2], M.15.25.F.25.40.MCAR.cov.cl.70[2], 
-                                    M.15.25.F.25.40.MCAR.cov.cl.75[2], M.15.25.F.25.40.MCAR.cov.cl.80[2], 
-                                    M.15.25.F.25.40.MCAR.cov.cl.85[2], M.15.25.F.25.40.MCAR.cov.cl.90[2], 
-                                    M.15.25.F.25.40.MCAR.cov.cl.95[2], M.15.25.F.25.40.cov.100[2],
-                                    
-                                    M.25.40.F.25.40.MCAR.cov.cl.35[2], M.25.40.F.25.40.MCAR.cov.cl.40[2], 
-                                    M.25.40.F.25.40.MCAR.cov.cl.45[2], M.25.40.F.25.40.MCAR.cov.cl.50[2], 
-                                    M.25.40.F.25.40.MCAR.cov.cl.55[2], M.25.40.F.25.40.MCAR.cov.cl.60[2], 
-                                    M.25.40.F.25.40.MCAR.cov.cl.65[2], M.25.40.F.25.40.MCAR.cov.cl.70[2], 
-                                    M.25.40.F.25.40.MCAR.cov.cl.75[2], M.25.40.F.25.40.MCAR.cov.cl.80[2], 
-                                    M.25.40.F.25.40.MCAR.cov.cl.85[2], M.25.40.F.25.40.MCAR.cov.cl.90[2], 
-                                    M.25.40.F.25.40.MCAR.cov.cl.95[2], M.25.40.F.25.40.cov.100[2],
-                                    
-                                    M.40.50.F.25.40.MCAR.cov.cl.35[2], M.40.50.F.25.40.MCAR.cov.cl.40[2], 
-                                    M.40.50.F.25.40.MCAR.cov.cl.45[2], M.40.50.F.25.40.MCAR.cov.cl.50[2], 
-                                    M.40.50.F.25.40.MCAR.cov.cl.55[2], M.40.50.F.25.40.MCAR.cov.cl.60[2], 
-                                    M.40.50.F.25.40.MCAR.cov.cl.65[2], M.40.50.F.25.40.MCAR.cov.cl.70[2], 
-                                    M.40.50.F.25.40.MCAR.cov.cl.75[2], M.40.50.F.25.40.MCAR.cov.cl.80[2], 
-                                    M.40.50.F.25.40.MCAR.cov.cl.85[2], M.40.50.F.25.40.MCAR.cov.cl.90[2], 
-                                    M.40.50.F.25.40.MCAR.cov.cl.95[2], M.40.50.F.25.40.cov.100[2],
-                                    
-                                    M.15.25.F.40.50.MCAR.cov.cl.35[2], M.15.25.F.40.50.MCAR.cov.cl.40[2], 
-                                    M.15.25.F.40.50.MCAR.cov.cl.45[2], M.15.25.F.40.50.MCAR.cov.cl.50[2], 
-                                    M.15.25.F.40.50.MCAR.cov.cl.55[2], M.15.25.F.40.50.MCAR.cov.cl.60[2], 
-                                    M.15.25.F.40.50.MCAR.cov.cl.65[2], M.15.25.F.40.50.MCAR.cov.cl.70[2], 
-                                    M.15.25.F.40.50.MCAR.cov.cl.75[2], M.15.25.F.40.50.MCAR.cov.cl.80[2], 
-                                    M.15.25.F.40.50.MCAR.cov.cl.85[2], M.15.25.F.40.50.MCAR.cov.cl.90[2], 
-                                    M.15.25.F.40.50.MCAR.cov.cl.95[2], M.15.25.F.40.50.cov.100[2],
-                                    
-                                    M.25.40.F.40.50.MCAR.cov.cl.35[2], M.25.40.F.40.50.MCAR.cov.cl.40[2], 
-                                    M.25.40.F.40.50.MCAR.cov.cl.45[2], M.25.40.F.40.50.MCAR.cov.cl.50[2], 
-                                    M.25.40.F.40.50.MCAR.cov.cl.55[2], M.25.40.F.40.50.MCAR.cov.cl.60[2], 
-                                    M.25.40.F.40.50.MCAR.cov.cl.65[2], M.25.40.F.40.50.MCAR.cov.cl.70[2], 
-                                    M.25.40.F.40.50.MCAR.cov.cl.75[2], M.25.40.F.40.50.MCAR.cov.cl.80[2], 
-                                    M.25.40.F.40.50.MCAR.cov.cl.85[2], M.25.40.F.40.50.MCAR.cov.cl.90[2], 
-                                    M.25.40.F.40.50.MCAR.cov.cl.95[2], M.25.40.F.40.50.cov.100[2],
-                                    
-                                    M.40.50.F.40.50.MCAR.cov.cl.35[2], M.40.50.F.40.50.MCAR.cov.cl.40[2], 
-                                    M.40.50.F.40.50.MCAR.cov.cl.45[2], M.40.50.F.40.50.MCAR.cov.cl.50[2], 
-                                    M.40.50.F.40.50.MCAR.cov.cl.55[2], M.40.50.F.40.50.MCAR.cov.cl.60[2], 
-                                    M.40.50.F.40.50.MCAR.cov.cl.65[2], M.40.50.F.40.50.MCAR.cov.cl.70[2], 
-                                    M.40.50.F.40.50.MCAR.cov.cl.75[2], M.40.50.F.40.50.MCAR.cov.cl.80[2], 
-                                    M.40.50.F.40.50.MCAR.cov.cl.85[2], M.40.50.F.40.50.MCAR.cov.cl.90[2], 
-                                    M.40.50.F.40.50.MCAR.cov.cl.95[2], M.40.50.F.40.50.cov.100[2]),
-                                  
-                                  ncol = 14,
-                                  byrow = TRUE)
+                                       M.15.25.F.15.25.MCAR.cov.cl.45[2], M.15.25.F.15.25.MCAR.cov.cl.50[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.55[2], M.15.25.F.15.25.MCAR.cov.cl.60[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.65[2], M.15.25.F.15.25.MCAR.cov.cl.70[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.75[2], M.15.25.F.15.25.MCAR.cov.cl.80[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.85[2], M.15.25.F.15.25.MCAR.cov.cl.90[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.95[2], M.15.25.F.15.25.cov.100[2],
+                                       
+                                       M.25.40.F.15.25.MCAR.cov.cl.35[2], M.25.40.F.15.25.MCAR.cov.cl.40[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.45[2], M.25.40.F.15.25.MCAR.cov.cl.50[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.55[2], M.25.40.F.15.25.MCAR.cov.cl.60[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.65[2], M.25.40.F.15.25.MCAR.cov.cl.70[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.75[2], M.25.40.F.15.25.MCAR.cov.cl.80[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.85[2], M.25.40.F.15.25.MCAR.cov.cl.90[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.95[2], M.25.40.F.15.25.cov.100[2],
+                                       
+                                       M.40.50.F.15.25.MCAR.cov.cl.35[2], M.40.50.F.15.25.MCAR.cov.cl.40[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.45[2], M.40.50.F.15.25.MCAR.cov.cl.50[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.55[2], M.40.50.F.15.25.MCAR.cov.cl.60[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.65[2], M.40.50.F.15.25.MCAR.cov.cl.70[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.75[2], M.40.50.F.15.25.MCAR.cov.cl.80[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.85[2], M.40.50.F.15.25.MCAR.cov.cl.90[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.95[2], M.40.50.F.15.25.cov.100[2],
+                                       
+                                       M.15.25.F.25.40.MCAR.cov.cl.35[2], M.15.25.F.25.40.MCAR.cov.cl.40[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.45[2], M.15.25.F.25.40.MCAR.cov.cl.50[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.55[2], M.15.25.F.25.40.MCAR.cov.cl.60[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.65[2], M.15.25.F.25.40.MCAR.cov.cl.70[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.75[2], M.15.25.F.25.40.MCAR.cov.cl.80[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.85[2], M.15.25.F.25.40.MCAR.cov.cl.90[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.95[2], M.15.25.F.25.40.cov.100[2],
+                                       
+                                       M.25.40.F.25.40.MCAR.cov.cl.35[2], M.25.40.F.25.40.MCAR.cov.cl.40[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.45[2], M.25.40.F.25.40.MCAR.cov.cl.50[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.55[2], M.25.40.F.25.40.MCAR.cov.cl.60[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.65[2], M.25.40.F.25.40.MCAR.cov.cl.70[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.75[2], M.25.40.F.25.40.MCAR.cov.cl.80[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.85[2], M.25.40.F.25.40.MCAR.cov.cl.90[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.95[2], M.25.40.F.25.40.cov.100[2],
+                                       
+                                       M.40.50.F.25.40.MCAR.cov.cl.35[2], M.40.50.F.25.40.MCAR.cov.cl.40[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.45[2], M.40.50.F.25.40.MCAR.cov.cl.50[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.55[2], M.40.50.F.25.40.MCAR.cov.cl.60[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.65[2], M.40.50.F.25.40.MCAR.cov.cl.70[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.75[2], M.40.50.F.25.40.MCAR.cov.cl.80[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.85[2], M.40.50.F.25.40.MCAR.cov.cl.90[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.95[2], M.40.50.F.25.40.cov.100[2],
+                                       
+                                       M.15.25.F.40.50.MCAR.cov.cl.35[2], M.15.25.F.40.50.MCAR.cov.cl.40[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.45[2], M.15.25.F.40.50.MCAR.cov.cl.50[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.55[2], M.15.25.F.40.50.MCAR.cov.cl.60[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.65[2], M.15.25.F.40.50.MCAR.cov.cl.70[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.75[2], M.15.25.F.40.50.MCAR.cov.cl.80[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.85[2], M.15.25.F.40.50.MCAR.cov.cl.90[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.95[2], M.15.25.F.40.50.cov.100[2],
+                                       
+                                       M.25.40.F.40.50.MCAR.cov.cl.35[2], M.25.40.F.40.50.MCAR.cov.cl.40[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.45[2], M.25.40.F.40.50.MCAR.cov.cl.50[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.55[2], M.25.40.F.40.50.MCAR.cov.cl.60[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.65[2], M.25.40.F.40.50.MCAR.cov.cl.70[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.75[2], M.25.40.F.40.50.MCAR.cov.cl.80[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.85[2], M.25.40.F.40.50.MCAR.cov.cl.90[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.95[2], M.25.40.F.40.50.cov.100[2],
+                                       
+                                       M.40.50.F.40.50.MCAR.cov.cl.35[2], M.40.50.F.40.50.MCAR.cov.cl.40[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.45[2], M.40.50.F.40.50.MCAR.cov.cl.50[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.55[2], M.40.50.F.40.50.MCAR.cov.cl.60[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.65[2], M.40.50.F.40.50.MCAR.cov.cl.70[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.75[2], M.40.50.F.40.50.MCAR.cov.cl.80[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.85[2], M.40.50.F.40.50.MCAR.cov.cl.90[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.95[2], M.40.50.F.40.50.cov.100[2]),
+                                     
+                                     ncol = 14,
+                                     byrow = TRUE)
 
 
 
@@ -2061,11 +2266,11 @@ colnames(agreggated.pairings.cl.mat) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
                                           "cl.cov.95", "true.cov.100")
 
 rownames(agreggated.pairings.cl.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", "M.40.50.F.15.25",
-                                       "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
-                                       "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
+                                          "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
+                                          "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
 
 
-write.csv(agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/agreggated.pairings.clusters.csv")
+write.csv(agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/agreggated.pairings.clusters.MCAR.csv")
 
 
 CI.agreggated.pairings.cl.mat <- matrix(c(paste(M.15.25.F.15.25.MCAR.cov.cl.35[2], "[", M.15.25.F.15.25.MCAR.cov.cl.35[1], "-", M.15.25.F.15.25.MCAR.cov.cl.35[3], "]"), 
@@ -2219,7 +2424,8 @@ rownames(CI.agreggated.pairings.cl.mat) <- c("paste(M.15.25.F.15.25", "paste(M.2
                                              "paste(M.15.25.F.40.50", "paste(M.25.40.F.40.50", "paste(M.40.50.F.40.50")
 
 
-write.csv(CI.agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/agreggated.pairings.clusters_CI.csv")
+write.csv(CI.agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/agreggated.pairings.clusters_CI.MCAR.csv")
+
 
 
 # proportion of pairings inferred from transmission clusters
@@ -2310,7 +2516,7 @@ d.MCAR.true.cov.100.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.100.prop.wom
 
 
 
-# I. Inference made in transmission clusters ------------------------------
+# I. Inference made in transmission clusters: proportions of men/women in pairings ------------------------------
 
 
 
@@ -2849,6 +3055,7 @@ d.MCAR.cov.70.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.men[,8
 d.MCAR.cov.70.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.women[,8])
 
 d.MCAR.cov.70.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.men[,9])
+
 d.MCAR.cov.70.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.women[,9])
 
 
@@ -3343,6 +3550,7 @@ props <- matrix(c(d.MCAR.cov.35.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.pr
 ncol = 14,
 byrow = TRUE)
 
+props <- round(props, digits = 2)
 
 
 colnames(props) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
@@ -3361,7 +3569,7 @@ rownames(props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                      "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                      "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(props, file = "/home/david/age_mixing_AD_clusters/results/inferred.proportions.csv")
+write.csv(props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/inferred.proportions.MCAR.csv")
 
 
 CI.props <- matrix(c(paste(d.MCAR.cov.35.cl.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.35.cl.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.35.cl.prop.men15.25.F.15.25[3], "]"), 
@@ -3657,11 +3865,10 @@ rownames(CI.props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                         "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                         "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(CI.props, file = "/home/david/age_mixing_AD_clusters/results/inferred.proportions_CI.csv")
+write.csv(CI.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/inferred.proportions_CI.MCAR.csv")
 
 
-
-
+#  Figures --------------
 
 # men15.25.F.15.25. --------------------
 
@@ -4327,815 +4534,135 @@ prop.women40.50.M.40.50.df$parameter <- "prop.F.40.50.M.40.50" # d.MCAR.true.cov
 # men40.50.F.40.50, women40.50.M.40.50
 
 
-proportions.df <- rbind(prop.men15.25.F.15.25.df, prop.women15.25.M.15.25.df,
-                        prop.men25.40.F.15.25.df, prop.women25.40.M.15.25.df,
-                        prop.men40.50.F.15.25.df, prop.women40.50.M.15.25.df,
-                        
-                        prop.men15.25.F.25.40.df, prop.women15.25.M.25.40.df,
-                        prop.men25.40.F.25.40.df, prop.women25.40.M.25.40.df,
-                        prop.men40.50.F.25.40.df, prop.women40.50.M.25.40.df,
-                        
-                        prop.men15.25.F.40.50.df, prop.women15.25.M.40.50.df,
-                        prop.men25.40.F.40.50.df, prop.women25.40.M.40.50.df,
-                        prop.men40.50.F.40.50.df, prop.women40.50.M.40.50.df)
+proportions.df.F.15.25 <- rbind(prop.men15.25.F.15.25.df, 
+                                prop.men25.40.F.15.25.df, 
+                                prop.men40.50.F.15.25.df)
+
+proportions.df.F.25.40 <- rbind(prop.men15.25.F.25.40.df,
+                                prop.men25.40.F.25.40.df,
+                                prop.men40.50.F.25.40.df)
+
+proportions.df.F.40.50 <- rbind(prop.men15.25.F.40.50.df,
+                                prop.men25.40.F.40.50.df,
+                                prop.men40.50.F.40.50.df)
+
+proportions.df.M.15.25 <- rbind(prop.women15.25.M.15.25.df,
+                                prop.women25.40.M.15.25.df,
+                                prop.women40.50.M.15.25.df)
+
+proportions.df.M.25.40 <- rbind(prop.women15.25.M.25.40.df,
+                                prop.women25.40.M.25.40.df,
+                                prop.women40.50.M.25.40.df)
+
+proportions.df.M.40.50 <- rbind(prop.women15.25.M.40.50.df,
+                                prop.women25.40.M.40.50.df,
+                                prop.women40.50.M.40.50.df)
 
 
-plot.proportions.df <- ggplot(proportions.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
-  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
-  # geom_line(size=.3) +
+
+plot.F.15.25 <- ggplot(proportions.df.F.15.25, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Value") +
-  ggtitle("Pairings across age groups")
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
 
+plot.F.25.40 <- ggplot(proportions.df.F.25.40, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
 
+plot.F.40.50 <- ggplot(proportions.df.F.40.50, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
 
+plot.M.15.25 <- ggplot(proportions.df.M.15.25, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
 
+plot.M.25.40 <- ggplot(proportions.df.M.25.40, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
 
-# Visualising I in different MCAR coverages -------------------------------
+plot.M.40.50 <- ggplot(proportions.df.M.40.50, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
 
 
 
-# Proportions from transmission clusters ---------------------------------
+plotall.F <- ggpubr::ggarrange(plot.F.15.25, plot.F.25.40, plot.F.40.50)
 
-# AAAAAAAAAA 15.25 - 40.50 and 15.25
+plotall.M <- ggpubr::ggarrange(plot.M.15.25, plot.M.25.40, plot.M.40.50)
 
-# Men: men15.25.F.15.25
 
-# d.MCAR.true.cov.100.prop.men15.25.F.15.25
+ggsave(filename = "plotall.proportions.F.pdf",
+       plot = plotall.F,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
-cl.prop.men15.25.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.prop.men15.25.F.15.25[2],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.50.cl.prop.men15.25.F.15.25[2],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.60.cl.prop.men15.25.F.15.25[2],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.70.cl.prop.men15.25.F.15.25[2],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.80.cl.prop.men15.25.F.15.25[2],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.90.cl.prop.men15.25.F.15.25[2],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.15.25[2], d.MCAR.true.cov.100.prop.men15.25.F.15.25[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men15.25.F.15.25[1], d.MCAR.cov.40.cl.prop.men15.25.F.15.25[1],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.15.25[1], d.MCAR.cov.50.cl.prop.men15.25.F.15.25[1],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.15.25[1], d.MCAR.cov.60.cl.prop.men15.25.F.15.25[1],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.15.25[1], d.MCAR.cov.70.cl.prop.men15.25.F.15.25[1],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.15.25[1], d.MCAR.cov.80.cl.prop.men15.25.F.15.25[1],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.15.25[1], d.MCAR.cov.90.cl.prop.men15.25.F.15.25[1],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.15.25[1], d.MCAR.true.cov.100.prop.men15.25.F.15.25[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men15.25.F.15.25[3], d.MCAR.cov.40.cl.prop.men15.25.F.15.25[3],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.15.25[3], d.MCAR.cov.50.cl.prop.men15.25.F.15.25[3],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.15.25[3], d.MCAR.cov.60.cl.prop.men15.25.F.15.25[3],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.15.25[3], d.MCAR.cov.70.cl.prop.men15.25.F.15.25[3],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.15.25[3], d.MCAR.cov.80.cl.prop.men15.25.F.15.25[3],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.15.25[3], d.MCAR.cov.90.cl.prop.men15.25.F.15.25[3],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.15.25[3], d.MCAR.true.cov.100.prop.men15.25.F.15.25[3]))
+ggsave(filename = "plotall.proportions.M.pdf",
+       plot = plotall.M,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
-plot.cl.prop.men15.25.F.15.25 <- ggplot(cl.prop.men15.25.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 15 - 25 paired with women with 15 - 25 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
 
-ggsave(filename = "plot.cl.prop.men15.25.F.15.25.png",
-       plot = plot.cl.prop.men15.25.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
 
-# Women: women15.25.M.15.25
 
-cl.prop.women15.25.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.40.cl.prop.women15.25.M.15.25[2],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.50.cl.prop.women15.25.M.15.25[2],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.60.cl.prop.women15.25.M.15.25[2],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.70.cl.prop.women15.25.M.15.25[2],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.80.cl.prop.women15.25.M.15.25[2],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.90.cl.prop.women15.25.M.15.25[2],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.15.25[2], d.MCAR.true.cov.100.prop.women15.25.M.15.25[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women15.25.M.15.25[1], d.MCAR.cov.40.cl.prop.women15.25.M.15.25[1],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.15.25[1], d.MCAR.cov.50.cl.prop.women15.25.M.15.25[1],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.15.25[1], d.MCAR.cov.60.cl.prop.women15.25.M.15.25[1],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.15.25[1], d.MCAR.cov.70.cl.prop.women15.25.M.15.25[1],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.15.25[1], d.MCAR.cov.80.cl.prop.women15.25.M.15.25[1],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.15.25[1], d.MCAR.cov.90.cl.prop.women15.25.M.15.25[1],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.15.25[1], d.MCAR.true.cov.100.prop.women15.25.M.15.25[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women15.25.M.15.25[3], d.MCAR.cov.40.cl.prop.women15.25.M.15.25[3],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.15.25[3], d.MCAR.cov.50.cl.prop.women15.25.M.15.25[3],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.15.25[3], d.MCAR.cov.60.cl.prop.women15.25.M.15.25[3],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.15.25[3], d.MCAR.cov.70.cl.prop.women15.25.M.15.25[3],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.15.25[3], d.MCAR.cov.80.cl.prop.women15.25.M.15.25[3],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.15.25[3], d.MCAR.cov.90.cl.prop.women15.25.M.15.25[3],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.15.25[3], d.MCAR.true.cov.100.prop.women15.25.M.15.25[3]))
 
-
-
-plot.cl.prop.women15.25.M.15.25 <- ggplot(cl.prop.women15.25.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men 15 - 25 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.women15.25.M.15.25.png",
-       plot = plot.cl.prop.women15.25.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: men25.40.F.15.25 
-
-cl.prop.men25.40.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.40.cl.prop.men25.40.F.15.25[2],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.50.cl.prop.men25.40.F.15.25[2],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.60.cl.prop.men25.40.F.15.25[2],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.70.cl.prop.men25.40.F.15.25[2],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.80.cl.prop.men25.40.F.15.25[2],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.90.cl.prop.men25.40.F.15.25[2],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.15.25[2], d.MCAR.true.cov.100.prop.men25.40.F.15.25[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men25.40.F.15.25[1], d.MCAR.cov.40.cl.prop.men25.40.F.15.25[1],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.15.25[1], d.MCAR.cov.50.cl.prop.men25.40.F.15.25[1],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.15.25[1], d.MCAR.cov.60.cl.prop.men25.40.F.15.25[1],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.15.25[1], d.MCAR.cov.70.cl.prop.men25.40.F.15.25[1],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.15.25[1], d.MCAR.cov.80.cl.prop.men25.40.F.15.25[1],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.15.25[1], d.MCAR.cov.90.cl.prop.men25.40.F.15.25[1],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.15.25[1], d.MCAR.true.cov.100.prop.men25.40.F.15.25[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men25.40.F.15.25[3], d.MCAR.cov.40.cl.prop.men25.40.F.15.25[3],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.15.25[3], d.MCAR.cov.50.cl.prop.men25.40.F.15.25[3],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.15.25[3], d.MCAR.cov.60.cl.prop.men25.40.F.15.25[3],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.15.25[3], d.MCAR.cov.70.cl.prop.men25.40.F.15.25[3],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.15.25[3], d.MCAR.cov.80.cl.prop.men25.40.F.15.25[3],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.15.25[3], d.MCAR.cov.90.cl.prop.men25.40.F.15.25[3],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.15.25[3], d.MCAR.true.cov.100.prop.men25.40.F.15.25[3]))
-
-
-plot.cl.prop.men25.40.F.15.25 <- ggplot(cl.prop.men25.40.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.men25.40.F.15.25.png",
-       plot = plot.cl.prop.men25.40.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Women: women25.40.M.15.25 
-
-cl.prop.women25.40.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.40.cl.prop.women25.40.M.15.25[2],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.50.cl.prop.women25.40.M.15.25[2],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.60.cl.prop.women25.40.M.15.25[2],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.70.cl.prop.women25.40.M.15.25[2],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.80.cl.prop.women25.40.M.15.25[2],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.90.cl.prop.women25.40.M.15.25[2],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.15.25[2], d.MCAR.true.cov.100.prop.women25.40.M.15.25[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women25.40.M.15.25[1], d.MCAR.cov.40.cl.prop.women25.40.M.15.25[1],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.15.25[1], d.MCAR.cov.50.cl.prop.women25.40.M.15.25[1],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.15.25[1], d.MCAR.cov.60.cl.prop.women25.40.M.15.25[1],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.15.25[1], d.MCAR.cov.70.cl.prop.women25.40.M.15.25[1],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.15.25[1], d.MCAR.cov.80.cl.prop.women25.40.M.15.25[1],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.15.25[1], d.MCAR.cov.90.cl.prop.women25.40.M.15.25[1],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.15.25[1], d.MCAR.true.cov.100.prop.women25.40.M.15.25[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women25.40.M.15.25[3], d.MCAR.cov.40.cl.prop.women25.40.M.15.25[3],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.15.25[3], d.MCAR.cov.50.cl.prop.women25.40.M.15.25[3],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.15.25[3], d.MCAR.cov.60.cl.prop.women25.40.M.15.25[3],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.15.25[3], d.MCAR.cov.70.cl.prop.women25.40.M.15.25[3],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.15.25[3], d.MCAR.cov.80.cl.prop.women25.40.M.15.25[3],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.15.25[3], d.MCAR.cov.90.cl.prop.women25.40.M.15.25[3],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.15.25[3], d.MCAR.true.cov.100.prop.women25.40.M.15.25[3]))
-
-
-plot.cl.prop.women25.40.M.15.25 <- ggplot(cl.prop.women25.40.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.prop.women25.40.M.15.25.png",
-       plot = plot.cl.prop.women25.40.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: men40.50.F.15.25 
-
-cl.prop.men40.50.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.40.cl.prop.men40.50.F.15.25[2],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.50.cl.prop.men40.50.F.15.25[2],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.60.cl.prop.men40.50.F.15.25[2],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.70.cl.prop.men40.50.F.15.25[2],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.80.cl.prop.men40.50.F.15.25[2],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.90.cl.prop.men40.50.F.15.25[2],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.15.25[2], d.MCAR.true.cov.100.prop.men40.50.F.15.25[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men40.50.F.15.25[1], d.MCAR.cov.40.cl.prop.men40.50.F.15.25[1],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.15.25[1], d.MCAR.cov.50.cl.prop.men40.50.F.15.25[1],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.15.25[1], d.MCAR.cov.60.cl.prop.men40.50.F.15.25[1],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.15.25[1], d.MCAR.cov.70.cl.prop.men40.50.F.15.25[1],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.15.25[1], d.MCAR.cov.80.cl.prop.men40.50.F.15.25[1],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.15.25[1], d.MCAR.cov.90.cl.prop.men40.50.F.15.25[1],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.15.25[1], d.MCAR.true.cov.100.prop.men40.50.F.15.25[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men40.50.F.15.25[3], d.MCAR.cov.40.cl.prop.men40.50.F.15.25[3],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.15.25[3], d.MCAR.cov.50.cl.prop.men40.50.F.15.25[3],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.15.25[3], d.MCAR.cov.60.cl.prop.men40.50.F.15.25[3],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.15.25[3], d.MCAR.cov.70.cl.prop.men40.50.F.15.25[3],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.15.25[3], d.MCAR.cov.80.cl.prop.men40.50.F.15.25[3],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.15.25[3], d.MCAR.cov.90.cl.prop.men40.50.F.15.25[3],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.15.25[3], d.MCAR.true.cov.100.prop.men40.50.F.15.25[3]))
-
-
-plot.cl.prop.men40.50.F.15.25 <- ggplot(cl.prop.men40.50.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 40 - 50 paired with women in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.men40.50.F.15.25.png",
-       plot = plot.cl.prop.men40.50.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women40.50.M.15.25 
-
-cl.prop.women40.50.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.40.cl.prop.women40.50.M.15.25[2],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.50.cl.prop.women40.50.M.15.25[2],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.60.cl.prop.women40.50.M.15.25[2],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.70.cl.prop.women40.50.M.15.25[2],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.80.cl.prop.women40.50.M.15.25[2],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.90.cl.prop.women40.50.M.15.25[2],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.15.25[2], d.MCAR.true.cov.100.prop.women40.50.M.15.25[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women40.50.M.15.25[1], d.MCAR.cov.40.cl.prop.women40.50.M.15.25[1],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.15.25[1], d.MCAR.cov.50.cl.prop.women40.50.M.15.25[1],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.15.25[1], d.MCAR.cov.60.cl.prop.women40.50.M.15.25[1],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.15.25[1], d.MCAR.cov.70.cl.prop.women40.50.M.15.25[1],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.15.25[1], d.MCAR.cov.80.cl.prop.women40.50.M.15.25[1],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.15.25[1], d.MCAR.cov.90.cl.prop.women40.50.M.15.25[1],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.15.25[1], d.MCAR.true.cov.100.prop.women40.50.M.15.25[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women40.50.M.15.25[3], d.MCAR.cov.40.cl.prop.women40.50.M.15.25[3],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.15.25[3], d.MCAR.cov.50.cl.prop.women40.50.M.15.25[3],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.15.25[3], d.MCAR.cov.60.cl.prop.women40.50.M.15.25[3],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.15.25[3], d.MCAR.cov.70.cl.prop.women40.50.M.15.25[3],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.15.25[3], d.MCAR.cov.80.cl.prop.women40.50.M.15.25[3],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.15.25[3], d.MCAR.cov.90.cl.prop.women40.50.M.15.25[3],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.15.25[3], d.MCAR.true.cov.100.prop.women40.50.M.15.25[3]))
-
-
-plot.cl.prop.women40.50.M.15.25 <- ggplot(cl.prop.women40.50.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.women40.50.M.15.25.png",
-       plot = plot.cl.prop.women40.50.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-## BBBBBBBBBBBB 15.25 - 40.50 and 25.40
-
-
-# Men: men15.25.F.25.40
-
-# d.MCAR.true.cov.100.prop.men15.25.F.25.40
-
-cl.prop.men15.25.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.40.cl.prop.men15.25.F.25.40[2],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.50.cl.prop.men15.25.F.25.40[2],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.60.cl.prop.men15.25.F.25.40[2],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.70.cl.prop.men15.25.F.25.40[2],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.80.cl.prop.men15.25.F.25.40[2],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.90.cl.prop.men15.25.F.25.40[2],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.25.40[2], d.MCAR.true.cov.100.prop.men15.25.F.25.40[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men15.25.F.25.40[1], d.MCAR.cov.40.cl.prop.men15.25.F.25.40[1],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.25.40[1], d.MCAR.cov.50.cl.prop.men15.25.F.25.40[1],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.25.40[1], d.MCAR.cov.60.cl.prop.men15.25.F.25.40[1],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.25.40[1], d.MCAR.cov.70.cl.prop.men15.25.F.25.40[1],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.25.40[1], d.MCAR.cov.80.cl.prop.men15.25.F.25.40[1],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.25.40[1], d.MCAR.cov.90.cl.prop.men15.25.F.25.40[1],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.25.40[1], d.MCAR.true.cov.100.prop.men15.25.F.25.40[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men15.25.F.25.40[3], d.MCAR.cov.40.cl.prop.men15.25.F.25.40[3],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.25.40[3], d.MCAR.cov.50.cl.prop.men15.25.F.25.40[3],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.25.40[3], d.MCAR.cov.60.cl.prop.men15.25.F.25.40[3],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.25.40[3], d.MCAR.cov.70.cl.prop.men15.25.F.25.40[3],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.25.40[3], d.MCAR.cov.80.cl.prop.men15.25.F.25.40[3],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.25.40[3], d.MCAR.cov.90.cl.prop.men15.25.F.25.40[3],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.25.40[3], d.MCAR.true.cov.100.prop.men15.25.F.25.40[3]))
-
-
-plot.cl.prop.men15.25.F.25.40 <- ggplot(cl.prop.men15.25.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 15 - 25 paired with women with 25 - 40 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.prop.men15.25.F.25.40.png",
-       plot = plot.cl.prop.men15.25.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Women: women15.25.M.25.40
-
-cl.prop.women15.25.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.40.cl.prop.women15.25.M.25.40[2],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.50.cl.prop.women15.25.M.25.40[2],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.60.cl.prop.women15.25.M.25.40[2],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.70.cl.prop.women15.25.M.25.40[2],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.80.cl.prop.women15.25.M.25.40[2],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.90.cl.prop.women15.25.M.25.40[2],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.25.40[2], d.MCAR.true.cov.100.prop.women15.25.M.25.40[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women15.25.M.25.40[1], d.MCAR.cov.40.cl.prop.women15.25.M.25.40[1],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.25.40[1], d.MCAR.cov.50.cl.prop.women15.25.M.25.40[1],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.25.40[1], d.MCAR.cov.60.cl.prop.women15.25.M.25.40[1],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.25.40[1], d.MCAR.cov.70.cl.prop.women15.25.M.25.40[1],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.25.40[1], d.MCAR.cov.80.cl.prop.women15.25.M.25.40[1],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.25.40[1], d.MCAR.cov.90.cl.prop.women15.25.M.25.40[1],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.25.40[1], d.MCAR.true.cov.100.prop.women15.25.M.25.40[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women15.25.M.25.40[3], d.MCAR.cov.40.cl.prop.women15.25.M.25.40[3],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.25.40[3], d.MCAR.cov.50.cl.prop.women15.25.M.25.40[3],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.25.40[3], d.MCAR.cov.60.cl.prop.women15.25.M.25.40[3],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.25.40[3], d.MCAR.cov.70.cl.prop.women15.25.M.25.40[3],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.25.40[3], d.MCAR.cov.80.cl.prop.women15.25.M.25.40[3],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.25.40[3], d.MCAR.cov.90.cl.prop.women15.25.M.25.40[3],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.25.40[3], d.MCAR.true.cov.100.prop.women15.25.M.25.40[3]))
-
-
-
-plot.cl.prop.women15.25.M.25.40 <- ggplot(cl.prop.women15.25.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men 25 - 40 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.prop.women15.25.M.25.40.png",
-       plot = plot.cl.prop.women15.25.M.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: men25.40.F.25.40 
-
-cl.prop.men25.40.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.40.cl.prop.men25.40.F.25.40[2],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.50.cl.prop.men25.40.F.25.40[2],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.60.cl.prop.men25.40.F.25.40[2],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.70.cl.prop.men25.40.F.25.40[2],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.80.cl.prop.men25.40.F.25.40[2],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.90.cl.prop.men25.40.F.25.40[2],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.25.40[2], d.MCAR.true.cov.100.prop.men25.40.F.25.40[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men25.40.F.25.40[1], d.MCAR.cov.40.cl.prop.men25.40.F.25.40[1],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.25.40[1], d.MCAR.cov.50.cl.prop.men25.40.F.25.40[1],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.25.40[1], d.MCAR.cov.60.cl.prop.men25.40.F.25.40[1],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.25.40[1], d.MCAR.cov.70.cl.prop.men25.40.F.25.40[1],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.25.40[1], d.MCAR.cov.80.cl.prop.men25.40.F.25.40[1],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.25.40[1], d.MCAR.cov.90.cl.prop.men25.40.F.25.40[1],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.25.40[1], d.MCAR.true.cov.100.prop.men25.40.F.25.40[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men25.40.F.25.40[3], d.MCAR.cov.40.cl.prop.men25.40.F.25.40[3],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.25.40[3], d.MCAR.cov.50.cl.prop.men25.40.F.25.40[3],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.25.40[3], d.MCAR.cov.60.cl.prop.men25.40.F.25.40[3],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.25.40[3], d.MCAR.cov.70.cl.prop.men25.40.F.25.40[3],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.25.40[3], d.MCAR.cov.80.cl.prop.men25.40.F.25.40[3],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.25.40[3], d.MCAR.cov.90.cl.prop.men25.40.F.25.40[3],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.25.40[3], d.MCAR.true.cov.100.prop.men25.40.F.25.40[3]))
-
-
-plot.cl.prop.men25.40.F.25.40 <- ggplot(cl.prop.men25.40.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.men25.40.F.25.40.png",
-       plot = plot.cl.prop.men25.40.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women25.40.M.25.40 
-
-cl.prop.women25.40.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.40.cl.prop.women25.40.M.25.40[2],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.50.cl.prop.women25.40.M.25.40[2],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.60.cl.prop.women25.40.M.25.40[2],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.70.cl.prop.women25.40.M.25.40[2],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.80.cl.prop.women25.40.M.25.40[2],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.90.cl.prop.women25.40.M.25.40[2],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.25.40[2], d.MCAR.true.cov.100.prop.women25.40.M.25.40[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women25.40.M.25.40[1], d.MCAR.cov.40.cl.prop.women25.40.M.25.40[1],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.25.40[1], d.MCAR.cov.50.cl.prop.women25.40.M.25.40[1],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.25.40[1], d.MCAR.cov.60.cl.prop.women25.40.M.25.40[1],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.25.40[1], d.MCAR.cov.70.cl.prop.women25.40.M.25.40[1],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.25.40[1], d.MCAR.cov.80.cl.prop.women25.40.M.25.40[1],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.25.40[1], d.MCAR.cov.90.cl.prop.women25.40.M.25.40[1],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.25.40[1], d.MCAR.true.cov.100.prop.women25.40.M.25.40[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women25.40.M.25.40[3], d.MCAR.cov.40.cl.prop.women25.40.M.25.40[3],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.25.40[3], d.MCAR.cov.50.cl.prop.women25.40.M.25.40[3],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.25.40[3], d.MCAR.cov.60.cl.prop.women25.40.M.25.40[3],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.25.40[3], d.MCAR.cov.70.cl.prop.women25.40.M.25.40[3],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.25.40[3], d.MCAR.cov.80.cl.prop.women25.40.M.25.40[3],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.25.40[3], d.MCAR.cov.90.cl.prop.women25.40.M.25.40[3],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.25.40[3], d.MCAR.true.cov.100.prop.women25.40.M.25.40[3]))
-
-
-plot.cl.prop.women25.40.M.25.40 <- ggplot(cl.prop.women25.40.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.women25.40.M.25.40.png",
-       plot = plot.cl.prop.women25.40.M.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men40.50.F.25.40 
-
-cl.prop.men40.50.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.40.cl.prop.men40.50.F.25.40[2],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.50.cl.prop.men40.50.F.25.40[2],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.60.cl.prop.men40.50.F.25.40[2],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.70.cl.prop.men40.50.F.25.40[2],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.80.cl.prop.men40.50.F.25.40[2],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.90.cl.prop.men40.50.F.25.40[2],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.25.40[2], d.MCAR.true.cov.100.prop.men40.50.F.25.40[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men40.50.F.25.40[1], d.MCAR.cov.40.cl.prop.men40.50.F.25.40[1],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.25.40[1], d.MCAR.cov.50.cl.prop.men40.50.F.25.40[1],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.25.40[1], d.MCAR.cov.60.cl.prop.men40.50.F.25.40[1],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.25.40[1], d.MCAR.cov.70.cl.prop.men40.50.F.25.40[1],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.25.40[1], d.MCAR.cov.80.cl.prop.men40.50.F.25.40[1],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.25.40[1], d.MCAR.cov.90.cl.prop.men40.50.F.25.40[1],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.25.40[1], d.MCAR.true.cov.100.prop.men40.50.F.25.40[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men40.50.F.25.40[3], d.MCAR.cov.40.cl.prop.men40.50.F.25.40[3],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.25.40[3], d.MCAR.cov.50.cl.prop.men40.50.F.25.40[3],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.25.40[3], d.MCAR.cov.60.cl.prop.men40.50.F.25.40[3],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.25.40[3], d.MCAR.cov.70.cl.prop.men40.50.F.25.40[3],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.25.40[3], d.MCAR.cov.80.cl.prop.men40.50.F.25.40[3],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.25.40[3], d.MCAR.cov.90.cl.prop.men40.50.F.25.40[3],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.25.40[3], d.MCAR.true.cov.100.prop.men40.50.F.25.40[3]))
-
-
-plot.cl.prop.men40.50.F.25.40 <- ggplot(cl.prop.men40.50.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 40 - 50 paired with women in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.men40.50.F.25.40.png",
-       plot = plot.cl.prop.men40.50.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women40.50.M.25.40 
-
-cl.prop.women40.50.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.40.cl.prop.women40.50.M.25.40[2],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.50.cl.prop.women40.50.M.25.40[2],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.60.cl.prop.women40.50.M.25.40[2],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.70.cl.prop.women40.50.M.25.40[2],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.80.cl.prop.women40.50.M.25.40[2],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.90.cl.prop.women40.50.M.25.40[2],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.25.40[2], d.MCAR.true.cov.100.prop.women40.50.M.25.40[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women40.50.M.25.40[1], d.MCAR.cov.40.cl.prop.women40.50.M.25.40[1],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.25.40[1], d.MCAR.cov.50.cl.prop.women40.50.M.25.40[1],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.25.40[1], d.MCAR.cov.60.cl.prop.women40.50.M.25.40[1],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.25.40[1], d.MCAR.cov.70.cl.prop.women40.50.M.25.40[1],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.25.40[1], d.MCAR.cov.80.cl.prop.women40.50.M.25.40[1],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.25.40[1], d.MCAR.cov.90.cl.prop.women40.50.M.25.40[1],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.25.40[1], d.MCAR.true.cov.100.prop.women40.50.M.25.40[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women40.50.M.25.40[3], d.MCAR.cov.40.cl.prop.women40.50.M.25.40[3],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.25.40[3], d.MCAR.cov.50.cl.prop.women40.50.M.25.40[3],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.25.40[3], d.MCAR.cov.60.cl.prop.women40.50.M.25.40[3],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.25.40[3], d.MCAR.cov.70.cl.prop.women40.50.M.25.40[3],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.25.40[3], d.MCAR.cov.80.cl.prop.women40.50.M.25.40[3],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.25.40[3], d.MCAR.cov.90.cl.prop.women40.50.M.25.40[3],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.25.40[3], d.MCAR.true.cov.100.prop.women40.50.M.25.40[3]))
-
-
-plot.cl.prop.women40.50.M.25.40 <- ggplot(cl.prop.women40.50.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.women40.50.M.25.40.png",
-       plot = plot.cl.prop.men40.50.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-## CCCCCCCCCC 15.25 - 40 - 50 and 40.50
-
-
-
-# Men: men15.25.F.40.50
-
-# d.MCAR.true.cov.100.prop.men15.25.F.40.50
-
-cl.prop.men15.25.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.40.cl.prop.men15.25.F.40.50[2],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.50.cl.prop.men15.25.F.40.50[2],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.60.cl.prop.men15.25.F.40.50[2],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.70.cl.prop.men15.25.F.40.50[2],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.80.cl.prop.men15.25.F.40.50[2],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.90.cl.prop.men15.25.F.40.50[2],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.40.50[2], d.MCAR.true.cov.100.prop.men15.25.F.40.50[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men15.25.F.40.50[1], d.MCAR.cov.40.cl.prop.men15.25.F.40.50[1],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.40.50[1], d.MCAR.cov.50.cl.prop.men15.25.F.40.50[1],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.40.50[1], d.MCAR.cov.60.cl.prop.men15.25.F.40.50[1],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.40.50[1], d.MCAR.cov.70.cl.prop.men15.25.F.40.50[1],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.40.50[1], d.MCAR.cov.80.cl.prop.men15.25.F.40.50[1],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.40.50[1], d.MCAR.cov.90.cl.prop.men15.25.F.40.50[1],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.40.50[1], d.MCAR.true.cov.100.prop.men15.25.F.40.50[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men15.25.F.40.50[3], d.MCAR.cov.40.cl.prop.men15.25.F.40.50[3],
-                                             d.MCAR.cov.45.cl.prop.men15.25.F.40.50[3], d.MCAR.cov.50.cl.prop.men15.25.F.40.50[3],
-                                             d.MCAR.cov.55.cl.prop.men15.25.F.40.50[3], d.MCAR.cov.60.cl.prop.men15.25.F.40.50[3],
-                                             d.MCAR.cov.65.cl.prop.men15.25.F.40.50[3], d.MCAR.cov.70.cl.prop.men15.25.F.40.50[3],
-                                             d.MCAR.cov.75.cl.prop.men15.25.F.40.50[3], d.MCAR.cov.80.cl.prop.men15.25.F.40.50[3],
-                                             d.MCAR.cov.85.cl.prop.men15.25.F.40.50[3], d.MCAR.cov.90.cl.prop.men15.25.F.40.50[3],
-                                             d.MCAR.cov.95.cl.prop.men15.25.F.40.50[3], d.MCAR.true.cov.100.prop.men15.25.F.40.50[3]))
-
-
-plot.cl.prop.men15.25.F.40.50 <- ggplot(cl.prop.men15.25.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 15 - 25 paired with women with 40 - 50 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.men15.25.F.40.50.png",
-       plot = plot.cl.prop.men15.25.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: women15.25.M.40.50
-
-cl.prop.women15.25.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.40.cl.prop.women15.25.M.40.50[2],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.50.cl.prop.women15.25.M.40.50[2],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.60.cl.prop.women15.25.M.40.50[2],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.70.cl.prop.women15.25.M.40.50[2],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.80.cl.prop.women15.25.M.40.50[2],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.90.cl.prop.women15.25.M.40.50[2],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.40.50[2], d.MCAR.true.cov.100.prop.women15.25.M.40.50[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women15.25.M.40.50[1], d.MCAR.cov.40.cl.prop.women15.25.M.40.50[1],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.40.50[1], d.MCAR.cov.50.cl.prop.women15.25.M.40.50[1],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.40.50[1], d.MCAR.cov.60.cl.prop.women15.25.M.40.50[1],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.40.50[1], d.MCAR.cov.70.cl.prop.women15.25.M.40.50[1],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.40.50[1], d.MCAR.cov.80.cl.prop.women15.25.M.40.50[1],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.40.50[1], d.MCAR.cov.90.cl.prop.women15.25.M.40.50[1],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.40.50[1], d.MCAR.true.cov.100.prop.women15.25.M.40.50[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women15.25.M.40.50[3], d.MCAR.cov.40.cl.prop.women15.25.M.40.50[3],
-                                               d.MCAR.cov.45.cl.prop.women15.25.M.40.50[3], d.MCAR.cov.50.cl.prop.women15.25.M.40.50[3],
-                                               d.MCAR.cov.55.cl.prop.women15.25.M.40.50[3], d.MCAR.cov.60.cl.prop.women15.25.M.40.50[3],
-                                               d.MCAR.cov.65.cl.prop.women15.25.M.40.50[3], d.MCAR.cov.70.cl.prop.women15.25.M.40.50[3],
-                                               d.MCAR.cov.75.cl.prop.women15.25.M.40.50[3], d.MCAR.cov.80.cl.prop.women15.25.M.40.50[3],
-                                               d.MCAR.cov.85.cl.prop.women15.25.M.40.50[3], d.MCAR.cov.90.cl.prop.women15.25.M.40.50[3],
-                                               d.MCAR.cov.95.cl.prop.women15.25.M.40.50[3], d.MCAR.true.cov.100.prop.women15.25.M.40.50[3]))
-
-
-
-plot.cl.prop.women15.25.M.40.50 <- ggplot(cl.prop.women15.25.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men 40 - 50 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.women15.25.M.40.50.png",
-       plot = plot.cl.prop.women15.25.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men25.40.F.40.50 
-
-cl.prop.men25.40.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.40.cl.prop.men25.40.F.40.50[2],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.50.cl.prop.men25.40.F.40.50[2],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.60.cl.prop.men25.40.F.40.50[2],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.70.cl.prop.men25.40.F.40.50[2],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.80.cl.prop.men25.40.F.40.50[2],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.90.cl.prop.men25.40.F.40.50[2],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.40.50[2], d.MCAR.true.cov.100.prop.men25.40.F.40.50[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men25.40.F.40.50[1], d.MCAR.cov.40.cl.prop.men25.40.F.40.50[1],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.40.50[1], d.MCAR.cov.50.cl.prop.men25.40.F.40.50[1],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.40.50[1], d.MCAR.cov.60.cl.prop.men25.40.F.40.50[1],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.40.50[1], d.MCAR.cov.70.cl.prop.men25.40.F.40.50[1],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.40.50[1], d.MCAR.cov.80.cl.prop.men25.40.F.40.50[1],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.40.50[1], d.MCAR.cov.90.cl.prop.men25.40.F.40.50[1],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.40.50[1], d.MCAR.true.cov.100.prop.men25.40.F.40.50[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men25.40.F.40.50[3], d.MCAR.cov.40.cl.prop.men25.40.F.40.50[3],
-                                             d.MCAR.cov.45.cl.prop.men25.40.F.40.50[3], d.MCAR.cov.50.cl.prop.men25.40.F.40.50[3],
-                                             d.MCAR.cov.55.cl.prop.men25.40.F.40.50[3], d.MCAR.cov.60.cl.prop.men25.40.F.40.50[3],
-                                             d.MCAR.cov.65.cl.prop.men25.40.F.40.50[3], d.MCAR.cov.70.cl.prop.men25.40.F.40.50[3],
-                                             d.MCAR.cov.75.cl.prop.men25.40.F.40.50[3], d.MCAR.cov.80.cl.prop.men25.40.F.40.50[3],
-                                             d.MCAR.cov.85.cl.prop.men25.40.F.40.50[3], d.MCAR.cov.90.cl.prop.men25.40.F.40.50[3],
-                                             d.MCAR.cov.95.cl.prop.men25.40.F.40.50[3], d.MCAR.true.cov.100.prop.men25.40.F.40.50[3]))
-
-
-plot.cl.prop.men25.40.F.40.50 <- ggplot(cl.prop.men25.40.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 40 - 50 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.men25.40.F.40.50.png",
-       plot = plot.cl.prop.men25.40.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: women25.40.M.40.50 
-
-cl.prop.women25.40.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.40.cl.prop.women25.40.M.40.50[2],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.50.cl.prop.women25.40.M.40.50[2],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.60.cl.prop.women25.40.M.40.50[2],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.70.cl.prop.women25.40.M.40.50[2],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.80.cl.prop.women25.40.M.40.50[2],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.90.cl.prop.women25.40.M.40.50[2],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.40.50[2], d.MCAR.true.cov.100.prop.women25.40.M.40.50[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women25.40.M.40.50[1], d.MCAR.cov.40.cl.prop.women25.40.M.40.50[1],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.40.50[1], d.MCAR.cov.50.cl.prop.women25.40.M.40.50[1],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.40.50[1], d.MCAR.cov.60.cl.prop.women25.40.M.40.50[1],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.40.50[1], d.MCAR.cov.70.cl.prop.women25.40.M.40.50[1],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.40.50[1], d.MCAR.cov.80.cl.prop.women25.40.M.40.50[1],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.40.50[1], d.MCAR.cov.90.cl.prop.women25.40.M.40.50[1],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.40.50[1], d.MCAR.true.cov.100.prop.women25.40.M.40.50[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women25.40.M.40.50[3], d.MCAR.cov.40.cl.prop.women25.40.M.40.50[3],
-                                               d.MCAR.cov.45.cl.prop.women25.40.M.40.50[3], d.MCAR.cov.50.cl.prop.women25.40.M.40.50[3],
-                                               d.MCAR.cov.55.cl.prop.women25.40.M.40.50[3], d.MCAR.cov.60.cl.prop.women25.40.M.40.50[3],
-                                               d.MCAR.cov.65.cl.prop.women25.40.M.40.50[3], d.MCAR.cov.70.cl.prop.women25.40.M.40.50[3],
-                                               d.MCAR.cov.75.cl.prop.women25.40.M.40.50[3], d.MCAR.cov.80.cl.prop.women25.40.M.40.50[3],
-                                               d.MCAR.cov.85.cl.prop.women25.40.M.40.50[3], d.MCAR.cov.90.cl.prop.women25.40.M.40.50[3],
-                                               d.MCAR.cov.95.cl.prop.women25.40.M.40.50[3], d.MCAR.true.cov.100.prop.women25.40.M.40.50[3]))
-
-
-plot.cl.prop.women25.40.M.40.50 <- ggplot(cl.prop.women25.40.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 40 - 50 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.prop.women25.40.M.40.50.png",
-       plot = plot.cl.prop.women25.40.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men40.50.F.40.50 
-
-cl.prop.men40.50.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(d.MCAR.cov.35.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.40.cl.prop.men40.50.F.40.50[2],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.50.cl.prop.men40.50.F.40.50[2],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.60.cl.prop.men40.50.F.40.50[2],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.70.cl.prop.men40.50.F.40.50[2],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.80.cl.prop.men40.50.F.40.50[2],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.90.cl.prop.men40.50.F.40.50[2],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.40.50[2], d.MCAR.true.cov.100.prop.men40.50.F.40.50[2]),
-                                       
-                                       L = c(d.MCAR.cov.35.cl.prop.men40.50.F.40.50[1], d.MCAR.cov.40.cl.prop.men40.50.F.40.50[1],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.40.50[1], d.MCAR.cov.50.cl.prop.men40.50.F.40.50[1],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.40.50[1], d.MCAR.cov.60.cl.prop.men40.50.F.40.50[1],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.40.50[1], d.MCAR.cov.70.cl.prop.men40.50.F.40.50[1],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.40.50[1], d.MCAR.cov.80.cl.prop.men40.50.F.40.50[1],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.40.50[1], d.MCAR.cov.90.cl.prop.men40.50.F.40.50[1],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.40.50[1], d.MCAR.true.cov.100.prop.men40.50.F.40.50[1]),
-                                       
-                                       U = c(d.MCAR.cov.35.cl.prop.men40.50.F.40.50[3], d.MCAR.cov.40.cl.prop.men40.50.F.40.50[3],
-                                             d.MCAR.cov.45.cl.prop.men40.50.F.40.50[3], d.MCAR.cov.50.cl.prop.men40.50.F.40.50[3],
-                                             d.MCAR.cov.55.cl.prop.men40.50.F.40.50[3], d.MCAR.cov.60.cl.prop.men40.50.F.40.50[3],
-                                             d.MCAR.cov.65.cl.prop.men40.50.F.40.50[3], d.MCAR.cov.70.cl.prop.men40.50.F.40.50[3],
-                                             d.MCAR.cov.75.cl.prop.men40.50.F.40.50[3], d.MCAR.cov.80.cl.prop.men40.50.F.40.50[3],
-                                             d.MCAR.cov.85.cl.prop.men40.50.F.40.50[3], d.MCAR.cov.90.cl.prop.men40.50.F.40.50[3],
-                                             d.MCAR.cov.95.cl.prop.men40.50.F.40.50[3], d.MCAR.true.cov.100.prop.men40.50.F.40.50[3]))
-
-
-plot.cl.prop.men40.50.F.40.50 <- ggplot(cl.prop.men40.50.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 40 - 50 paired with women in 40 - 50 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.prop.men40.50.F.40.50.png",
-       plot = plot.cl.prop.men40.50.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women40.50.M.40.50 
-
-cl.prop.women40.50.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(d.MCAR.cov.35.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.40.cl.prop.women40.50.M.40.50[2],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.50.cl.prop.women40.50.M.40.50[2],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.60.cl.prop.women40.50.M.40.50[2],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.70.cl.prop.women40.50.M.40.50[2],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.80.cl.prop.women40.50.M.40.50[2],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.90.cl.prop.women40.50.M.40.50[2],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.40.50[2], d.MCAR.true.cov.100.prop.women40.50.M.40.50[2]),
-                                         
-                                         L = c(d.MCAR.cov.35.cl.prop.women40.50.M.40.50[1], d.MCAR.cov.40.cl.prop.women40.50.M.40.50[1],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.40.50[1], d.MCAR.cov.50.cl.prop.women40.50.M.40.50[1],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.40.50[1], d.MCAR.cov.60.cl.prop.women40.50.M.40.50[1],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.40.50[1], d.MCAR.cov.70.cl.prop.women40.50.M.40.50[1],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.40.50[1], d.MCAR.cov.80.cl.prop.women40.50.M.40.50[1],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.40.50[1], d.MCAR.cov.90.cl.prop.women40.50.M.40.50[1],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.40.50[1], d.MCAR.true.cov.100.prop.women40.50.M.40.50[1]),
-                                         
-                                         U = c(d.MCAR.cov.35.cl.prop.women40.50.M.40.50[3], d.MCAR.cov.40.cl.prop.women40.50.M.40.50[3],
-                                               d.MCAR.cov.45.cl.prop.women40.50.M.40.50[3], d.MCAR.cov.50.cl.prop.women40.50.M.40.50[3],
-                                               d.MCAR.cov.55.cl.prop.women40.50.M.40.50[3], d.MCAR.cov.60.cl.prop.women40.50.M.40.50[3],
-                                               d.MCAR.cov.65.cl.prop.women40.50.M.40.50[3], d.MCAR.cov.70.cl.prop.women40.50.M.40.50[3],
-                                               d.MCAR.cov.75.cl.prop.women40.50.M.40.50[3], d.MCAR.cov.80.cl.prop.women40.50.M.40.50[3],
-                                               d.MCAR.cov.85.cl.prop.women40.50.M.40.50[3], d.MCAR.cov.90.cl.prop.women40.50.M.40.50[3],
-                                               d.MCAR.cov.95.cl.prop.women40.50.M.40.50[3], d.MCAR.true.cov.100.prop.women40.50.M.40.50[3]))
-
-
-plot.cl.prop.women40.50.M.40.50 <- ggplot(cl.prop.women40.50.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 40 - 50 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-
-ggsave(filename = "cl.prop.women40.50.M.40.50.png",
-       plot = plot.cl.prop.women40.50.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-
-
-
-
-# II. True values in transmission clusters --------------------------------
-
+# II. True proportions in pairings ------------------------------
 
 
 
 # Cov 35
+
+
+# Vector
+
+
+vector.MCAR.cov.35.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.35.cl.true.prop.men[,1]
+vector.MCAR.cov.35.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.35.cl.true.prop.women[,1]
+
+vector.MCAR.cov.35.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.35.cl.true.prop.men[,2]
+vector.MCAR.cov.35.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.35.cl.true.prop.women[,2]
+
+vector.MCAR.cov.35.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.35.cl.true.prop.men[,3]
+vector.MCAR.cov.35.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.35.cl.true.prop.women[,3]
+
+vector.MCAR.cov.35.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.35.cl.true.prop.men[,4]
+vector.MCAR.cov.35.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.35.cl.true.prop.women[,4]
+
+vector.MCAR.cov.35.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.35.cl.true.prop.men[,5]
+vector.MCAR.cov.35.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.35.cl.true.prop.women[,5]
+
+vector.MCAR.cov.35.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.35.cl.true.prop.men[,6]
+vector.MCAR.cov.35.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.35.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.35.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.35.cl.true.prop.men[,7]
+vector.MCAR.cov.35.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.35.cl.true.prop.women[,7]
+
+vector.MCAR.cov.35.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.35.cl.true.prop.men[,8]
+vector.MCAR.cov.35.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.35.cl.true.prop.women[,8]
+
+vector.MCAR.cov.35.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.35.cl.true.prop.men[,9]
+vector.MCAR.cov.35.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.35.cl.true.prop.women[,9]
+
+
+
+# Summarised
 
 d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.35.cl.true.prop.men[,1])
 d.MCAR.cov.35.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.35.cl.true.prop.women[,1])
@@ -5167,6 +4694,43 @@ d.MCAR.cov.35.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.35.cl.true
 
 
 # Cov 40
+
+
+# Vector
+
+
+vector.MCAR.cov.40.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.40.cl.true.prop.men[,1]
+vector.MCAR.cov.40.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.40.cl.true.prop.women[,1]
+
+vector.MCAR.cov.40.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.40.cl.true.prop.men[,2]
+vector.MCAR.cov.40.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.40.cl.true.prop.women[,2]
+
+vector.MCAR.cov.40.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.40.cl.true.prop.men[,3]
+vector.MCAR.cov.40.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.40.cl.true.prop.women[,3]
+
+vector.MCAR.cov.40.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.40.cl.true.prop.men[,4]
+vector.MCAR.cov.40.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.40.cl.true.prop.women[,4]
+
+vector.MCAR.cov.40.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.40.cl.true.prop.men[,5]
+vector.MCAR.cov.40.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.40.cl.true.prop.women[,5]
+
+vector.MCAR.cov.40.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.40.cl.true.prop.men[,6]
+vector.MCAR.cov.40.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.40.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.40.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.40.cl.true.prop.men[,7]
+vector.MCAR.cov.40.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.40.cl.true.prop.women[,7]
+
+vector.MCAR.cov.40.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.40.cl.true.prop.men[,8]
+vector.MCAR.cov.40.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.40.cl.true.prop.women[,8]
+
+vector.MCAR.cov.40.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.40.cl.true.prop.men[,9]
+vector.MCAR.cov.40.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.40.cl.true.prop.women[,9]
+
+
+
+# Summarised
+
 d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.40.cl.true.prop.men[,1])
 d.MCAR.cov.40.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.40.cl.true.prop.women[,1])
 
@@ -5198,6 +4762,42 @@ d.MCAR.cov.40.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.40.cl.true
 
 # Cov 45
 
+
+# Vector
+
+
+vector.MCAR.cov.45.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.45.cl.true.prop.men[,1]
+vector.MCAR.cov.45.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.45.cl.true.prop.women[,1]
+
+vector.MCAR.cov.45.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.45.cl.true.prop.men[,2]
+vector.MCAR.cov.45.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.45.cl.true.prop.women[,2]
+
+vector.MCAR.cov.45.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.45.cl.true.prop.men[,3]
+vector.MCAR.cov.45.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.45.cl.true.prop.women[,3]
+
+vector.MCAR.cov.45.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.45.cl.true.prop.men[,4]
+vector.MCAR.cov.45.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.45.cl.true.prop.women[,4]
+
+vector.MCAR.cov.45.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.45.cl.true.prop.men[,5]
+vector.MCAR.cov.45.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.45.cl.true.prop.women[,5]
+
+vector.MCAR.cov.45.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.45.cl.true.prop.men[,6]
+vector.MCAR.cov.45.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.45.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.45.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.45.cl.true.prop.men[,7]
+vector.MCAR.cov.45.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.45.cl.true.prop.women[,7]
+
+vector.MCAR.cov.45.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.45.cl.true.prop.men[,8]
+vector.MCAR.cov.45.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.45.cl.true.prop.women[,8]
+
+vector.MCAR.cov.45.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.45.cl.true.prop.men[,9]
+vector.MCAR.cov.45.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.45.cl.true.prop.women[,9]
+
+
+
+# Summarised
+
 d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.45.cl.true.prop.men[,1])
 d.MCAR.cov.45.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.45.cl.true.prop.women[,1])
 
@@ -5227,7 +4827,44 @@ d.MCAR.cov.45.cl.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.45.cl.true.p
 d.MCAR.cov.45.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.45.cl.true.prop.women[,9])
 
 
+
+
 # Cov 50
+
+
+# Vector
+
+
+vector.MCAR.cov.50.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.50.cl.true.prop.men[,1]
+vector.MCAR.cov.50.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.50.cl.true.prop.women[,1]
+
+vector.MCAR.cov.50.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.50.cl.true.prop.men[,2]
+vector.MCAR.cov.50.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.50.cl.true.prop.women[,2]
+
+vector.MCAR.cov.50.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.50.cl.true.prop.men[,3]
+vector.MCAR.cov.50.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.50.cl.true.prop.women[,3]
+
+vector.MCAR.cov.50.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.50.cl.true.prop.men[,4]
+vector.MCAR.cov.50.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.50.cl.true.prop.women[,4]
+
+vector.MCAR.cov.50.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.50.cl.true.prop.men[,5]
+vector.MCAR.cov.50.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.50.cl.true.prop.women[,5]
+
+vector.MCAR.cov.50.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.50.cl.true.prop.men[,6]
+vector.MCAR.cov.50.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.50.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.50.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.50.cl.true.prop.men[,7]
+vector.MCAR.cov.50.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.50.cl.true.prop.women[,7]
+
+vector.MCAR.cov.50.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.50.cl.true.prop.men[,8]
+vector.MCAR.cov.50.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.50.cl.true.prop.women[,8]
+
+vector.MCAR.cov.50.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.50.cl.true.prop.men[,9]
+vector.MCAR.cov.50.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.50.cl.true.prop.women[,9]
+
+
+# Summarised
 
 d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.50.cl.true.prop.men[,1])
 d.MCAR.cov.50.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.50.cl.true.prop.women[,1])
@@ -5261,6 +4898,41 @@ d.MCAR.cov.50.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.50.cl.true
 
 # Cov 55
 
+
+# Vector
+
+
+vector.MCAR.cov.55.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.55.cl.true.prop.men[,1]
+vector.MCAR.cov.55.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.55.cl.true.prop.women[,1]
+
+vector.MCAR.cov.55.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.55.cl.true.prop.men[,2]
+vector.MCAR.cov.55.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.55.cl.true.prop.women[,2]
+
+vector.MCAR.cov.55.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.55.cl.true.prop.men[,3]
+vector.MCAR.cov.55.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.55.cl.true.prop.women[,3]
+
+vector.MCAR.cov.55.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.55.cl.true.prop.men[,4]
+vector.MCAR.cov.55.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.55.cl.true.prop.women[,4]
+
+vector.MCAR.cov.55.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.55.cl.true.prop.men[,5]
+vector.MCAR.cov.55.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.55.cl.true.prop.women[,5]
+
+vector.MCAR.cov.55.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.55.cl.true.prop.men[,6]
+vector.MCAR.cov.55.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.55.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.55.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.55.cl.true.prop.men[,7]
+vector.MCAR.cov.55.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.55.cl.true.prop.women[,7]
+
+vector.MCAR.cov.55.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.55.cl.true.prop.men[,8]
+vector.MCAR.cov.55.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.55.cl.true.prop.women[,8]
+
+vector.MCAR.cov.55.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.55.cl.true.prop.men[,9]
+vector.MCAR.cov.55.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.55.cl.true.prop.women[,9]
+
+
+# Summarised
+
 d.MCAR.cov.55.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.55.cl.true.prop.men[,1])
 d.MCAR.cov.55.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.55.cl.true.prop.women[,1])
 
@@ -5292,6 +4964,41 @@ d.MCAR.cov.55.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.55.cl.true
 
 
 # Cov 60
+
+
+# Vector
+
+
+vector.MCAR.cov.60.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.60.cl.true.prop.men[,1]
+vector.MCAR.cov.60.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.60.cl.true.prop.women[,1]
+
+vector.MCAR.cov.60.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.60.cl.true.prop.men[,2]
+vector.MCAR.cov.60.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.60.cl.true.prop.women[,2]
+
+vector.MCAR.cov.60.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.60.cl.true.prop.men[,3]
+vector.MCAR.cov.60.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.60.cl.true.prop.women[,3]
+
+vector.MCAR.cov.60.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.60.cl.true.prop.men[,4]
+vector.MCAR.cov.60.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.60.cl.true.prop.women[,4]
+
+vector.MCAR.cov.60.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.60.cl.true.prop.men[,5]
+vector.MCAR.cov.60.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.60.cl.true.prop.women[,5]
+
+vector.MCAR.cov.60.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.60.cl.true.prop.men[,6]
+vector.MCAR.cov.60.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.60.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.60.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.60.cl.true.prop.men[,7]
+vector.MCAR.cov.60.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.60.cl.true.prop.women[,7]
+
+vector.MCAR.cov.60.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.60.cl.true.prop.men[,8]
+vector.MCAR.cov.60.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.60.cl.true.prop.women[,8]
+
+vector.MCAR.cov.60.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.60.cl.true.prop.men[,9]
+vector.MCAR.cov.60.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.60.cl.true.prop.women[,9]
+
+
+# Summarised
 
 d.MCAR.cov.60.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.60.cl.true.prop.men[,1])
 d.MCAR.cov.60.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.60.cl.true.prop.women[,1])
@@ -5325,6 +5032,42 @@ d.MCAR.cov.60.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.60.cl.true
 
 # Cov 65
 
+
+# Vector
+
+
+vector.MCAR.cov.65.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.65.cl.true.prop.men[,1]
+vector.MCAR.cov.65.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.65.cl.true.prop.women[,1]
+
+vector.MCAR.cov.65.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.65.cl.true.prop.men[,2]
+vector.MCAR.cov.65.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.65.cl.true.prop.women[,2]
+
+vector.MCAR.cov.65.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.65.cl.true.prop.men[,3]
+vector.MCAR.cov.65.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.65.cl.true.prop.women[,3]
+
+vector.MCAR.cov.65.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.65.cl.true.prop.men[,4]
+vector.MCAR.cov.65.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.65.cl.true.prop.women[,4]
+
+vector.MCAR.cov.65.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.65.cl.true.prop.men[,5]
+vector.MCAR.cov.65.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.65.cl.true.prop.women[,5]
+
+vector.MCAR.cov.65.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.65.cl.true.prop.men[,6]
+vector.MCAR.cov.65.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.65.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.65.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.65.cl.true.prop.men[,7]
+vector.MCAR.cov.65.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.65.cl.true.prop.women[,7]
+
+vector.MCAR.cov.65.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.65.cl.true.prop.men[,8]
+vector.MCAR.cov.65.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.65.cl.true.prop.women[,8]
+
+vector.MCAR.cov.65.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.65.cl.true.prop.men[,9]
+vector.MCAR.cov.65.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.65.cl.true.prop.women[,9]
+
+
+
+# Summarised
+
 d.MCAR.cov.65.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.65.cl.true.prop.men[,1])
 d.MCAR.cov.65.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.65.cl.true.prop.women[,1])
 
@@ -5356,6 +5099,42 @@ d.MCAR.cov.65.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.65.cl.true
 
 # Cov 70
 
+
+# Vector
+
+
+vector.MCAR.cov.70.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.70.cl.true.prop.men[,1]
+vector.MCAR.cov.70.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.70.cl.true.prop.women[,1]
+
+vector.MCAR.cov.70.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.70.cl.true.prop.men[,2]
+vector.MCAR.cov.70.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.70.cl.true.prop.women[,2]
+
+vector.MCAR.cov.70.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.70.cl.true.prop.men[,3]
+vector.MCAR.cov.70.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.70.cl.true.prop.women[,3]
+
+vector.MCAR.cov.70.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.70.cl.true.prop.men[,4]
+vector.MCAR.cov.70.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.70.cl.true.prop.women[,4]
+
+vector.MCAR.cov.70.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.70.cl.true.prop.men[,5]
+vector.MCAR.cov.70.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.70.cl.true.prop.women[,5]
+
+vector.MCAR.cov.70.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.70.cl.true.prop.men[,6]
+vector.MCAR.cov.70.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.70.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.70.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.70.cl.true.prop.men[,7]
+vector.MCAR.cov.70.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.70.cl.true.prop.women[,7]
+
+vector.MCAR.cov.70.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.70.cl.true.prop.men[,8]
+vector.MCAR.cov.70.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.70.cl.true.prop.women[,8]
+
+vector.MCAR.cov.70.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.70.cl.true.prop.men[,9]
+vector.MCAR.cov.70.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.70.cl.true.prop.women[,9]
+
+
+
+# Summarised
+
 d.MCAR.cov.70.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.70.cl.true.prop.men[,1])
 d.MCAR.cov.70.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.70.cl.true.prop.women[,1])
 
@@ -5382,11 +5161,48 @@ d.MCAR.cov.70.cl.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.70.cl.true.p
 d.MCAR.cov.70.cl.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.70.cl.true.prop.women[,8])
 
 d.MCAR.cov.70.cl.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.70.cl.true.prop.men[,9])
+
 d.MCAR.cov.70.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.70.cl.true.prop.women[,9])
 
 
 
 # Cov 75
+
+
+# Vector
+
+
+vector.MCAR.cov.75.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.75.cl.true.prop.men[,1]
+vector.MCAR.cov.75.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.75.cl.true.prop.women[,1]
+
+vector.MCAR.cov.75.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.75.cl.true.prop.men[,2]
+vector.MCAR.cov.75.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.75.cl.true.prop.women[,2]
+
+vector.MCAR.cov.75.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.75.cl.true.prop.men[,3]
+vector.MCAR.cov.75.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.75.cl.true.prop.women[,3]
+
+vector.MCAR.cov.75.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.75.cl.true.prop.men[,4]
+vector.MCAR.cov.75.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.75.cl.true.prop.women[,4]
+
+vector.MCAR.cov.75.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.75.cl.true.prop.men[,5]
+vector.MCAR.cov.75.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.75.cl.true.prop.women[,5]
+
+vector.MCAR.cov.75.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.75.cl.true.prop.men[,6]
+vector.MCAR.cov.75.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.75.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.75.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.75.cl.true.prop.men[,7]
+vector.MCAR.cov.75.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.75.cl.true.prop.women[,7]
+
+vector.MCAR.cov.75.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.75.cl.true.prop.men[,8]
+vector.MCAR.cov.75.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.75.cl.true.prop.women[,8]
+
+vector.MCAR.cov.75.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.75.cl.true.prop.men[,9]
+vector.MCAR.cov.75.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.75.cl.true.prop.women[,9]
+
+
+
+# Summarised
 
 d.MCAR.cov.75.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.75.cl.true.prop.men[,1])
 d.MCAR.cov.75.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.75.cl.true.prop.women[,1])
@@ -5420,6 +5236,42 @@ d.MCAR.cov.75.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.75.cl.true
 
 # Cov 80
 
+
+# Vector
+
+
+vector.MCAR.cov.80.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.80.cl.true.prop.men[,1]
+vector.MCAR.cov.80.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.80.cl.true.prop.women[,1]
+
+vector.MCAR.cov.80.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.80.cl.true.prop.men[,2]
+vector.MCAR.cov.80.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.80.cl.true.prop.women[,2]
+
+vector.MCAR.cov.80.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.80.cl.true.prop.men[,3]
+vector.MCAR.cov.80.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.80.cl.true.prop.women[,3]
+
+vector.MCAR.cov.80.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.80.cl.true.prop.men[,4]
+vector.MCAR.cov.80.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.80.cl.true.prop.women[,4]
+
+vector.MCAR.cov.80.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.80.cl.true.prop.men[,5]
+vector.MCAR.cov.80.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.80.cl.true.prop.women[,5]
+
+vector.MCAR.cov.80.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.80.cl.true.prop.men[,6]
+vector.MCAR.cov.80.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.80.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.80.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.80.cl.true.prop.men[,7]
+vector.MCAR.cov.80.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.80.cl.true.prop.women[,7]
+
+vector.MCAR.cov.80.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.80.cl.true.prop.men[,8]
+vector.MCAR.cov.80.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.80.cl.true.prop.women[,8]
+
+vector.MCAR.cov.80.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.80.cl.true.prop.men[,9]
+vector.MCAR.cov.80.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.80.cl.true.prop.women[,9]
+
+
+
+# Summarised
+
 d.MCAR.cov.80.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.80.cl.true.prop.men[,1])
 d.MCAR.cov.80.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.80.cl.true.prop.women[,1])
 
@@ -5451,6 +5303,42 @@ d.MCAR.cov.80.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.80.cl.true
 
 
 # Cov 85
+
+
+# Vector
+
+
+vector.MCAR.cov.85.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.85.cl.true.prop.men[,1]
+vector.MCAR.cov.85.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.85.cl.true.prop.women[,1]
+
+vector.MCAR.cov.85.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.85.cl.true.prop.men[,2]
+vector.MCAR.cov.85.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.85.cl.true.prop.women[,2]
+
+vector.MCAR.cov.85.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.85.cl.true.prop.men[,3]
+vector.MCAR.cov.85.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.85.cl.true.prop.women[,3]
+
+vector.MCAR.cov.85.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.85.cl.true.prop.men[,4]
+vector.MCAR.cov.85.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.85.cl.true.prop.women[,4]
+
+vector.MCAR.cov.85.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.85.cl.true.prop.men[,5]
+vector.MCAR.cov.85.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.85.cl.true.prop.women[,5]
+
+vector.MCAR.cov.85.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.85.cl.true.prop.men[,6]
+vector.MCAR.cov.85.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.85.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.85.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.85.cl.true.prop.men[,7]
+vector.MCAR.cov.85.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.85.cl.true.prop.women[,7]
+
+vector.MCAR.cov.85.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.85.cl.true.prop.men[,8]
+vector.MCAR.cov.85.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.85.cl.true.prop.women[,8]
+
+vector.MCAR.cov.85.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.85.cl.true.prop.men[,9]
+vector.MCAR.cov.85.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.85.cl.true.prop.women[,9]
+
+
+
+# Summarised
 
 d.MCAR.cov.85.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.85.cl.true.prop.men[,1])
 d.MCAR.cov.85.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.85.cl.true.prop.women[,1])
@@ -5485,6 +5373,41 @@ d.MCAR.cov.85.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.85.cl.true
 # Cov 90
 
 
+# Vector
+
+
+vector.MCAR.cov.90.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.90.cl.true.prop.men[,1]
+vector.MCAR.cov.90.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.90.cl.true.prop.women[,1]
+
+vector.MCAR.cov.90.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.90.cl.true.prop.men[,2]
+vector.MCAR.cov.90.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.90.cl.true.prop.women[,2]
+
+vector.MCAR.cov.90.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.90.cl.true.prop.men[,3]
+vector.MCAR.cov.90.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.90.cl.true.prop.women[,3]
+
+vector.MCAR.cov.90.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.90.cl.true.prop.men[,4]
+vector.MCAR.cov.90.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.90.cl.true.prop.women[,4]
+
+vector.MCAR.cov.90.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.90.cl.true.prop.men[,5]
+vector.MCAR.cov.90.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.90.cl.true.prop.women[,5]
+
+vector.MCAR.cov.90.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.90.cl.true.prop.men[,6]
+vector.MCAR.cov.90.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.90.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.90.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.90.cl.true.prop.men[,7]
+vector.MCAR.cov.90.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.90.cl.true.prop.women[,7]
+
+vector.MCAR.cov.90.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.90.cl.true.prop.men[,8]
+vector.MCAR.cov.90.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.90.cl.true.prop.women[,8]
+
+vector.MCAR.cov.90.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.90.cl.true.prop.men[,9]
+vector.MCAR.cov.90.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.90.cl.true.prop.women[,9]
+
+
+
+# Summarised
+
 d.MCAR.cov.90.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.90.cl.true.prop.men[,1])
 d.MCAR.cov.90.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.90.cl.true.prop.women[,1])
 
@@ -5516,11 +5439,46 @@ d.MCAR.cov.90.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.90.cl.true
 
 # Cov 95
 
+
+# Vector
+
+
+vector.MCAR.cov.95.cl.true.prop.men15.25.F.15.25 <- d.MCAR.cov.95.cl.true.prop.men[,1]
+vector.MCAR.cov.95.cl.true.prop.women15.25.M.15.25 <- d.MCAR.cov.95.cl.true.prop.women[,1]
+
+vector.MCAR.cov.95.cl.true.prop.men25.40.F.15.25 <- d.MCAR.cov.95.cl.true.prop.men[,2]
+vector.MCAR.cov.95.cl.true.prop.women25.40.M.15.25 <- d.MCAR.cov.95.cl.true.prop.women[,2]
+
+vector.MCAR.cov.95.cl.true.prop.men40.50.F.15.25 <- d.MCAR.cov.95.cl.true.prop.men[,3]
+vector.MCAR.cov.95.cl.true.prop.women40.50.M.15.25 <- d.MCAR.cov.95.cl.true.prop.women[,3]
+
+vector.MCAR.cov.95.cl.true.prop.men15.25.F.25.40 <- d.MCAR.cov.95.cl.true.prop.men[,4]
+vector.MCAR.cov.95.cl.true.prop.women15.25.M.25.40 <- d.MCAR.cov.95.cl.true.prop.women[,4]
+
+vector.MCAR.cov.95.cl.true.prop.men25.40.F.25.40 <- d.MCAR.cov.95.cl.true.prop.men[,5]
+vector.MCAR.cov.95.cl.true.prop.women25.40.M.25.40 <- d.MCAR.cov.95.cl.true.prop.women[,5]
+
+vector.MCAR.cov.95.cl.true.prop.men40.50.F.25.40 <- d.MCAR.cov.95.cl.true.prop.men[,6]
+vector.MCAR.cov.95.cl.true.prop.women40.50.M.25.40 <- d.MCAR.cov.95.cl.true.prop.women[,6]
+
+
+vector.MCAR.cov.95.cl.true.prop.men15.25.F.40.50 <- d.MCAR.cov.95.cl.true.prop.men[,7]
+vector.MCAR.cov.95.cl.true.prop.women15.25.M.40.50 <- d.MCAR.cov.95.cl.true.prop.women[,7]
+
+vector.MCAR.cov.95.cl.true.prop.men25.40.F.40.50 <- d.MCAR.cov.95.cl.true.prop.men[,8]
+vector.MCAR.cov.95.cl.true.prop.women25.40.M.40.50 <- d.MCAR.cov.95.cl.true.prop.women[,8]
+
+vector.MCAR.cov.95.cl.true.prop.men40.50.F.40.50 <- d.MCAR.cov.95.cl.true.prop.men[,9]
+vector.MCAR.cov.95.cl.true.prop.women40.50.M.40.50 <- d.MCAR.cov.95.cl.true.prop.women[,9]
+
+
+# Summarised
+
 d.MCAR.cov.95.cl.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.men[,1])
 d.MCAR.cov.95.cl.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.women[,1])
 
-
 d.MCAR.cov.95.cl.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.men[,2])
+
 d.MCAR.cov.95.cl.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.women[,2])
 
 d.MCAR.cov.95.cl.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.95.cl.true.prop.men[,3])
@@ -5546,14 +5504,10 @@ d.MCAR.cov.95.cl.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.95.cl.true.p
 d.MCAR.cov.95.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.95.cl.true.prop.women[,9])
 
 
+# Table of proportions in transmission clusters inference ------------------------
 
 
-# Table of proportions in true transmission network of individuals in clusters lusters -----------------
-
-
-
-
-props.true <- matrix(c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[2], 
+true.props <- matrix(c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[2], 
                        d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25[2], 
                        d.MCAR.cov.55.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.60.cl.true.prop.men15.25.F.15.25[2], 
                        d.MCAR.cov.65.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.70.cl.true.prop.men15.25.F.15.25[2], 
@@ -5702,15 +5656,16 @@ props.true <- matrix(c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], d.MCAR.co
 ncol = 14,
 byrow = TRUE)
 
+true.props <- round(true.props, digits = 2)
 
 
-colnames(props.true) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
+colnames(true.props) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
                           "cl.cov.50", "cl.cov.55", "cl.cov.60",
                           "cl.cov.65", "cl.cov.70", "cl.cov.75",
                           "cl.cov.80", "cl.cov.85", "cl.cov.90",
                           "cl.cov.95", "true.cov.100")
 
-rownames(props.true) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25", 
+rownames(true.props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25", 
                           "prop.M.25.40.F.15.25", "prop.F.25.40.M.15.25", 
                           "prop.M.40.50.F.15.25", "prop.F.40.50.M.15.25",
                           "prop.M.15.25.F.25.40", "prop.F.15.25.M.25.40",
@@ -5720,10 +5675,10 @@ rownames(props.true) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                           "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                           "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(props.true, file = "/home/david/age_mixing_AD_clusters/results/true.proportions.clusters.csv")
+write.csv(true.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.proportions.MCAR.csv")
 
 
-CI.props.true <- matrix(c(paste(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[3], "]"), 
+CI.true.props <- matrix(c(paste(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[3], "]"), 
                           paste(d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[2],  "[", d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[3], "]"), 
                           paste(d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25[3], "]"), 
                           paste(d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25[3], "]"), 
@@ -6000,13 +5955,13 @@ CI.props.true <- matrix(c(paste(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], 
 ncol = 14,
 byrow = TRUE)
 
-colnames(CI.props.true) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
+colnames(CI.true.props) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
                              "cl.cov.50", "cl.cov.55", "cl.cov.60",
                              "cl.cov.65", "cl.cov.70", "cl.cov.75",
                              "cl.cov.80", "cl.cov.85", "cl.cov.90",
                              "cl.cov.95", "true.cov.100")
 
-rownames(CI.props.true) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25", 
+rownames(CI.true.props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25", 
                              "prop.M.25.40.F.15.25", "prop.F.25.40.M.15.25", 
                              "prop.M.40.50.F.15.25", "prop.F.40.50.M.15.25",
                              "prop.M.15.25.F.25.40", "prop.F.15.25.M.25.40",
@@ -6016,10 +5971,11 @@ rownames(CI.props.true) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                              "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                              "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(CI.props.true, file = "/home/david/age_mixing_AD_clusters/results/true.proportions.clusters_CI.csv")
+write.csv(CI.true.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.proportions_CI.MCAR.csv")
 
 
 
+# Figures -----------------------
 
 # men15.25.F.15.25. --------------------
 
@@ -6643,6 +6599,8 @@ true.prop.men40.50.F.40.50.df$parameter <- "prop.M.40.50.F.40.50"
 
 
 
+
+
 # women40.50.M.40.50.      ---------------------------
 
 true.prop.women40.50.M.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
@@ -6683,2284 +6641,88 @@ true.prop.women40.50.M.40.50.df$parameter <- "prop.F.40.50.M.40.50" # d.MCAR.tru
 # men40.50.F.40.50, women40.50.M.40.50
 
 
-true.proportions.df <- rbind(true.prop.men15.25.F.15.25.df, true.prop.women15.25.M.15.25.df,
-                             true.prop.men25.40.F.15.25.df, true.prop.women25.40.M.15.25.df,
-                             true.prop.men40.50.F.15.25.df, true.prop.women40.50.M.15.25.df,
-                             
-                             true.prop.men15.25.F.25.40.df, true.prop.women15.25.M.25.40.df,
-                             true.prop.men25.40.F.25.40.df, true.prop.women25.40.M.25.40.df,
-                             true.prop.men40.50.F.25.40.df, true.prop.women40.50.M.25.40.df,
-                             
-                             true.prop.men15.25.F.40.50.df, true.prop.women15.25.M.40.50.df,
-                             true.prop.men25.40.F.40.50.df, true.prop.women25.40.M.40.50.df,
-                             true.prop.men40.50.F.40.50.df, true.prop.women40.50.M.40.50.df)
+true.propos.df.F.15.25 <- rbind(true.prop.men15.25.F.15.25.df, 
+                                true.prop.men25.40.F.15.25.df, 
+                                true.prop.men40.50.F.15.25.df)
+
+true.propos.df.F.25.40 <- rbind(true.prop.men15.25.F.25.40.df,
+                                true.prop.men25.40.F.25.40.df,
+                                true.prop.men40.50.F.25.40.df)
+
+true.propos.df.F.40.50 <- rbind(true.prop.men15.25.F.40.50.df,
+                                true.prop.men25.40.F.40.50.df,
+                                true.prop.men40.50.F.40.50.df)
+
+true.propos.df.M.15.25 <- rbind(true.prop.women15.25.M.15.25.df,
+                                true.prop.women25.40.M.15.25.df,
+                                true.prop.women40.50.M.15.25.df)
+
+true.propos.df.M.25.40 <- rbind(true.prop.women15.25.M.25.40.df,
+                                true.prop.women25.40.M.25.40.df,
+                                true.prop.women40.50.M.25.40.df)
+
+true.propos.df.M.40.50 <- rbind(true.prop.women15.25.M.40.50.df,
+                                true.prop.women25.40.M.40.50.df,
+                                true.prop.women40.50.M.40.50.df)
 
 
-plot.true.proportions.df <- ggplot(true.proportions.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+
+plot.F.15.25 <- ggplot(true.propos.df.F.15.25, aes(x=x, y=F, colour=parameter, group = parameter)) + 
   # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
   # geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Value") +
-  ggtitle("True pairings across age groups")
-
-
-
-
-
-
-
-# Visualising II in different MCAR coverages -------------------------------
-
-
-## AAAAAAAAAa 15.25 - 40.50 and 15.25
-
-# Men: men15.25.F.15.25
-
-cl.true.prop.men15.25.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.60.cl.true.prop.men15.25.F.15.25[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.70.cl.true.prop.men15.25.F.15.25[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.80.cl.true.prop.men15.25.F.15.25[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.90.cl.true.prop.men15.25.F.15.25[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.15.25[2], d.MCAR.true.cov.100.prop.men15.25.F.15.25[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[1], d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25[1], d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.15.25[1], d.MCAR.cov.60.cl.true.prop.men15.25.F.15.25[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.15.25[1], d.MCAR.cov.70.cl.true.prop.men15.25.F.15.25[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.15.25[1], d.MCAR.cov.80.cl.true.prop.men15.25.F.15.25[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.15.25[1], d.MCAR.cov.90.cl.true.prop.men15.25.F.15.25[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.15.25[1], d.MCAR.true.cov.100.prop.men15.25.F.15.25[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[3], d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.15.25[3], d.MCAR.cov.50.cl.true.prop.men15.25.F.15.25[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.15.25[3], d.MCAR.cov.60.cl.true.prop.men15.25.F.15.25[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.15.25[3], d.MCAR.cov.70.cl.true.prop.men15.25.F.15.25[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.15.25[3], d.MCAR.cov.80.cl.true.prop.men15.25.F.15.25[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.15.25[3], d.MCAR.cov.90.cl.true.prop.men15.25.F.15.25[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.15.25[3], d.MCAR.true.cov.100.prop.men15.25.F.15.25[3]))
-
-
-plot.cl.true.prop.men15.25.F.15.25 <- ggplot(cl.true.prop.men15.25.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 15 - 25 paired with women with 15 - 25 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.true.prop.men15.25.F.15.25.png",
-       plot = plot.cl.true.prop.men15.25.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Women: women15.25.M.15.25
-
-cl.true.prop.women15.25.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.15.25[2], d.MCAR.cov.40.cl.true.prop.women15.25.M.15.25[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.15.25[2], d.MCAR.cov.50.cl.true.prop.women15.25.M.15.25[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.15.25[2], d.MCAR.cov.60.cl.true.prop.women15.25.M.15.25[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.15.25[2], d.MCAR.cov.70.cl.true.prop.women15.25.M.15.25[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.15.25[2], d.MCAR.cov.80.cl.true.prop.women15.25.M.15.25[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.15.25[2], d.MCAR.cov.90.cl.true.prop.women15.25.M.15.25[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.15.25[2], d.MCAR.true.cov.100.prop.women15.25.M.15.25[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.15.25[1], d.MCAR.cov.40.cl.true.prop.women15.25.M.15.25[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.15.25[1], d.MCAR.cov.50.cl.true.prop.women15.25.M.15.25[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.15.25[1], d.MCAR.cov.60.cl.true.prop.women15.25.M.15.25[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.15.25[1], d.MCAR.cov.70.cl.true.prop.women15.25.M.15.25[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.15.25[1], d.MCAR.cov.80.cl.true.prop.women15.25.M.15.25[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.15.25[1], d.MCAR.cov.90.cl.true.prop.women15.25.M.15.25[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.15.25[1], d.MCAR.true.cov.100.prop.women15.25.M.15.25[1]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.15.25[3], d.MCAR.cov.40.cl.true.prop.women15.25.M.15.25[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.15.25[3], d.MCAR.cov.50.cl.true.prop.women15.25.M.15.25[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.15.25[3], d.MCAR.cov.60.cl.true.prop.women15.25.M.15.25[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.15.25[3], d.MCAR.cov.70.cl.true.prop.women15.25.M.15.25[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.15.25[3], d.MCAR.cov.80.cl.true.prop.women15.25.M.15.25[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.15.25[3], d.MCAR.cov.90.cl.true.prop.women15.25.M.15.25[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.15.25[3], d.MCAR.true.cov.100.prop.women15.25.M.15.25[3]))
-
-
-
-plot.cl.true.prop.women15.25.M.15.25 <- ggplot(cl.true.prop.women15.25.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men in 15 - 25 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.true.prop.women15.25.M.15.25.png",
-       plot = plot.cl.true.prop.women15.25.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: men25.40.F.15.25 
-
-cl.true.prop.men25.40.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.15.25[2], d.MCAR.cov.40.cl.true.prop.men25.40.F.15.25[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.15.25[2], d.MCAR.cov.50.cl.true.prop.men25.40.F.15.25[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.15.25[2], d.MCAR.cov.60.cl.true.prop.men25.40.F.15.25[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.15.25[2], d.MCAR.cov.70.cl.true.prop.men25.40.F.15.25[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.15.25[2], d.MCAR.cov.80.cl.true.prop.men25.40.F.15.25[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.15.25[2], d.MCAR.cov.90.cl.true.prop.men25.40.F.15.25[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.15.25[2], d.MCAR.true.cov.100.prop.men25.40.F.15.25[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.15.25[1], d.MCAR.cov.40.cl.true.prop.men25.40.F.15.25[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.15.25[1], d.MCAR.cov.50.cl.true.prop.men25.40.F.15.25[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.15.25[1], d.MCAR.cov.60.cl.true.prop.men25.40.F.15.25[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.15.25[1], d.MCAR.cov.70.cl.true.prop.men25.40.F.15.25[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.15.25[1], d.MCAR.cov.80.cl.true.prop.men25.40.F.15.25[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.15.25[1], d.MCAR.cov.90.cl.true.prop.men25.40.F.15.25[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.15.25[1], d.MCAR.true.cov.100.prop.men25.40.F.15.25[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.15.25[3], d.MCAR.cov.40.cl.true.prop.men25.40.F.15.25[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.15.25[3], d.MCAR.cov.50.cl.true.prop.men25.40.F.15.25[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.15.25[3], d.MCAR.cov.60.cl.true.prop.men25.40.F.15.25[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.15.25[3], d.MCAR.cov.70.cl.true.prop.men25.40.F.15.25[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.15.25[3], d.MCAR.cov.80.cl.true.prop.men25.40.F.15.25[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.15.25[3], d.MCAR.cov.90.cl.true.prop.men25.40.F.15.25[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.15.25[3], d.MCAR.true.cov.100.prop.men25.40.F.15.25[3]))
-
-
-plot.cl.true.prop.men25.40.F.15.25 <- ggplot(cl.true.prop.men25.40.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.true.prop.men25.40.F.15.25.png",
-       plot = plot.cl.true.prop.men25.40.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Women: women25.40.M.15.25 
-
-cl.true.prop.women25.40.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.15.25[2], d.MCAR.cov.40.cl.true.prop.women25.40.M.15.25[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.15.25[2], d.MCAR.cov.50.cl.true.prop.women25.40.M.15.25[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.15.25[2], d.MCAR.cov.60.cl.true.prop.women25.40.M.15.25[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.15.25[2], d.MCAR.cov.70.cl.true.prop.women25.40.M.15.25[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.15.25[2], d.MCAR.cov.80.cl.true.prop.women25.40.M.15.25[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.15.25[2], d.MCAR.cov.90.cl.true.prop.women25.40.M.15.25[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.15.25[2], d.MCAR.true.cov.100.prop.women25.40.M.15.25[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.15.25[1], d.MCAR.cov.40.cl.true.prop.women25.40.M.15.25[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.15.25[1], d.MCAR.cov.50.cl.true.prop.women25.40.M.15.25[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.15.25[1], d.MCAR.cov.60.cl.true.prop.women25.40.M.15.25[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.15.25[1], d.MCAR.cov.70.cl.true.prop.women25.40.M.15.25[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.15.25[1], d.MCAR.cov.80.cl.true.prop.women25.40.M.15.25[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.15.25[1], d.MCAR.cov.90.cl.true.prop.women25.40.M.15.25[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.15.25[1], d.MCAR.true.cov.100.prop.women25.40.M.15.25[2]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.15.25[3], d.MCAR.cov.40.cl.true.prop.women25.40.M.15.25[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.15.25[3], d.MCAR.cov.50.cl.true.prop.women25.40.M.15.25[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.15.25[3], d.MCAR.cov.60.cl.true.prop.women25.40.M.15.25[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.15.25[3], d.MCAR.cov.70.cl.true.prop.women25.40.M.15.25[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.15.25[3], d.MCAR.cov.80.cl.true.prop.women25.40.M.15.25[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.15.25[3], d.MCAR.cov.90.cl.true.prop.women25.40.M.15.25[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.15.25[3], d.MCAR.true.cov.100.prop.women25.40.M.15.25[3]))
-
-
-plot.cl.true.prop.women25.40.M.15.25 <- ggplot(cl.true.prop.women25.40.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.true.prop.women25.40.M.15.25.png",
-       plot = plot.cl.true.prop.women25.40.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men40.50.F.15.25 
-
-cl.true.prop.men40.50.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.15.25[2], d.MCAR.cov.40.cl.true.prop.men40.50.F.15.25[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.15.25[2], d.MCAR.cov.50.cl.true.prop.men40.50.F.15.25[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.15.25[2], d.MCAR.cov.60.cl.true.prop.men40.50.F.15.25[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.15.25[2], d.MCAR.cov.70.cl.true.prop.men40.50.F.15.25[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.15.25[2], d.MCAR.cov.80.cl.true.prop.men40.50.F.15.25[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.15.25[2], d.MCAR.cov.90.cl.true.prop.men40.50.F.15.25[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.15.25[2], d.MCAR.true.cov.100.prop.men40.50.F.15.25[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.15.25[1], d.MCAR.cov.40.cl.true.prop.men40.50.F.15.25[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.15.25[1], d.MCAR.cov.50.cl.true.prop.men40.50.F.15.25[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.15.25[1], d.MCAR.cov.60.cl.true.prop.men40.50.F.15.25[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.15.25[1], d.MCAR.cov.70.cl.true.prop.men40.50.F.15.25[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.15.25[1], d.MCAR.cov.80.cl.true.prop.men40.50.F.15.25[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.15.25[1], d.MCAR.cov.90.cl.true.prop.men40.50.F.15.25[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.15.25[1], d.MCAR.true.cov.100.prop.men40.50.F.15.25[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.15.25[3], d.MCAR.cov.40.cl.true.prop.men40.50.F.15.25[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.15.25[3], d.MCAR.cov.50.cl.true.prop.men40.50.F.15.25[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.15.25[3], d.MCAR.cov.60.cl.true.prop.men40.50.F.15.25[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.15.25[3], d.MCAR.cov.70.cl.true.prop.men40.50.F.15.25[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.15.25[3], d.MCAR.cov.80.cl.true.prop.men40.50.F.15.25[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.15.25[3], d.MCAR.cov.90.cl.true.prop.men40.50.F.15.25[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.15.25[3], d.MCAR.true.cov.100.prop.men40.50.F.15.25[3]))
-
-
-plot.cl.true.prop.men40.50.F.15.25 <- ggplot(cl.true.prop.men40.50.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 40 - 50 paired with women in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.men40.50.F.15.25.png",
-       plot = plot.cl.true.prop.men40.50.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: women40.50.M.15.25 
-
-cl.true.prop.women40.50.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.15.25[2], d.MCAR.cov.40.cl.true.prop.women40.50.M.15.25[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.15.25[2], d.MCAR.cov.50.cl.true.prop.women40.50.M.15.25[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.15.25[2], d.MCAR.cov.60.cl.true.prop.women40.50.M.15.25[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.15.25[2], d.MCAR.cov.70.cl.true.prop.women40.50.M.15.25[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.15.25[2], d.MCAR.cov.80.cl.true.prop.women40.50.M.15.25[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.15.25[2], d.MCAR.cov.90.cl.true.prop.women40.50.M.15.25[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.15.25[2], d.MCAR.true.cov.100.prop.women40.50.M.15.25[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.15.25[1], d.MCAR.cov.40.cl.true.prop.women40.50.M.15.25[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.15.25[1], d.MCAR.cov.50.cl.true.prop.women40.50.M.15.25[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.15.25[1], d.MCAR.cov.60.cl.true.prop.women40.50.M.15.25[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.15.25[1], d.MCAR.cov.70.cl.true.prop.women40.50.M.15.25[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.15.25[1], d.MCAR.cov.80.cl.true.prop.women40.50.M.15.25[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.15.25[1], d.MCAR.cov.90.cl.true.prop.women40.50.M.15.25[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.15.25[1], d.MCAR.true.cov.100.prop.women40.50.M.15.25[1]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.15.25[3], d.MCAR.cov.40.cl.true.prop.women40.50.M.15.25[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.15.25[3], d.MCAR.cov.50.cl.true.prop.women40.50.M.15.25[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.15.25[3], d.MCAR.cov.60.cl.true.prop.women40.50.M.15.25[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.15.25[3], d.MCAR.cov.70.cl.true.prop.women40.50.M.15.25[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.15.25[3], d.MCAR.cov.80.cl.true.prop.women40.50.M.15.25[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.15.25[3], d.MCAR.cov.90.cl.true.prop.women40.50.M.15.25[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.15.25[3], d.MCAR.true.cov.100.prop.women40.50.M.15.25[3]))
-
-
-plot.cl.true.prop.women40.50.M.15.25 <- ggplot(cl.true.prop.women40.50.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-
-ggsave(filename = "plot.cl.true.prop.women40.50.M.15.25.png",
-       plot = plot.cl.true.prop.women40.50.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# BBBBBBBBBBBb 15.25 - 40.50 and 25.40
-
-
-# Men: men15.25.F.25.40
-
-cl.true.prop.men15.25.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.25.40[2], d.MCAR.cov.40.cl.true.prop.men15.25.F.25.40[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.25.40[2], d.MCAR.cov.50.cl.true.prop.men15.25.F.25.40[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.25.40[2], d.MCAR.cov.60.cl.true.prop.men15.25.F.25.40[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.25.40[2], d.MCAR.cov.70.cl.true.prop.men15.25.F.25.40[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.25.40[2], d.MCAR.cov.80.cl.true.prop.men15.25.F.25.40[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.25.40[2], d.MCAR.cov.90.cl.true.prop.men15.25.F.25.40[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.25.40[2], d.MCAR.true.cov.100.prop.men15.25.F.25.40[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.25.40[1], d.MCAR.cov.40.cl.true.prop.men15.25.F.25.40[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.25.40[1], d.MCAR.cov.50.cl.true.prop.men15.25.F.25.40[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.25.40[1], d.MCAR.cov.60.cl.true.prop.men15.25.F.25.40[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.25.40[1], d.MCAR.cov.70.cl.true.prop.men15.25.F.25.40[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.25.40[1], d.MCAR.cov.80.cl.true.prop.men15.25.F.25.40[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.25.40[1], d.MCAR.cov.90.cl.true.prop.men15.25.F.25.40[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.25.40[1], d.MCAR.true.cov.100.prop.men15.25.F.25.40[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.25.40[3], d.MCAR.cov.40.cl.true.prop.men15.25.F.25.40[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.25.40[3], d.MCAR.cov.50.cl.true.prop.men15.25.F.25.40[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.25.40[3], d.MCAR.cov.60.cl.true.prop.men15.25.F.25.40[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.25.40[3], d.MCAR.cov.70.cl.true.prop.men15.25.F.25.40[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.25.40[3], d.MCAR.cov.80.cl.true.prop.men15.25.F.25.40[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.25.40[3], d.MCAR.cov.90.cl.true.prop.men15.25.F.25.40[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.25.40[3], d.MCAR.true.cov.100.prop.men15.25.F.25.40[3]))
-
-
-plot.cl.true.prop.men15.25.F.25.40 <- ggplot(cl.true.prop.men15.25.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 15 - 25 paired with women with 25 - 40 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.true.prop.men15.25.F.25.40.png",
-       plot = plot.cl.true.prop.men15.25.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women15.25.M.25.40
-
-cl.true.prop.women15.25.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.25.40[2], d.MCAR.cov.40.cl.true.prop.women15.25.M.25.40[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.25.40[2], d.MCAR.cov.50.cl.true.prop.women15.25.M.25.40[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.25.40[2], d.MCAR.cov.60.cl.true.prop.women15.25.M.25.40[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.25.40[2], d.MCAR.cov.70.cl.true.prop.women15.25.M.25.40[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.25.40[2], d.MCAR.cov.80.cl.true.prop.women15.25.M.25.40[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.25.40[2], d.MCAR.cov.90.cl.true.prop.women15.25.M.25.40[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.25.40[2], d.MCAR.true.cov.100.prop.women15.25.M.25.40[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.25.40[1], d.MCAR.cov.40.cl.true.prop.women15.25.M.25.40[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.25.40[1], d.MCAR.cov.50.cl.true.prop.women15.25.M.25.40[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.25.40[1], d.MCAR.cov.60.cl.true.prop.women15.25.M.25.40[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.25.40[1], d.MCAR.cov.70.cl.true.prop.women15.25.M.25.40[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.25.40[1], d.MCAR.cov.80.cl.true.prop.women15.25.M.25.40[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.25.40[1], d.MCAR.cov.90.cl.true.prop.women15.25.M.25.40[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.25.40[1], d.MCAR.true.cov.100.prop.women15.25.M.25.40[1]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.25.40[3], d.MCAR.cov.40.cl.true.prop.women15.25.M.25.40[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.25.40[3], d.MCAR.cov.50.cl.true.prop.women15.25.M.25.40[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.25.40[3], d.MCAR.cov.60.cl.true.prop.women15.25.M.25.40[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.25.40[3], d.MCAR.cov.70.cl.true.prop.women15.25.M.25.40[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.25.40[3], d.MCAR.cov.80.cl.true.prop.women15.25.M.25.40[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.25.40[3], d.MCAR.cov.90.cl.true.prop.women15.25.M.25.40[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.25.40[3], d.MCAR.true.cov.100.prop.women15.25.M.25.40[3]))
-
-
-
-plot.cl.true.prop.women15.25.M.25.40 <- ggplot(cl.true.prop.women15.25.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men in 25 - 40 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "cl.true.prop.women15.25.M.25.40.png",
-       plot = cl.true.prop.women15.25.M.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: men25.40.F.25.40 
-
-cl.true.prop.men25.40.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.25.40[2], d.MCAR.cov.40.cl.true.prop.men25.40.F.25.40[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.25.40[2], d.MCAR.cov.50.cl.true.prop.men25.40.F.25.40[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.25.40[2], d.MCAR.cov.60.cl.true.prop.men25.40.F.25.40[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.25.40[2], d.MCAR.cov.70.cl.true.prop.men25.40.F.25.40[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.25.40[2], d.MCAR.cov.80.cl.true.prop.men25.40.F.25.40[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.25.40[2], d.MCAR.cov.90.cl.true.prop.men25.40.F.25.40[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.25.40[2], d.MCAR.true.cov.100.prop.men25.40.F.25.40[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.25.40[1], d.MCAR.cov.40.cl.true.prop.men25.40.F.25.40[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.25.40[1], d.MCAR.cov.50.cl.true.prop.men25.40.F.25.40[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.25.40[1], d.MCAR.cov.60.cl.true.prop.men25.40.F.25.40[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.25.40[1], d.MCAR.cov.70.cl.true.prop.men25.40.F.25.40[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.25.40[1], d.MCAR.cov.80.cl.true.prop.men25.40.F.25.40[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.25.40[1], d.MCAR.cov.90.cl.true.prop.men25.40.F.25.40[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.25.40[1], d.MCAR.true.cov.100.prop.men25.40.F.25.40[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.25.40[3], d.MCAR.cov.40.cl.true.prop.men25.40.F.25.40[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.25.40[3], d.MCAR.cov.50.cl.true.prop.men25.40.F.25.40[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.25.40[3], d.MCAR.cov.60.cl.true.prop.men25.40.F.25.40[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.25.40[3], d.MCAR.cov.70.cl.true.prop.men25.40.F.25.40[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.25.40[3], d.MCAR.cov.80.cl.true.prop.men25.40.F.25.40[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.25.40[3], d.MCAR.cov.90.cl.true.prop.men25.40.F.25.40[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.25.40[3], d.MCAR.true.cov.100.prop.men25.40.F.25.40[3]))
-
-
-plot.cl.true.prop.men25.40.F.25.40 <- ggplot(cl.true.prop.men25.40.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.men25.40.F.25.40.png",
-       plot = plot.cl.true.prop.men25.40.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: women25.40.M.25.40 
-
-cl.true.prop.women25.40.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.25.40[2], d.MCAR.cov.40.cl.true.prop.women25.40.M.25.40[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.25.40[2], d.MCAR.cov.50.cl.true.prop.women25.40.M.25.40[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.25.40[2], d.MCAR.cov.60.cl.true.prop.women25.40.M.25.40[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.25.40[2], d.MCAR.cov.70.cl.true.prop.women25.40.M.25.40[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.25.40[2], d.MCAR.cov.80.cl.true.prop.women25.40.M.25.40[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.25.40[2], d.MCAR.cov.90.cl.true.prop.women25.40.M.25.40[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.25.40[2], d.MCAR.true.cov.100.prop.women25.40.M.25.40[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.25.40[1], d.MCAR.cov.40.cl.true.prop.women25.40.M.25.40[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.25.40[1], d.MCAR.cov.50.cl.true.prop.women25.40.M.25.40[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.25.40[1], d.MCAR.cov.60.cl.true.prop.women25.40.M.25.40[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.25.40[1], d.MCAR.cov.70.cl.true.prop.women25.40.M.25.40[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.25.40[1], d.MCAR.cov.80.cl.true.prop.women25.40.M.25.40[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.25.40[1], d.MCAR.cov.90.cl.true.prop.women25.40.M.25.40[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.25.40[1], d.MCAR.true.cov.100.prop.women25.40.M.25.40[2]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.25.40[3], d.MCAR.cov.40.cl.true.prop.women25.40.M.25.40[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.25.40[3], d.MCAR.cov.50.cl.true.prop.women25.40.M.25.40[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.25.40[3], d.MCAR.cov.60.cl.true.prop.women25.40.M.25.40[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.25.40[3], d.MCAR.cov.70.cl.true.prop.women25.40.M.25.40[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.25.40[3], d.MCAR.cov.80.cl.true.prop.women25.40.M.25.40[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.25.40[3], d.MCAR.cov.90.cl.true.prop.women25.40.M.25.40[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.25.40[3], d.MCAR.true.cov.100.prop.women25.40.M.25.40[3]))
-
-
-plot.cl.true.prop.women25.40.M.25.40 <- ggplot(cl.true.prop.women25.40.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.women25.40.M.25.40.png",
-       plot = plot.cl.true.prop.women25.40.M.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men40.50.F.25.40 
-
-cl.true.prop.men40.50.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.25.40[2], d.MCAR.cov.40.cl.true.prop.men40.50.F.25.40[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.25.40[2], d.MCAR.cov.50.cl.true.prop.men40.50.F.25.40[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.25.40[2], d.MCAR.cov.60.cl.true.prop.men40.50.F.25.40[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.25.40[2], d.MCAR.cov.70.cl.true.prop.men40.50.F.25.40[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.25.40[2], d.MCAR.cov.80.cl.true.prop.men40.50.F.25.40[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.25.40[2], d.MCAR.cov.90.cl.true.prop.men40.50.F.25.40[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.25.40[2], d.MCAR.true.cov.100.prop.men40.50.F.25.40[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.25.40[1], d.MCAR.cov.40.cl.true.prop.men40.50.F.25.40[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.25.40[1], d.MCAR.cov.50.cl.true.prop.men40.50.F.25.40[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.25.40[1], d.MCAR.cov.60.cl.true.prop.men40.50.F.25.40[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.25.40[1], d.MCAR.cov.70.cl.true.prop.men40.50.F.25.40[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.25.40[1], d.MCAR.cov.80.cl.true.prop.men40.50.F.25.40[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.25.40[1], d.MCAR.cov.90.cl.true.prop.men40.50.F.25.40[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.25.40[1], d.MCAR.true.cov.100.prop.men40.50.F.25.40[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.25.40[3], d.MCAR.cov.40.cl.true.prop.men40.50.F.25.40[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.25.40[3], d.MCAR.cov.50.cl.true.prop.men40.50.F.25.40[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.25.40[3], d.MCAR.cov.60.cl.true.prop.men40.50.F.25.40[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.25.40[3], d.MCAR.cov.70.cl.true.prop.men40.50.F.25.40[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.25.40[3], d.MCAR.cov.80.cl.true.prop.men40.50.F.25.40[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.25.40[3], d.MCAR.cov.90.cl.true.prop.men40.50.F.25.40[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.25.40[3], d.MCAR.true.cov.100.prop.men40.50.F.25.40[3]))
-
-
-plot.cl.true.prop.men40.50.F.25.40 <- ggplot(cl.true.prop.men40.50.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 40 - 50 paired with women in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.men40.50.F.25.40.png",
-       plot = plot.cl.true.prop.men40.50.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women40.50.M.25.40 
-
-cl.true.prop.women40.50.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.25.40[2], d.MCAR.cov.40.cl.true.prop.women40.50.M.25.40[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.25.40[2], d.MCAR.cov.50.cl.true.prop.women40.50.M.25.40[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.25.40[2], d.MCAR.cov.60.cl.true.prop.women40.50.M.25.40[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.25.40[2], d.MCAR.cov.70.cl.true.prop.women40.50.M.25.40[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.25.40[2], d.MCAR.cov.80.cl.true.prop.women40.50.M.25.40[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.25.40[2], d.MCAR.cov.90.cl.true.prop.women40.50.M.25.40[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.25.40[2], d.MCAR.true.cov.100.prop.women40.50.M.25.40[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.25.40[1], d.MCAR.cov.40.cl.true.prop.women40.50.M.25.40[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.25.40[1], d.MCAR.cov.50.cl.true.prop.women40.50.M.25.40[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.25.40[1], d.MCAR.cov.60.cl.true.prop.women40.50.M.25.40[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.25.40[1], d.MCAR.cov.70.cl.true.prop.women40.50.M.25.40[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.25.40[1], d.MCAR.cov.80.cl.true.prop.women40.50.M.25.40[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.25.40[1], d.MCAR.cov.90.cl.true.prop.women40.50.M.25.40[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.25.40[1], d.MCAR.true.cov.100.prop.women40.50.M.25.40[1]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.25.40[3], d.MCAR.cov.40.cl.true.prop.women40.50.M.25.40[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.25.40[3], d.MCAR.cov.50.cl.true.prop.women40.50.M.25.40[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.25.40[3], d.MCAR.cov.60.cl.true.prop.women40.50.M.25.40[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.25.40[3], d.MCAR.cov.70.cl.true.prop.women40.50.M.25.40[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.25.40[3], d.MCAR.cov.80.cl.true.prop.women40.50.M.25.40[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.25.40[3], d.MCAR.cov.90.cl.true.prop.women40.50.M.25.40[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.25.40[3], d.MCAR.true.cov.100.prop.women40.50.M.25.40[3]))
-
-
-plot.cl.true.prop.women40.50.M.25.40 <- ggplot(cl.true.prop.women40.50.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.women40.50.M.25.40.png",
-       plot = plot.cl.true.prop.women40.50.M.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-## CCCCCCCCCCCC 15.25 - 40.50 and 40.50
-
-
-# Men: men15.25.F.40.50
-
-cl.true.prop.men15.25.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.40.50[2], d.MCAR.cov.40.cl.true.prop.men15.25.F.40.50[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.40.50[2], d.MCAR.cov.50.cl.true.prop.men15.25.F.40.50[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.40.50[2], d.MCAR.cov.60.cl.true.prop.men15.25.F.40.50[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.40.50[2], d.MCAR.cov.70.cl.true.prop.men15.25.F.40.50[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.40.50[2], d.MCAR.cov.80.cl.true.prop.men15.25.F.40.50[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.40.50[2], d.MCAR.cov.90.cl.true.prop.men15.25.F.40.50[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.40.50[2], d.MCAR.true.cov.100.prop.men15.25.F.40.50[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.40.50[1], d.MCAR.cov.40.cl.true.prop.men15.25.F.40.50[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.40.50[1], d.MCAR.cov.50.cl.true.prop.men15.25.F.40.50[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.40.50[1], d.MCAR.cov.60.cl.true.prop.men15.25.F.40.50[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.40.50[1], d.MCAR.cov.70.cl.true.prop.men15.25.F.40.50[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.40.50[1], d.MCAR.cov.80.cl.true.prop.men15.25.F.40.50[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.40.50[1], d.MCAR.cov.90.cl.true.prop.men15.25.F.40.50[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.40.50[1], d.MCAR.true.cov.100.prop.men15.25.F.40.50[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men15.25.F.40.50[3], d.MCAR.cov.40.cl.true.prop.men15.25.F.40.50[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men15.25.F.40.50[3], d.MCAR.cov.50.cl.true.prop.men15.25.F.40.50[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men15.25.F.40.50[3], d.MCAR.cov.60.cl.true.prop.men15.25.F.40.50[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men15.25.F.40.50[3], d.MCAR.cov.70.cl.true.prop.men15.25.F.40.50[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men15.25.F.40.50[3], d.MCAR.cov.80.cl.true.prop.men15.25.F.40.50[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men15.25.F.40.50[3], d.MCAR.cov.90.cl.true.prop.men15.25.F.40.50[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men15.25.F.40.50[3], d.MCAR.true.cov.100.prop.men15.25.F.40.50[3]))
-
-
-plot.cl.true.prop.men15.25.F.40.50 <- ggplot(cl.true.prop.men15.25.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 15 - 25 paired with women with 25 - 40 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.men15.25.F.40.50.png",
-       plot = plot.cl.true.prop.men15.25.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: women15.25.M.40.50
-
-cl.true.prop.women15.25.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.40.50[2], d.MCAR.cov.40.cl.true.prop.women15.25.M.40.50[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.40.50[2], d.MCAR.cov.50.cl.true.prop.women15.25.M.40.50[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.40.50[2], d.MCAR.cov.60.cl.true.prop.women15.25.M.40.50[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.40.50[2], d.MCAR.cov.70.cl.true.prop.women15.25.M.40.50[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.40.50[2], d.MCAR.cov.80.cl.true.prop.women15.25.M.40.50[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.40.50[2], d.MCAR.cov.90.cl.true.prop.women15.25.M.40.50[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.40.50[2], d.MCAR.true.cov.100.prop.women15.25.M.40.50[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.40.50[1], d.MCAR.cov.40.cl.true.prop.women15.25.M.40.50[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.40.50[1], d.MCAR.cov.50.cl.true.prop.women15.25.M.40.50[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.40.50[1], d.MCAR.cov.60.cl.true.prop.women15.25.M.40.50[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.40.50[1], d.MCAR.cov.70.cl.true.prop.women15.25.M.40.50[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.40.50[1], d.MCAR.cov.80.cl.true.prop.women15.25.M.40.50[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.40.50[1], d.MCAR.cov.90.cl.true.prop.women15.25.M.40.50[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.40.50[1], d.MCAR.true.cov.100.prop.women15.25.M.40.50[1]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women15.25.M.40.50[3], d.MCAR.cov.40.cl.true.prop.women15.25.M.40.50[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women15.25.M.40.50[3], d.MCAR.cov.50.cl.true.prop.women15.25.M.40.50[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women15.25.M.40.50[3], d.MCAR.cov.60.cl.true.prop.women15.25.M.40.50[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women15.25.M.40.50[3], d.MCAR.cov.70.cl.true.prop.women15.25.M.40.50[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women15.25.M.40.50[3], d.MCAR.cov.80.cl.true.prop.women15.25.M.40.50[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women15.25.M.40.50[3], d.MCAR.cov.90.cl.true.prop.women15.25.M.40.50[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women15.25.M.40.50[3], d.MCAR.true.cov.100.prop.women15.25.M.40.50[3]))
-
-
-
-plot.cl.true.prop.women15.25.M.40.50 <- ggplot(cl.true.prop.women15.25.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men in 25 - 40 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.women15.25.M.40.50.png",
-       plot = plot.cl.true.prop.women15.25.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men25.40.F.40.50 
-
-cl.true.prop.men25.40.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.40.50[2], d.MCAR.cov.40.cl.true.prop.men25.40.F.40.50[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.40.50[2], d.MCAR.cov.50.cl.true.prop.men25.40.F.40.50[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.40.50[2], d.MCAR.cov.60.cl.true.prop.men25.40.F.40.50[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.40.50[2], d.MCAR.cov.70.cl.true.prop.men25.40.F.40.50[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.40.50[2], d.MCAR.cov.80.cl.true.prop.men25.40.F.40.50[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.40.50[2], d.MCAR.cov.90.cl.true.prop.men25.40.F.40.50[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.40.50[2], d.MCAR.true.cov.100.prop.men25.40.F.40.50[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.40.50[1], d.MCAR.cov.40.cl.true.prop.men25.40.F.40.50[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.40.50[1], d.MCAR.cov.50.cl.true.prop.men25.40.F.40.50[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.40.50[1], d.MCAR.cov.60.cl.true.prop.men25.40.F.40.50[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.40.50[1], d.MCAR.cov.70.cl.true.prop.men25.40.F.40.50[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.40.50[1], d.MCAR.cov.80.cl.true.prop.men25.40.F.40.50[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.40.50[1], d.MCAR.cov.90.cl.true.prop.men25.40.F.40.50[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.40.50[1], d.MCAR.true.cov.100.prop.men25.40.F.40.50[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men25.40.F.40.50[3], d.MCAR.cov.40.cl.true.prop.men25.40.F.40.50[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men25.40.F.40.50[3], d.MCAR.cov.50.cl.true.prop.men25.40.F.40.50[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men25.40.F.40.50[3], d.MCAR.cov.60.cl.true.prop.men25.40.F.40.50[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men25.40.F.40.50[3], d.MCAR.cov.70.cl.true.prop.men25.40.F.40.50[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men25.40.F.40.50[3], d.MCAR.cov.80.cl.true.prop.men25.40.F.40.50[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men25.40.F.40.50[3], d.MCAR.cov.90.cl.true.prop.men25.40.F.40.50[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men25.40.F.40.50[3], d.MCAR.true.cov.100.prop.men25.40.F.40.50[3]))
-
-
-plot.cl.true.prop.men25.40.F.40.50 <- ggplot(cl.true.prop.men25.40.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.men25.40.F.40.50.png",
-       plot = plot.cl.true.prop.men25.40.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women25.40.M.40.50 
-
-cl.true.prop.women25.40.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.40.50[2], d.MCAR.cov.40.cl.true.prop.women25.40.M.40.50[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.40.50[2], d.MCAR.cov.50.cl.true.prop.women25.40.M.40.50[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.40.50[2], d.MCAR.cov.60.cl.true.prop.women25.40.M.40.50[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.40.50[2], d.MCAR.cov.70.cl.true.prop.women25.40.M.40.50[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.40.50[2], d.MCAR.cov.80.cl.true.prop.women25.40.M.40.50[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.40.50[2], d.MCAR.cov.90.cl.true.prop.women25.40.M.40.50[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.40.50[2], d.MCAR.true.cov.100.prop.women25.40.M.40.50[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.40.50[1], d.MCAR.cov.40.cl.true.prop.women25.40.M.40.50[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.40.50[1], d.MCAR.cov.50.cl.true.prop.women25.40.M.40.50[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.40.50[1], d.MCAR.cov.60.cl.true.prop.women25.40.M.40.50[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.40.50[1], d.MCAR.cov.70.cl.true.prop.women25.40.M.40.50[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.40.50[1], d.MCAR.cov.80.cl.true.prop.women25.40.M.40.50[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.40.50[1], d.MCAR.cov.90.cl.true.prop.women25.40.M.40.50[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.40.50[1], d.MCAR.true.cov.100.prop.women25.40.M.40.50[2]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women25.40.M.40.50[3], d.MCAR.cov.40.cl.true.prop.women25.40.M.40.50[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women25.40.M.40.50[3], d.MCAR.cov.50.cl.true.prop.women25.40.M.40.50[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women25.40.M.40.50[3], d.MCAR.cov.60.cl.true.prop.women25.40.M.40.50[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women25.40.M.40.50[3], d.MCAR.cov.70.cl.true.prop.women25.40.M.40.50[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women25.40.M.40.50[3], d.MCAR.cov.80.cl.true.prop.women25.40.M.40.50[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women25.40.M.40.50[3], d.MCAR.cov.90.cl.true.prop.women25.40.M.40.50[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women25.40.M.40.50[3], d.MCAR.true.cov.100.prop.women25.40.M.40.50[3]))
-
-
-plot.cl.true.prop.women25.40.M.40.50 <- ggplot(cl.true.prop.women25.40.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.women25.40.M.40.50.png",
-       plot = plot.cl.true.prop.women25.40.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men40.50.F.40.50 
-
-cl.true.prop.men40.50.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.40.50[2], d.MCAR.cov.40.cl.true.prop.men40.50.F.40.50[2],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.40.50[2], d.MCAR.cov.50.cl.true.prop.men40.50.F.40.50[2],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.40.50[2], d.MCAR.cov.60.cl.true.prop.men40.50.F.40.50[2],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.40.50[2], d.MCAR.cov.70.cl.true.prop.men40.50.F.40.50[2],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.40.50[2], d.MCAR.cov.80.cl.true.prop.men40.50.F.40.50[2],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.40.50[2], d.MCAR.cov.90.cl.true.prop.men40.50.F.40.50[2],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.40.50[2], d.MCAR.true.cov.100.prop.men40.50.F.40.50[2]),
-                                            
-                                            L = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.40.50[1], d.MCAR.cov.40.cl.true.prop.men40.50.F.40.50[1],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.40.50[1], d.MCAR.cov.50.cl.true.prop.men40.50.F.40.50[1],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.40.50[1], d.MCAR.cov.60.cl.true.prop.men40.50.F.40.50[1],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.40.50[1], d.MCAR.cov.70.cl.true.prop.men40.50.F.40.50[1],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.40.50[1], d.MCAR.cov.80.cl.true.prop.men40.50.F.40.50[1],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.40.50[1], d.MCAR.cov.90.cl.true.prop.men40.50.F.40.50[1],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.40.50[1], d.MCAR.true.cov.100.prop.men40.50.F.40.50[1]),
-                                            
-                                            U = c(d.MCAR.cov.35.cl.true.prop.men40.50.F.40.50[3], d.MCAR.cov.40.cl.true.prop.men40.50.F.40.50[3],
-                                                  d.MCAR.cov.45.cl.true.prop.men40.50.F.40.50[3], d.MCAR.cov.50.cl.true.prop.men40.50.F.40.50[3],
-                                                  d.MCAR.cov.55.cl.true.prop.men40.50.F.40.50[3], d.MCAR.cov.60.cl.true.prop.men40.50.F.40.50[3],
-                                                  d.MCAR.cov.65.cl.true.prop.men40.50.F.40.50[3], d.MCAR.cov.70.cl.true.prop.men40.50.F.40.50[3],
-                                                  d.MCAR.cov.75.cl.true.prop.men40.50.F.40.50[3], d.MCAR.cov.80.cl.true.prop.men40.50.F.40.50[3],
-                                                  d.MCAR.cov.85.cl.true.prop.men40.50.F.40.50[3], d.MCAR.cov.90.cl.true.prop.men40.50.F.40.50[3],
-                                                  d.MCAR.cov.95.cl.true.prop.men40.50.F.40.50[3], d.MCAR.true.cov.100.prop.men40.50.F.40.50[3]))
-
-
-plot.cl.true.prop.men40.50.F.40.50 <- ggplot(cl.true.prop.men40.50.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 40 - 50 paired with women in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.cl.true.prop.men40.50.F.40.50.png",
-       plot = plot.cl.true.prop.men40.50.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women40.50.M.40.50 
-
-cl.true.prop.women40.50.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.40.50[2], d.MCAR.cov.40.cl.true.prop.women40.50.M.40.50[2],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.40.50[2], d.MCAR.cov.50.cl.true.prop.women40.50.M.40.50[2],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.40.50[2], d.MCAR.cov.60.cl.true.prop.women40.50.M.40.50[2],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.40.50[2], d.MCAR.cov.70.cl.true.prop.women40.50.M.40.50[2],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.40.50[2], d.MCAR.cov.80.cl.true.prop.women40.50.M.40.50[2],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.40.50[2], d.MCAR.cov.90.cl.true.prop.women40.50.M.40.50[2],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.40.50[2], d.MCAR.true.cov.100.prop.women40.50.M.40.50[2]),
-                                              
-                                              L = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.40.50[1], d.MCAR.cov.40.cl.true.prop.women40.50.M.40.50[1],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.40.50[1], d.MCAR.cov.50.cl.true.prop.women40.50.M.40.50[1],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.40.50[1], d.MCAR.cov.60.cl.true.prop.women40.50.M.40.50[1],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.40.50[1], d.MCAR.cov.70.cl.true.prop.women40.50.M.40.50[1],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.40.50[1], d.MCAR.cov.80.cl.true.prop.women40.50.M.40.50[1],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.40.50[1], d.MCAR.cov.90.cl.true.prop.women40.50.M.40.50[1],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.40.50[1], d.MCAR.true.cov.100.prop.women40.50.M.40.50[1]),
-                                              
-                                              U = c(d.MCAR.cov.35.cl.true.prop.women40.50.M.40.50[3], d.MCAR.cov.40.cl.true.prop.women40.50.M.40.50[3],
-                                                    d.MCAR.cov.45.cl.true.prop.women40.50.M.40.50[3], d.MCAR.cov.50.cl.true.prop.women40.50.M.40.50[3],
-                                                    d.MCAR.cov.55.cl.true.prop.women40.50.M.40.50[3], d.MCAR.cov.60.cl.true.prop.women40.50.M.40.50[3],
-                                                    d.MCAR.cov.65.cl.true.prop.women40.50.M.40.50[3], d.MCAR.cov.70.cl.true.prop.women40.50.M.40.50[3],
-                                                    d.MCAR.cov.75.cl.true.prop.women40.50.M.40.50[3], d.MCAR.cov.80.cl.true.prop.women40.50.M.40.50[3],
-                                                    d.MCAR.cov.85.cl.true.prop.women40.50.M.40.50[3], d.MCAR.cov.90.cl.true.prop.women40.50.M.40.50[3],
-                                                    d.MCAR.cov.95.cl.true.prop.women40.50.M.40.50[3], d.MCAR.true.cov.100.prop.women40.50.M.40.50[3]))
-
-
-plot.cl.true.prop.women40.50.M.40.50 <- ggplot(cl.true.prop.women40.50.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.cl.true.prop.women40.50.M.40.50.png",
-       plot = plot.cl.true.prop.women40.50.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-# III. True values from full phylogeny  --------------------------------
-
-
-
-
-# Cov 35 
-
-d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,1])
-d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,2])
-d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,3])
-d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,4])
-d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,5])
-d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,6])
-d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,7])
-d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,8])
-d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.men[,9])
-d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.35.tree.trans.true.prop.women[,9])
-
-
-# Cov 40
-d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,1])
-d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,2])
-d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,3])
-d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,4])
-d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,5])
-d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,6])
-d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,7])
-d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,8])
-d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.men[,9])
-d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.40.tree.trans.true.prop.women[,9])
-
-
-# Cov 45
-
-d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,1])
-d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,2])
-d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,3])
-d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,4])
-d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,5])
-d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,6])
-d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,7])
-d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,8])
-d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.men[,9])
-d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.45.tree.trans.true.prop.women[,9])
-
-
-# Cov 50
-
-d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,1])
-d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,2])
-d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,3])
-d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,4])
-d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,5])
-d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,6])
-d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,7])
-d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,8])
-d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.men[,9])
-d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.50.tree.trans.true.prop.women[,9])
-
-
-
-# Cov 55
-
-d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,1])
-d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,2])
-d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,3])
-d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,4])
-d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,5])
-d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,6])
-d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,7])
-d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,8])
-d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.men[,9])
-d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.55.tree.trans.true.prop.women[,9])
-
-
-
-# Cov 60
-
-d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,1])
-d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,2])
-d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,3])
-d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,4])
-d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,5])
-d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,6])
-d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,7])
-d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,8])
-d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.men[,9])
-d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.60.tree.trans.true.prop.women[,9])
-
-
-
-# Cov 65
-
-d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,1])
-d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,2])
-d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,3])
-d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,4])
-d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,5])
-d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,6])
-d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,7])
-d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,8])
-d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.men[,9])
-d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.65.tree.trans.true.prop.women[,9])
-
-
-# Cov 70
-
-d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,1])
-d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,2])
-d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,3])
-d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,4])
-d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,5])
-d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,6])
-d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,7])
-d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,8])
-d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.men[,9])
-d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.70.tree.trans.true.prop.women[,9])
-
-
-
-# Cov 75
-
-d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,1])
-d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,2])
-d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,3])
-d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,4])
-d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,5])
-d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,6])
-d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,7])
-d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,8])
-d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.men[,9])
-d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.75.tree.trans.true.prop.women[,9])
-
-
-
-# Cov 80
-
-d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,1])
-d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,2])
-d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,3])
-d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,4])
-d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,5])
-d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,6])
-d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,7])
-d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,8])
-d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.men[,9])
-d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.80.tree.trans.true.prop.women[,9])
-
-
-
-# Cov 85
-
-d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,1])
-d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,2])
-d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,3])
-d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,4])
-d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,5])
-d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,6])
-d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,7])
-d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,8])
-d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.men[,9])
-d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.85.tree.trans.true.prop.women[,9])
-
-
-
-# Cov 90
-
-
-d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,1])
-d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,2])
-d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,3])
-d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,4])
-d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,5])
-d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,6])
-d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,7])
-d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,8])
-d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.men[,9])
-d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.90.tree.trans.true.prop.women[,9])
-
-
-# Cov 95
-
-d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,1])
-d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,1])
-
-d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,2])
-d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,2])
-
-d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,3])
-d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,3])
-
-d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,4])
-d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,4])
-
-d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,5])
-d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,5])
-
-d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,6])
-d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,6])
-
-
-d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,7])
-d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,7])
-
-d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,8])
-d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,8])
-
-d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.men[,9])
-d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.95.tree.trans.true.prop.women[,9])
-
-
-# Table of proportions in true transmission network of individuals in the entire phylogeny -----------------
-
-
-
-props.true.tree <- matrix(c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.true.cov.100.prop.men15.25.F.15.25[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.true.cov.100.prop.women15.25.M.15.25[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.true.cov.100.prop.men25.40.F.15.25[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.true.cov.100.prop.women25.40.M.15.25[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.true.cov.100.prop.men40.50.F.15.25[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.true.cov.100.prop.women40.50.M.15.25[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.true.cov.100.prop.men15.25.F.25.40[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.true.cov.100.prop.women15.25.M.25.40[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.true.cov.100.prop.men25.40.F.25.40[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.true.cov.100.prop.women25.40.M.25.40[2],
-                            
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.25.40[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.25.40[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.25.40[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.25.40[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.25.40[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.25.40[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.25.40[2], d.MCAR.true.cov.100.prop.men40.50.F.25.40[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.25.40[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.25.40[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.25.40[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.25.40[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.25.40[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.25.40[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.25.40[2], d.MCAR.true.cov.100.prop.women40.50.M.25.40[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.true.cov.100.prop.men15.25.F.40.50[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.true.cov.100.prop.women15.25.M.40.50[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.true.cov.100.prop.men25.40.F.40.50[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.true.cov.100.prop.women25.40.M.40.50[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.40.50[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.40.50[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.40.50[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.40.50[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.40.50[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.40.50[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.40.50[2], d.MCAR.true.cov.100.prop.men40.50.F.40.50[2],
-                            
-                            d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.40.50[2], 
-                            d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.40.50[2], 
-                            d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.40.50[2], 
-                            d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.40.50[2], 
-                            d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.40.50[2], 
-                            d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.40.50[2], 
-                            d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.40.50[2], d.MCAR.true.cov.100.prop.women40.50.M.40.50[2]
-),
-
-ncol = 14,
-byrow = TRUE)
-
-
-
-colnames(props.true.tree) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
-                               "cl.cov.50", "cl.cov.55", "cl.cov.60",
-                               "cl.cov.65", "cl.cov.70", "cl.cov.75",
-                               "cl.cov.80", "cl.cov.85", "cl.cov.90",
-                               "cl.cov.95", "true.cov.100")
-
-rownames(props.true.tree) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25", 
-                               "prop.M.25.40.F.15.25", "prop.F.25.40.M.15.25", 
-                               "prop.M.40.50.F.15.25", "prop.F.40.50.M.15.25",
-                               "prop.M.15.25.F.25.40", "prop.F.15.25.M.25.40",
-                               "prop.M.25.40.F.25.40", "prop.F.25.40.M.25.40",
-                               "prop.M.40.50.F.25.40", "prop.F.40.50.M.25.40",
-                               "prop.M.15.25.F.40.50", "prop.F.15.25.M.40.50",
-                               "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
-                               "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
-
-write.csv(props.true.tree, file = "proportions.true.tree.csv")
-
-
-CI.props.true.tree <- matrix(c(paste(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men15.25.F.15.25[2], "[", d.MCAR.true.cov.100.prop.men15.25.F.15.25[1], "-", d.MCAR.true.cov.100.prop.men15.25.F.15.25[3], "]"),
-                               
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women15.25.M.15.25[2], "[", d.MCAR.true.cov.100.prop.women15.25.M.15.25[1], "-", d.MCAR.true.cov.100.prop.women15.25.M.15.25[3], "]"),
-                               
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men25.40.F.15.25[2], "[", d.MCAR.true.cov.100.prop.men25.40.F.15.25[1], "-", d.MCAR.true.cov.100.prop.men25.40.F.15.25[3], "]"),
-                               
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women25.40.M.15.25[2], "[", d.MCAR.true.cov.100.prop.women25.40.M.15.25[1], "-", d.MCAR.true.cov.100.prop.women25.40.M.15.25[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men40.50.F.15.25[2], "[", d.MCAR.true.cov.100.prop.men40.50.F.15.25[1], "-", d.MCAR.true.cov.100.prop.men40.50.F.15.25[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women40.50.M.15.25[2], "[", d.MCAR.true.cov.100.prop.women40.50.M.15.25[1], "-", d.MCAR.true.cov.100.prop.women40.50.M.15.25[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men15.25.F.25.40[2], "[", d.MCAR.true.cov.100.prop.men15.25.F.25.40[1], "-", d.MCAR.true.cov.100.prop.men15.25.F.25.40[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women15.25.M.25.40[2], "[", d.MCAR.true.cov.100.prop.women15.25.M.25.40[1], "-", d.MCAR.true.cov.100.prop.women15.25.M.25.40[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men25.40.F.25.40[2], "[", d.MCAR.true.cov.100.prop.men25.40.F.25.40[1], "-", d.MCAR.true.cov.100.prop.men25.40.F.25.40[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women25.40.M.25.40[2], "[", d.MCAR.true.cov.100.prop.women25.40.M.25.40[1], "-", d.MCAR.true.cov.100.prop.women25.40.M.25.40[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.25.40[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.25.40[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.25.40[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.25.40[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men40.50.F.25.40[2], "[", d.MCAR.true.cov.100.prop.men40.50.F.25.40[1], "-", d.MCAR.true.cov.100.prop.men40.50.F.25.40[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.25.40[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.25.40[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.25.40[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.25.40[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women40.50.M.25.40[2], "[", d.MCAR.true.cov.100.prop.women40.50.M.25.40[1], "-", d.MCAR.true.cov.100.prop.women40.50.M.25.40[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men15.25.F.40.50[2], "[", d.MCAR.true.cov.100.prop.men15.25.F.40.50[1], "-", d.MCAR.true.cov.100.prop.men15.25.F.40.50[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women15.25.M.40.50[2], "[", d.MCAR.true.cov.100.prop.women15.25.M.40.50[1], "-", d.MCAR.true.cov.100.prop.women15.25.M.40.50[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men25.40.F.40.50[2], "[", d.MCAR.true.cov.100.prop.men25.40.F.40.50[1], "-", d.MCAR.true.cov.100.prop.men25.40.F.40.50[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women25.40.M.40.50[2], "[", d.MCAR.true.cov.100.prop.women25.40.M.40.50[1], "-", d.MCAR.true.cov.100.prop.women25.40.M.40.50[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.40.50[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.40.50[2], "[", d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.40.50[1], "-", d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.40.50[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.men40.50.F.40.50[2], "[", d.MCAR.true.cov.100.prop.men40.50.F.40.50[1], "-", d.MCAR.true.cov.100.prop.men40.50.F.40.50[3], "]"),
-                               
-                               paste(d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.40.50[2],  "[", d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.40.50[2], "[", d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.40.50[1], "-", d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.40.50[3], "]"), 
-                               paste(d.MCAR.true.cov.100.prop.women40.50.M.40.50[2], "[", d.MCAR.true.cov.100.prop.women40.50.M.40.50[1], "-", d.MCAR.true.cov.100.prop.women40.50.M.40.50[3], "]")
-),
-
-ncol = 14,
-byrow = TRUE)
-
-colnames(CI.props.true.tree) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
-                                  "cl.cov.50", "cl.cov.55", "cl.cov.60",
-                                  "cl.cov.65", "cl.cov.70", "cl.cov.75",
-                                  "cl.cov.80", "cl.cov.85", "cl.cov.90",
-                                  "cl.cov.95", "true.cov.100")
-
-rownames(CI.props.true.tree) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25", 
-                                  "prop.M.25.40.F.15.25", "prop.F.25.40.M.15.25", 
-                                  "prop.M.40.50.F.15.25", "prop.F.40.50.M.15.25",
-                                  "prop.M.15.25.F.25.40", "prop.F.15.25.M.25.40",
-                                  "prop.M.25.40.F.25.40", "prop.F.25.40.M.25.40",
-                                  "prop.M.40.50.F.25.40", "prop.F.40.50.M.25.40",
-                                  "prop.M.15.25.F.40.50", "prop.F.15.25.M.40.50",
-                                  "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
-                                  "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
-
-write.csv(CI.props.true.tree, file = "CI.proportions.true.tree.csv")
-
-
-
-
-
-
-
-# Visualising III in different MCAR coverages -------------------------------
-
-
-############## AAAAAAAA : 15.25 - 40.50 and 15.25
-
-# Men: men15.25.F.15.25
-
-tree.trans.true.prop.men15.25.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                    
-                                                    F = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25[2],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25[2],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25[2],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25[2],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25[2],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25[2],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25[2], d.MCAR.true.cov.100.prop.men15.25.F.15.25[2]),
-                                                    
-                                                    L = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25[1], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25[1],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25[1], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25[1],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25[1], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25[1],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25[1], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25[1],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25[1], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25[1],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25[1], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25[1],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25[1], d.MCAR.true.cov.100.prop.men15.25.F.15.25[1]),
-                                                    
-                                                    U = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.15.25[3], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.15.25[3],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.15.25[3], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.15.25[3],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.15.25[3], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.15.25[3],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.15.25[3], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.15.25[3],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.15.25[3], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.15.25[3],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.15.25[3], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.15.25[3],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.15.25[3], d.MCAR.true.cov.100.prop.men15.25.F.15.25[3]))
-
-
-plot.tree.trans.true.prop.men15.25.F.15.25 <- ggplot(tree.trans.true.prop.men15.25.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings between of men in 15 - 25 paired with women in 15 - 25 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.men15.25.F.15.25.png",
-       plot = plot.tree.trans.true.prop.men15.25.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women15.25.M.15.25
-
-tree.trans.true.prop.women15.25.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                      
-                                                      F = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25[2],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25[2],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25[2],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25[2],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25[2],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25[2],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25[2], d.MCAR.true.cov.100.prop.women15.25.M.15.25[2]),
-                                                      
-                                                      L = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25[1], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25[1],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25[1], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25[1],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25[1], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25[1],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25[1], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25[1],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25[1], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25[1],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25[1], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25[1],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25[1], d.MCAR.true.cov.100.prop.women15.25.M.15.25[1]),
-                                                      
-                                                      U = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.15.25[3], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.15.25[3],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.15.25[3], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.15.25[3],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.15.25[3], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.15.25[3],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.15.25[3], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.15.25[3],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.15.25[3], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.15.25[3],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.15.25[3], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.15.25[3],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.15.25[3], d.MCAR.true.cov.100.prop.women15.25.M.15.25[3]))
-
-
-
-plot.tree.trans.true.prop.women15.25.M.15.25 <- ggplot(tree.trans.true.prop.women15.25.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men in 15 - 25 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.women15.25.M.15.25.png",
-       plot = plot.tree.trans.true.prop.women15.25.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men25.40.F.15.25 
-
-tree.trans.true.prop.men25.40.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                    
-                                                    F = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25[2],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25[2],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25[2],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25[2],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25[2],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25[2],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25[2], d.MCAR.true.cov.100.prop.men25.40.F.15.25[2]),
-                                                    
-                                                    L = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25[1], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25[1],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25[1], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25[1],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25[1], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25[1],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25[1], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25[1],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25[1], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25[1],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25[1], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25[1],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25[1], d.MCAR.true.cov.100.prop.men25.40.F.15.25[2]),
-                                                    
-                                                    U = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.15.25[3], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.15.25[3],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.15.25[3], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.15.25[3],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.15.25[3], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.15.25[3],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.15.25[3], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.15.25[3],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.15.25[3], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.15.25[3],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.15.25[3], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.15.25[3],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.15.25[3], d.MCAR.true.cov.100.prop.men25.40.F.15.25[3]))
-
-
-plot.tree.trans.true.prop.men25.40.F.15.25 <- ggplot(tree.trans.true.prop.men25.40.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.men25.40.F.15.25.png",
-       plot = plot.tree.trans.true.prop.men25.40.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women25.40.M.15.25 
-
-tree.trans.true.prop.women25.40.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                      
-                                                      F = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25[2],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25[2],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25[2],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25[2],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25[2],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25[2],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25[2], d.MCAR.true.cov.100.prop.women25.40.M.15.25[2]),
-                                                      
-                                                      L = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25[1], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25[1],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25[1], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25[1],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25[1], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25[1],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25[1], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25[1],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25[1], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25[1],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25[1], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25[1],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25[1], d.MCAR.true.cov.100.prop.women25.40.M.15.25[1]),
-                                                      
-                                                      U = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.15.25[3], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.15.25[3],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.15.25[3], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.15.25[3],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.15.25[3], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.15.25[3],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.15.25[3], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.15.25[3],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.15.25[3], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.15.25[3],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.15.25[3], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.15.25[3],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.15.25[3], d.MCAR.true.cov.100.prop.women25.40.M.15.25[3]))
-
-
-plot.tree.trans.true.prop.women25.40.M.15.25 <- ggplot(tree.trans.true.prop.women25.40.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.women25.40.M.15.25.png",
-       plot = plot.tree.trans.true.prop.women25.40.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: men40.50.F.15.25 
-
-tree.trans.true.prop.men40.50.F.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                    
-                                                    F = c(d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25[2],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25[2],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25[2],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25[2],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25[2],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25[2],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25[2], d.MCAR.true.cov.100.prop.men40.50.F.15.25[2]),
-                                                    
-                                                    L = c(d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25[1], d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25[1],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25[1], d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25[1],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25[1], d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25[1],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25[1], d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25[1],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25[1], d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25[1],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25[1], d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25[1],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25[1], d.MCAR.true.cov.100.prop.men40.50.F.15.25[1]),
-                                                    
-                                                    U = c(d.MCAR.cov.35.tree.trans.true.prop.men40.50.F.15.25[3], d.MCAR.cov.40.tree.trans.true.prop.men40.50.F.15.25[3],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men40.50.F.15.25[3], d.MCAR.cov.50.tree.trans.true.prop.men40.50.F.15.25[3],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men40.50.F.15.25[3], d.MCAR.cov.60.tree.trans.true.prop.men40.50.F.15.25[3],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men40.50.F.15.25[3], d.MCAR.cov.70.tree.trans.true.prop.men40.50.F.15.25[3],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men40.50.F.15.25[3], d.MCAR.cov.80.tree.trans.true.prop.men40.50.F.15.25[3],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men40.50.F.15.25[3], d.MCAR.cov.90.tree.trans.true.prop.men40.50.F.15.25[3],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men40.50.F.15.25[3], d.MCAR.true.cov.100.prop.men40.50.F.15.25[3]))
-
-
-plot.tree.trans.true.prop.men40.50.F.15.25 <- ggplot(tree.trans.true.prop.men40.50.F.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 40 - 50 paired with women in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.men40.50.F.15.25.png",
-       plot = plot.tree.trans.true.prop.men40.50.F.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women40.50.M.15.25 
-
-tree.trans.true.prop.women40.50.M.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                      
-                                                      F = c(d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25[2],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25[2],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25[2],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25[2],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25[2],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25[2],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25[2], d.MCAR.true.cov.100.prop.women40.50.M.15.25[2]),
-                                                      
-                                                      L = c(d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25[1], d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25[1],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25[1], d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25[1],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25[1], d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25[1],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25[1], d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25[1],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25[1], d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25[1],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25[1], d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25[1],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25[1], d.MCAR.true.cov.100.prop.women40.50.M.15.25[1]),
-                                                      
-                                                      U = c(d.MCAR.cov.35.tree.trans.true.prop.women40.50.M.15.25[3], d.MCAR.cov.40.tree.trans.true.prop.women40.50.M.15.25[3],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women40.50.M.15.25[3], d.MCAR.cov.50.tree.trans.true.prop.women40.50.M.15.25[3],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women40.50.M.15.25[3], d.MCAR.cov.60.tree.trans.true.prop.women40.50.M.15.25[3],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women40.50.M.15.25[3], d.MCAR.cov.70.tree.trans.true.prop.women40.50.M.15.25[3],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women40.50.M.15.25[3], d.MCAR.cov.80.tree.trans.true.prop.women40.50.M.15.25[3],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women40.50.M.15.25[3], d.MCAR.cov.90.tree.trans.true.prop.women40.50.M.15.25[3],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women40.50.M.15.25[3], d.MCAR.true.cov.100.prop.women40.50.M.15.25[3]))
-
-
-plot.tree.trans.true.prop.women40.50.M.15.25 <- ggplot(tree.trans.true.prop.women40.50.M.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 40 - 50 paired with men in 15 - 25 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.women40.50.M.15.25.png",
-       plot = plot.tree.trans.true.prop.women40.50.M.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-############## BBBBBBBBBB : 15.25 - 40.50 and 25.40
-
-
-
-# Men: men15.25.F.25.40
-
-tree.trans.true.prop.men15.25.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                    
-                                                    F = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40[2],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40[2],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40[2],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40[2],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40[2],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40[2],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40[2], d.MCAR.true.cov.100.prop.men15.25.F.25.40[2]),
-                                                    
-                                                    L = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40[1], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40[1],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40[1], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40[1],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40[1], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40[1],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40[1], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40[1],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40[1], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40[1],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40[1], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40[1],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40[1], d.MCAR.true.cov.100.prop.men15.25.F.25.40[1]),
-                                                    
-                                                    U = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.25.40[3], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.25.40[3],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.25.40[3], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.25.40[3],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.25.40[3], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.25.40[3],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.25.40[3], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.25.40[3],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.25.40[3], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.25.40[3],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.25.40[3], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.25.40[3],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.25.40[3], d.MCAR.true.cov.100.prop.men15.25.F.25.40[3]))
-
-
-plot.tree.trans.true.prop.men15.25.F.25.40 <- ggplot(tree.trans.true.prop.men15.25.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings between of men in 15 - 25 paired with women in 25 - 40 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.men15.25.F.25.40.png",
-       plot = plot.tree.trans.true.prop.men15.25.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women15.25.M.25.40
-
-tree.trans.true.prop.women15.25.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                      
-                                                      F = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40[2],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40[2],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40[2],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40[2],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40[2],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40[2],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40[2], d.MCAR.true.cov.100.prop.women15.25.M.25.40[2]),
-                                                      
-                                                      L = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40[1], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40[1],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40[1], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40[1],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40[1], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40[1],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40[1], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40[1],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40[1], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40[1],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40[1], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40[1],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40[1], d.MCAR.true.cov.100.prop.women15.25.M.25.40[1]),
-                                                      
-                                                      U = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.25.40[3], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.25.40[3],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.25.40[3], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.25.40[3],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.25.40[3], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.25.40[3],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.25.40[3], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.25.40[3],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.25.40[3], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.25.40[3],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.25.40[3], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.25.40[3],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.25.40[3], d.MCAR.true.cov.100.prop.women15.25.M.25.40[3]))
-
-
-
-plot.tree.trans.true.prop.women15.25.M.25.40 <- ggplot(tree.trans.true.prop.women15.25.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men in  25- 40 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.tree.trans.true.prop.women15.25.M.25.40.png",
-       plot = plot.tree.trans.true.prop.women15.25.M.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-
-# Men: men25.40.F.25.40 
-
-tree.trans.true.prop.men25.40.F.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                    
-                                                    F = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40[2],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40[2],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40[2],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40[2],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40[2],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40[2],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40[2], d.MCAR.true.cov.100.prop.men25.40.F.25.40[2]),
-                                                    
-                                                    L = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40[1], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40[1],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40[1], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40[1],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40[1], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40[1],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40[1], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40[1],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40[1], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40[1],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40[1], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40[1],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40[1], d.MCAR.true.cov.100.prop.men25.40.F.25.40[2]),
-                                                    
-                                                    U = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.25.40[3], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.25.40[3],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.25.40[3], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.25.40[3],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.25.40[3], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.25.40[3],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.25.40[3], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.25.40[3],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.25.40[3], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.25.40[3],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.25.40[3], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.25.40[3],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.25.40[3], d.MCAR.true.cov.100.prop.men25.40.F.25.40[3]))
-
-
-plot.tree.trans.true.prop.men25.40.F.25.40 <- ggplot(tree.trans.true.prop.men25.40.F.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-
-ggsave(filename = "plot.tree.trans.true.prop.men25.40.F.25.40.png",
-       plot = plot.tree.trans.true.prop.men25.40.F.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-# Women: women25.40.M.25.40 
-
-tree.trans.true.prop.women25.40.M.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                      
-                                                      F = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40[2],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40[2],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40[2],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40[2],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40[2],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40[2],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40[2], d.MCAR.true.cov.100.prop.women25.40.M.25.40[2]),
-                                                      
-                                                      L = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40[1], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40[1],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40[1], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40[1],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40[1], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40[1],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40[1], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40[1],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40[1], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40[1],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40[1], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40[1],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40[1], d.MCAR.true.cov.100.prop.women25.40.M.25.40[1]),
-                                                      
-                                                      U = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.25.40[3], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.25.40[3],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.25.40[3], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.25.40[3],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.25.40[3], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.25.40[3],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.25.40[3], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.25.40[3],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.25.40[3], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.25.40[3],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.25.40[3], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.25.40[3],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.25.40[3], d.MCAR.true.cov.100.prop.women25.40.M.25.40[3]))
-
-
-plot.tree.trans.true.prop.women25.40.M.25.40 <- ggplot(tree.trans.true.prop.women25.40.M.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in 25 - 40 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.women25.40.M.25.40.png",
-       plot = plot.tree.trans.true.prop.women25.40.M.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-############## CCCCCCC : 15.25 - 40.50 and 40.50
-
-
-
-# Men: men15.25.F.40.50
-
-tree.trans.true.prop.men15.25.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                    
-                                                    F = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50[2],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50[2],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50[2],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50[2],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50[2],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50[2],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50[2], d.MCAR.true.cov.100.prop.men15.25.F.40.50[2]),
-                                                    
-                                                    L = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50[1], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50[1],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50[1], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50[1],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50[1], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50[1],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50[1], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50[1],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50[1], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50[1],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50[1], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50[1],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50[1], d.MCAR.true.cov.100.prop.men15.25.F.40.50[1]),
-                                                    
-                                                    U = c(d.MCAR.cov.35.tree.trans.true.prop.men15.25.F.40.50[3], d.MCAR.cov.40.tree.trans.true.prop.men15.25.F.40.50[3],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men15.25.F.40.50[3], d.MCAR.cov.50.tree.trans.true.prop.men15.25.F.40.50[3],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men15.25.F.40.50[3], d.MCAR.cov.60.tree.trans.true.prop.men15.25.F.40.50[3],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men15.25.F.40.50[3], d.MCAR.cov.70.tree.trans.true.prop.men15.25.F.40.50[3],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men15.25.F.40.50[3], d.MCAR.cov.80.tree.trans.true.prop.men15.25.F.40.50[3],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men15.25.F.40.50[3], d.MCAR.cov.90.tree.trans.true.prop.men15.25.F.40.50[3],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men15.25.F.40.50[3], d.MCAR.true.cov.100.prop.men15.25.F.40.50[3]))
-
-
-plot.tree.trans.true.prop.men15.25.F.40.50 <- ggplot(tree.trans.true.prop.men15.25.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings between of men in 15 - 25 paired with women in  40 - 50 years- MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.men15.25.F.40.50.png",
-       plot = plot.tree.trans.true.prop.men15.25.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: women15.25.M.40.50
-
-tree.trans.true.prop.women15.25.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                      
-                                                      F = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50[2],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50[2],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50[2],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50[2],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50[2],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50[2],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50[2], d.MCAR.true.cov.100.prop.women15.25.M.40.50[2]),
-                                                      
-                                                      L = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50[1], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50[1],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50[1], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50[1],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50[1], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50[1],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50[1], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50[1],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50[1], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50[1],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50[1], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50[1],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50[1], d.MCAR.true.cov.100.prop.women15.25.M.40.50[1]),
-                                                      
-                                                      U = c(d.MCAR.cov.35.tree.trans.true.prop.women15.25.M.40.50[3], d.MCAR.cov.40.tree.trans.true.prop.women15.25.M.40.50[3],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women15.25.M.40.50[3], d.MCAR.cov.50.tree.trans.true.prop.women15.25.M.40.50[3],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women15.25.M.40.50[3], d.MCAR.cov.60.tree.trans.true.prop.women15.25.M.40.50[3],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women15.25.M.40.50[3], d.MCAR.cov.70.tree.trans.true.prop.women15.25.M.40.50[3],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women15.25.M.40.50[3], d.MCAR.cov.80.tree.trans.true.prop.women15.25.M.40.50[3],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women15.25.M.40.50[3], d.MCAR.cov.90.tree.trans.true.prop.women15.25.M.40.50[3],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women15.25.M.40.50[3], d.MCAR.true.cov.100.prop.women15.25.M.40.50[3]))
-
-
-
-plot.tree.trans.true.prop.women15.25.M.40.50 <- ggplot(tree.trans.true.prop.women15.25.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 15 - 25 paired with men in  40 - 50 years - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.women15.25.M.40.50.png",
-       plot = plot.tree.trans.true.prop.women15.25.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-# Men: men25.40.F.40.50 
-
-tree.trans.true.prop.men25.40.F.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                    
-                                                    F = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50[2],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50[2],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50[2],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50[2],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50[2],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50[2],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50[2], d.MCAR.true.cov.100.prop.men25.40.F.40.50[2]),
-                                                    
-                                                    L = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50[1], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50[1],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50[1], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50[1],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50[1], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50[1],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50[1], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50[1],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50[1], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50[1],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50[1], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50[1],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50[1], d.MCAR.true.cov.100.prop.men25.40.F.40.50[2]),
-                                                    
-                                                    U = c(d.MCAR.cov.35.tree.trans.true.prop.men25.40.F.40.50[3], d.MCAR.cov.40.tree.trans.true.prop.men25.40.F.40.50[3],
-                                                          d.MCAR.cov.45.tree.trans.true.prop.men25.40.F.40.50[3], d.MCAR.cov.50.tree.trans.true.prop.men25.40.F.40.50[3],
-                                                          d.MCAR.cov.55.tree.trans.true.prop.men25.40.F.40.50[3], d.MCAR.cov.60.tree.trans.true.prop.men25.40.F.40.50[3],
-                                                          d.MCAR.cov.65.tree.trans.true.prop.men25.40.F.40.50[3], d.MCAR.cov.70.tree.trans.true.prop.men25.40.F.40.50[3],
-                                                          d.MCAR.cov.75.tree.trans.true.prop.men25.40.F.40.50[3], d.MCAR.cov.80.tree.trans.true.prop.men25.40.F.40.50[3],
-                                                          d.MCAR.cov.85.tree.trans.true.prop.men25.40.F.40.50[3], d.MCAR.cov.90.tree.trans.true.prop.men25.40.F.40.50[3],
-                                                          d.MCAR.cov.95.tree.trans.true.prop.men25.40.F.40.50[3], d.MCAR.true.cov.100.prop.men25.40.F.40.50[3]))
-
-
-plot.tree.trans.true.prop.men25.40.F.40.50 <- ggplot(tree.trans.true.prop.men25.40.F.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of men in 25 - 40 paired with women in  40 - 50 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.men25.40.F.40.50.png",
-       plot = plot.tree.trans.true.prop.men25.40.F.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: women25.40.M.40.50 
-
-tree.trans.true.prop.women25.40.M.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                                      
-                                                      F = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50[2],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50[2],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50[2],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50[2],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50[2],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50[2],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50[2], d.MCAR.true.cov.100.prop.women25.40.M.40.50[2]),
-                                                      
-                                                      L = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50[1], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50[1],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50[1], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50[1],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50[1], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50[1],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50[1], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50[1],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50[1], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50[1],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50[1], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50[1],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50[1], d.MCAR.true.cov.100.prop.women25.40.M.40.50[1]),
-                                                      
-                                                      U = c(d.MCAR.cov.35.tree.trans.true.prop.women25.40.M.40.50[3], d.MCAR.cov.40.tree.trans.true.prop.women25.40.M.40.50[3],
-                                                            d.MCAR.cov.45.tree.trans.true.prop.women25.40.M.40.50[3], d.MCAR.cov.50.tree.trans.true.prop.women25.40.M.40.50[3],
-                                                            d.MCAR.cov.55.tree.trans.true.prop.women25.40.M.40.50[3], d.MCAR.cov.60.tree.trans.true.prop.women25.40.M.40.50[3],
-                                                            d.MCAR.cov.65.tree.trans.true.prop.women25.40.M.40.50[3], d.MCAR.cov.70.tree.trans.true.prop.women25.40.M.40.50[3],
-                                                            d.MCAR.cov.75.tree.trans.true.prop.women25.40.M.40.50[3], d.MCAR.cov.80.tree.trans.true.prop.women25.40.M.40.50[3],
-                                                            d.MCAR.cov.85.tree.trans.true.prop.women25.40.M.40.50[3], d.MCAR.cov.90.tree.trans.true.prop.women25.40.M.40.50[3],
-                                                            d.MCAR.cov.95.tree.trans.true.prop.women25.40.M.40.50[3], d.MCAR.true.cov.100.prop.women25.40.M.40.50[3]))
-
-
-plot.tree.trans.true.prop.women25.40.M.40.50 <- ggplot(tree.trans.true.prop.women25.40.M.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Proportion of pairings of women in 25 - 40 paired with men in  40 - 50 - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Proportion")
-
-ggsave(filename = "plot.tree.trans.true.prop.women25.40.M.40.50.png",
-       plot = plot.tree.trans.true.prop.women25.40.M.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
+
+plot.F.25.40 <- ggplot(true.propos.df.F.25.40, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
+
+plot.F.40.50 <- ggplot(true.propos.df.F.40.50, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
+
+plot.M.15.25 <- ggplot(true.propos.df.M.15.25, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
+
+plot.M.25.40 <- ggplot(true.propos.df.M.25.40, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
+
+plot.M.40.50 <- ggplot(true.propos.df.M.40.50, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value") # +
+# ggtitle("Pairings across age groups")
+
+
+
+plotall.F <- ggpubr::ggarrange(plot.F.15.25, plot.F.25.40, plot.F.40.50)
+
+plotall.M <- ggpubr::ggarrange(plot.M.15.25, plot.M.25.40, plot.M.40.50)
+
+
+ggsave(filename = "plotall.proportions.F.pdf",
+       plot = plotall.F,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+ggsave(filename = "plotall.proportions.M.pdf",
+       plot = plotall.M,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
 
@@ -9076,6 +6838,9 @@ sd.AD.num.men.true.cov.100.25.40 <- quant.med(AD.true.cov.100[,52])
 
 sd.AD.num.women.true.cov.100.40.50 <- quant.med(AD.true.cov.100[,53])
 sd.AD.num.men.true.cov.100.40.50 <- quant.med(AD.true.cov.100[,54])
+
+
+
 
 
 # Statistics of age difference  of individuals's in pairings  ----------------
@@ -10250,7 +8015,7 @@ AD.stats <- matrix(c(mean.MCAR.cov.35.AD.women.cl.15.25[2], mean.MCAR.cov.40.AD.
 ncol = 14,
 byrow = TRUE)
 
-
+AD.stats <- round(AD.stats, digits = 2)
 
 colnames(AD.stats) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
                         "cl.cov.50", "cl.cov.55", "cl.cov.60",
@@ -10270,7 +8035,7 @@ rownames(AD.stats) <- c("mean.AD.women.cl.15.25", "mean.AD.men.cl.15.25",
                         "sd.AD.women.cl.25.40", "sd.AD.men.cl.25.40",
                         "sd.AD.women.cl.40.50", "sd.AD.men.cl.40.50") 
 
-write.csv(AD.stats, file = "/home/david/age_mixing_AD_clusters/results/inferred.AD.stats.clust.csv")
+write.csv(AD.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/inferred.AD.stats.clust.MCAR.csv")
 
 
 CI.AD.stats <- matrix(c(paste(mean.MCAR.cov.35.AD.women.cl.15.25[2], "[", mean.MCAR.cov.35.AD.women.cl.15.25[1], "-", mean.MCAR.cov.35.AD.women.cl.15.25[3], "]"), 
@@ -10571,7 +8336,7 @@ rownames(CI.AD.stats) <- c("mean.AD.women.cl.15.25", "mean.AD.men.cl.15.25",
                            "sd.AD.women.cl.25.40", "sd.AD.men.cl.25.40",
                            "sd.AD.women.cl.40.50", "sd.AD.men.cl.40.50") 
 
-write.csv(CI.AD.stats, file = "/home/david/age_mixing_AD_clusters/results/inferred.AD.stats.clust_CI.csv")
+write.csv(CI.AD.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/inferred.AD.stats.clust_CI.MCAR.csv")
 
 
 
@@ -10797,20 +8562,41 @@ mean.AD.men.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
 mean.AD.men.40.50.df$parameter <- "mean.AD.men.40.50"
 
 
-mean.AD.df <- rbind(mean.AD.women.15.25.df, mean.AD.men.15.25.df,
-                    mean.AD.women.25.40.df, mean.AD.men.25.40.df,
-                    mean.AD.women.40.50.df, mean.AD.men.40.50.df)
+mean.men.AD.df <- rbind(mean.AD.men.15.25.df,
+                        mean.AD.men.25.40.df,
+                        mean.AD.men.40.50.df)
+
+mean.women.AD.df <- rbind(mean.AD.women.15.25.df,
+                          mean.AD.women.25.40.df,
+                          mean.AD.women.40.50.df)
 
 
-plot.mean.AD.df <- ggplot(mean.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
-  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
-  # geom_line(size=.3) +
+plot.mean.men.AD.df <- ggplot(mean.men.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Mean age difference value") # +
+  xlab("Sample size") + ylab("Men's  mean age difference value") # +
 # ggtitle("Pairings across age groups")
+ggsave(filename = "plot.mean.men.AD.df.pdf",
+       plot = plot.mean.men.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
+plot.mean.women.AD.df <- ggplot(mean.women.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Women's  mean age difference value") # +
+# ggtitle("Pairings across age groups")
+ggsave(filename = "plot.mean.women.AD.df.pdf",
+       plot = plot.mean.women.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
+
+plotall.mean.AD <- ggpubr::ggarrange(plot.mean.men.AD.df, plot.mean.women.AD.df)
+ggsave(filename = "plotall.mean.AD.pdf",
+       plot = plotall.mean.AD,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
 
@@ -11035,17 +8821,43 @@ med.AD.men.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
 med.AD.men.40.50.df$parameter <- "med.AD.men.40.50"
 
 
-med.AD.df <- rbind(med.AD.women.15.25.df, med.AD.men.15.25.df,
-                   med.AD.women.25.40.df, med.AD.men.25.40.df,
-                   med.AD.women.40.50.df, med.AD.men.40.50.df)
+med.men.AD.df <- rbind(med.AD.men.15.25.df,
+                       med.AD.men.25.40.df,
+                       med.AD.men.40.50.df)
+
+med.women.AD.df <- rbind(med.AD.women.15.25.df,
+                         med.AD.women.25.40.df,
+                         med.AD.women.40.50.df)
 
 
-plot.med.AD.df <- ggplot(med.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+plot.med.men.AD.df <- ggplot(med.men.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
   # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
   # geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Mean age difference value") # +
+  xlab("Sample size") + ylab("Men's  med age difference value") # +
 # ggtitle("Pairings across age groups")
+ggsave(filename = "plot.med.men.AD.df.pdf",
+       plot = plot.med.men.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+
+plot.med.women.AD.df <- ggplot(med.women.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Women's  med age difference value") # +
+# ggtitle("Pairings across age groups")
+ggsave(filename = "plot.med.women.AD.df.pdf",
+       plot = plot.med.women.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+plotall.med.AD <- ggpubr::ggarrange(plot.med.men.AD.df, plot.med.women.AD.df)
+ggsave(filename = "plotall.med.AD.pdf",
+       plot = plotall.med.AD,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
 
 
 
@@ -11273,788 +9085,42 @@ sd.AD.men.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
 sd.AD.men.40.50.df$parameter <- "sd.AD.men.40.50"
 
 
-sd.AD.df <- rbind(sd.AD.women.15.25.df, sd.AD.men.15.25.df,
-                  sd.AD.women.25.40.df, sd.AD.men.25.40.df,
-                  sd.AD.women.40.50.df, sd.AD.men.40.50.df)
+
+sd.men.AD.df <- rbind(sd.AD.men.15.25.df,
+                      sd.AD.men.25.40.df,
+                      sd.AD.men.40.50.df)
+
+sd.women.AD.df <- rbind(sd.AD.women.15.25.df,
+                        sd.AD.women.25.40.df,
+                        sd.AD.women.40.50.df)
 
 
-plot.sd.AD.df <- ggplot(sd.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
-  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
-  # geom_line(size=.3) +
+plot.sd.men.AD.df <- ggplot(sd.men.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Mean age difference value") # +
+  xlab("Sample size") + ylab("Men's  sd age difference value") # +
 # ggtitle("Pairings across age groups")
-
-
-
-
-
-
-
-# Visualization of AD statistics inferred from transmission cluste --------
-
-
-
-
-# Visualise age difference statistics -------------------------------------
-
-
-
-## Mean
-
-
-
-# Women 15.25
-
-mean.MCAR.women.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(mean.MCAR.cov.35.AD.women.cl.15.25[2], mean.MCAR.cov.40.AD.women.cl.15.25[2],
-                                             mean.MCAR.cov.45.AD.women.cl.15.25[2], mean.MCAR.cov.50.AD.women.cl.15.25[2],
-                                             mean.MCAR.cov.55.AD.women.cl.15.25[2], mean.MCAR.cov.60.AD.women.cl.15.25[2],
-                                             mean.MCAR.cov.65.AD.women.cl.15.25[2], mean.MCAR.cov.70.AD.women.cl.15.25[2],
-                                             mean.MCAR.cov.75.AD.women.cl.15.25[2], mean.MCAR.cov.80.AD.women.cl.15.25[2],
-                                             mean.MCAR.cov.85.AD.women.cl.15.25[2], mean.MCAR.cov.90.AD.women.cl.15.25[2],
-                                             mean.MCAR.cov.95.AD.women.cl.15.25[2], mean.AD.num.women.true.cov.100.15.25[2]),
-                                       
-                                       L = c(mean.MCAR.cov.35.AD.women.cl.15.25[1], mean.MCAR.cov.40.AD.women.cl.15.25[1],
-                                             mean.MCAR.cov.45.AD.women.cl.15.25[1], mean.MCAR.cov.50.AD.women.cl.15.25[1],
-                                             mean.MCAR.cov.55.AD.women.cl.15.25[1], mean.MCAR.cov.60.AD.women.cl.15.25[1],
-                                             mean.MCAR.cov.65.AD.women.cl.15.25[1], mean.MCAR.cov.70.AD.women.cl.15.25[1],
-                                             mean.MCAR.cov.75.AD.women.cl.15.25[1], mean.MCAR.cov.80.AD.women.cl.15.25[1],
-                                             mean.MCAR.cov.85.AD.women.cl.15.25[1], mean.MCAR.cov.90.AD.women.cl.15.25[1],
-                                             mean.MCAR.cov.95.AD.women.cl.15.25[1], mean.AD.num.women.true.cov.100.15.25[1]),
-                                       
-                                       U = c(mean.MCAR.cov.35.AD.women.cl.15.25[3], mean.MCAR.cov.40.AD.women.cl.15.25[3],
-                                             mean.MCAR.cov.45.AD.women.cl.15.25[3], mean.MCAR.cov.50.AD.women.cl.15.25[3],
-                                             mean.MCAR.cov.55.AD.women.cl.15.25[3], mean.MCAR.cov.60.AD.women.cl.15.25[3],
-                                             mean.MCAR.cov.65.AD.women.cl.15.25[3], mean.MCAR.cov.70.AD.women.cl.15.25[3],
-                                             mean.MCAR.cov.75.AD.women.cl.15.25[3], mean.MCAR.cov.80.AD.women.cl.15.25[3],
-                                             mean.MCAR.cov.85.AD.women.cl.15.25[3], mean.MCAR.cov.90.AD.women.cl.15.25[3],
-                                             mean.MCAR.cov.95.AD.women.cl.15.25[3], mean.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.mean.MCAR.women.cl.15.25 <- ggplot(mean.MCAR.women.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.women.cl.15.25.png",
-       plot = plot.mean.MCAR.women.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-mean.MCAR.men.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                     
-                                     F = c(mean.MCAR.cov.35.AD.men.cl.15.25[2], mean.MCAR.cov.40.AD.men.cl.15.25[2],
-                                           mean.MCAR.cov.45.AD.men.cl.15.25[2], mean.MCAR.cov.50.AD.men.cl.15.25[2],
-                                           mean.MCAR.cov.55.AD.men.cl.15.25[2], mean.MCAR.cov.60.AD.men.cl.15.25[2],
-                                           mean.MCAR.cov.65.AD.men.cl.15.25[2], mean.MCAR.cov.70.AD.men.cl.15.25[2],
-                                           mean.MCAR.cov.75.AD.men.cl.15.25[2], mean.MCAR.cov.80.AD.men.cl.15.25[2],
-                                           mean.MCAR.cov.85.AD.men.cl.15.25[2], mean.MCAR.cov.90.AD.men.cl.15.25[2],
-                                           mean.MCAR.cov.95.AD.men.cl.15.25[2], mean.AD.num.men.true.cov.100.15.25[2]),
-                                     
-                                     L = c(mean.MCAR.cov.35.AD.men.cl.15.25[1], mean.MCAR.cov.40.AD.men.cl.15.25[1],
-                                           mean.MCAR.cov.45.AD.men.cl.15.25[1], mean.MCAR.cov.50.AD.men.cl.15.25[1],
-                                           mean.MCAR.cov.55.AD.men.cl.15.25[1], mean.MCAR.cov.60.AD.men.cl.15.25[1],
-                                           mean.MCAR.cov.65.AD.men.cl.15.25[1], mean.MCAR.cov.70.AD.men.cl.15.25[1],
-                                           mean.MCAR.cov.75.AD.men.cl.15.25[1], mean.MCAR.cov.80.AD.men.cl.15.25[1],
-                                           mean.MCAR.cov.85.AD.men.cl.15.25[1], mean.MCAR.cov.90.AD.men.cl.15.25[1],
-                                           mean.MCAR.cov.95.AD.men.cl.15.25[1], mean.AD.num.men.true.cov.100.15.25[1]),
-                                     
-                                     U = c(mean.MCAR.cov.35.AD.men.cl.15.25[3], mean.MCAR.cov.40.AD.men.cl.15.25[3],
-                                           mean.MCAR.cov.45.AD.men.cl.15.25[3], mean.MCAR.cov.50.AD.men.cl.15.25[3],
-                                           mean.MCAR.cov.55.AD.men.cl.15.25[3], mean.MCAR.cov.60.AD.men.cl.15.25[3],
-                                           mean.MCAR.cov.65.AD.men.cl.15.25[3], mean.MCAR.cov.70.AD.men.cl.15.25[3],
-                                           mean.MCAR.cov.75.AD.men.cl.15.25[3], mean.MCAR.cov.80.AD.men.cl.15.25[3],
-                                           mean.MCAR.cov.85.AD.men.cl.15.25[3], mean.MCAR.cov.90.AD.men.cl.15.25[3],
-                                           mean.MCAR.cov.95.AD.men.cl.15.25[3], mean.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.mean.MCAR.men.cl.15.25 <- ggplot(mean.MCAR.men.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.men.cl.15.25.png",
-       plot = plot.mean.MCAR.men.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-mean.MCAR.women.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(mean.MCAR.cov.35.AD.women.cl.25.40[2], mean.MCAR.cov.40.AD.women.cl.25.40[2],
-                                             mean.MCAR.cov.45.AD.women.cl.25.40[2], mean.MCAR.cov.50.AD.women.cl.25.40[2],
-                                             mean.MCAR.cov.55.AD.women.cl.25.40[2], mean.MCAR.cov.60.AD.women.cl.25.40[2],
-                                             mean.MCAR.cov.65.AD.women.cl.25.40[2], mean.MCAR.cov.70.AD.women.cl.25.40[2],
-                                             mean.MCAR.cov.75.AD.women.cl.25.40[2], mean.MCAR.cov.80.AD.women.cl.25.40[2],
-                                             mean.MCAR.cov.85.AD.women.cl.25.40[2], mean.MCAR.cov.90.AD.women.cl.25.40[2],
-                                             mean.MCAR.cov.95.AD.women.cl.25.40[2], mean.AD.num.women.true.cov.100.25.40[2]),
-                                       
-                                       L = c(mean.MCAR.cov.35.AD.women.cl.25.40[1], mean.MCAR.cov.40.AD.women.cl.25.40[1],
-                                             mean.MCAR.cov.45.AD.women.cl.25.40[1], mean.MCAR.cov.50.AD.women.cl.25.40[1],
-                                             mean.MCAR.cov.55.AD.women.cl.25.40[1], mean.MCAR.cov.60.AD.women.cl.25.40[1],
-                                             mean.MCAR.cov.65.AD.women.cl.25.40[1], mean.MCAR.cov.70.AD.women.cl.25.40[1],
-                                             mean.MCAR.cov.75.AD.women.cl.25.40[1], mean.MCAR.cov.80.AD.women.cl.25.40[1],
-                                             mean.MCAR.cov.85.AD.women.cl.25.40[1], mean.MCAR.cov.90.AD.women.cl.25.40[1],
-                                             mean.MCAR.cov.95.AD.women.cl.25.40[1], mean.AD.num.women.true.cov.100.25.40[1]),
-                                       
-                                       U = c(mean.MCAR.cov.35.AD.women.cl.25.40[3], mean.MCAR.cov.40.AD.women.cl.25.40[3],
-                                             mean.MCAR.cov.45.AD.women.cl.25.40[3], mean.MCAR.cov.50.AD.women.cl.25.40[3],
-                                             mean.MCAR.cov.55.AD.women.cl.25.40[3], mean.MCAR.cov.60.AD.women.cl.25.40[3],
-                                             mean.MCAR.cov.65.AD.women.cl.25.40[3], mean.MCAR.cov.70.AD.women.cl.25.40[3],
-                                             mean.MCAR.cov.75.AD.women.cl.25.40[3], mean.MCAR.cov.80.AD.women.cl.25.40[3],
-                                             mean.MCAR.cov.85.AD.women.cl.25.40[3], mean.MCAR.cov.90.AD.women.cl.25.40[3],
-                                             mean.MCAR.cov.95.AD.women.cl.25.40[3], mean.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.women.cl.25.40 <- ggplot(mean.MCAR.women.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.women.cl.25.40.png",
-       plot = plot.mean.MCAR.women.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: 25.40
-
-mean.MCAR.men.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                     
-                                     F = c(mean.MCAR.cov.35.AD.men.cl.25.40[2], mean.MCAR.cov.40.AD.men.cl.25.40[2],
-                                           mean.MCAR.cov.45.AD.men.cl.25.40[2], mean.MCAR.cov.50.AD.men.cl.25.40[2],
-                                           mean.MCAR.cov.55.AD.men.cl.25.40[2], mean.MCAR.cov.60.AD.men.cl.25.40[2],
-                                           mean.MCAR.cov.65.AD.men.cl.25.40[2], mean.MCAR.cov.70.AD.men.cl.25.40[2],
-                                           mean.MCAR.cov.75.AD.men.cl.25.40[2], mean.MCAR.cov.80.AD.men.cl.25.40[2],
-                                           mean.MCAR.cov.85.AD.men.cl.25.40[2], mean.MCAR.cov.90.AD.men.cl.25.40[2],
-                                           mean.MCAR.cov.95.AD.men.cl.25.40[2], mean.AD.num.men.true.cov.100.25.40[2]),
-                                     
-                                     L = c(mean.MCAR.cov.35.AD.men.cl.25.40[1], mean.MCAR.cov.40.AD.men.cl.25.40[1],
-                                           mean.MCAR.cov.45.AD.men.cl.25.40[1], mean.MCAR.cov.50.AD.men.cl.25.40[1],
-                                           mean.MCAR.cov.55.AD.men.cl.25.40[1], mean.MCAR.cov.60.AD.men.cl.25.40[1],
-                                           mean.MCAR.cov.65.AD.men.cl.25.40[1], mean.MCAR.cov.70.AD.men.cl.25.40[1],
-                                           mean.MCAR.cov.75.AD.men.cl.25.40[1], mean.MCAR.cov.80.AD.men.cl.25.40[1],
-                                           mean.MCAR.cov.85.AD.men.cl.25.40[1], mean.MCAR.cov.90.AD.men.cl.25.40[1],
-                                           mean.MCAR.cov.95.AD.men.cl.25.40[1], mean.AD.num.men.true.cov.100.25.40[1]),
-                                     
-                                     U = c(mean.MCAR.cov.35.AD.men.cl.25.40[3], mean.MCAR.cov.40.AD.men.cl.25.40[3],
-                                           mean.MCAR.cov.45.AD.men.cl.25.40[3], mean.MCAR.cov.50.AD.men.cl.25.40[3],
-                                           mean.MCAR.cov.55.AD.men.cl.25.40[3], mean.MCAR.cov.60.AD.men.cl.25.40[3],
-                                           mean.MCAR.cov.65.AD.men.cl.25.40[3], mean.MCAR.cov.70.AD.men.cl.25.40[3],
-                                           mean.MCAR.cov.75.AD.men.cl.25.40[3], mean.MCAR.cov.80.AD.men.cl.25.40[3],
-                                           mean.MCAR.cov.85.AD.men.cl.25.40[3], mean.MCAR.cov.90.AD.men.cl.25.40[3],
-                                           mean.MCAR.cov.95.AD.men.cl.25.40[3], mean.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.men.cl.25.40 <- ggplot(mean.MCAR.men.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.mean.MCAR.men.cl.25.40.png",
-       plot = plot.mean.MCAR.men.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 40.50
-
-mean.MCAR.women.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                       
-                                       F = c(mean.MCAR.cov.35.AD.women.cl.40.50[2], mean.MCAR.cov.40.AD.women.cl.40.50[2],
-                                             mean.MCAR.cov.45.AD.women.cl.40.50[2], mean.MCAR.cov.50.AD.women.cl.40.50[2],
-                                             mean.MCAR.cov.55.AD.women.cl.40.50[2], mean.MCAR.cov.60.AD.women.cl.40.50[2],
-                                             mean.MCAR.cov.65.AD.women.cl.40.50[2], mean.MCAR.cov.70.AD.women.cl.40.50[2],
-                                             mean.MCAR.cov.75.AD.women.cl.40.50[2], mean.MCAR.cov.80.AD.women.cl.40.50[2],
-                                             mean.MCAR.cov.85.AD.women.cl.40.50[2], mean.MCAR.cov.90.AD.women.cl.40.50[2],
-                                             mean.MCAR.cov.95.AD.women.cl.40.50[2], mean.AD.num.women.true.cov.100.25.40[2]),
-                                       
-                                       L = c(mean.MCAR.cov.35.AD.women.cl.40.50[1], mean.MCAR.cov.40.AD.women.cl.40.50[1],
-                                             mean.MCAR.cov.45.AD.women.cl.40.50[1], mean.MCAR.cov.50.AD.women.cl.40.50[1],
-                                             mean.MCAR.cov.55.AD.women.cl.40.50[1], mean.MCAR.cov.60.AD.women.cl.40.50[1],
-                                             mean.MCAR.cov.65.AD.women.cl.40.50[1], mean.MCAR.cov.70.AD.women.cl.40.50[1],
-                                             mean.MCAR.cov.75.AD.women.cl.40.50[1], mean.MCAR.cov.80.AD.women.cl.40.50[1],
-                                             mean.MCAR.cov.85.AD.women.cl.40.50[1], mean.MCAR.cov.90.AD.women.cl.40.50[1],
-                                             mean.MCAR.cov.95.AD.women.cl.40.50[1], mean.AD.num.women.true.cov.100.25.40[1]),
-                                       
-                                       U = c(mean.MCAR.cov.35.AD.women.cl.40.50[3], mean.MCAR.cov.40.AD.women.cl.40.50[3],
-                                             mean.MCAR.cov.45.AD.women.cl.40.50[3], mean.MCAR.cov.50.AD.women.cl.40.50[3],
-                                             mean.MCAR.cov.55.AD.women.cl.40.50[3], mean.MCAR.cov.60.AD.women.cl.40.50[3],
-                                             mean.MCAR.cov.65.AD.women.cl.40.50[3], mean.MCAR.cov.70.AD.women.cl.40.50[3],
-                                             mean.MCAR.cov.75.AD.women.cl.40.50[3], mean.MCAR.cov.80.AD.women.cl.40.50[3],
-                                             mean.MCAR.cov.85.AD.women.cl.40.50[3], mean.MCAR.cov.90.AD.women.cl.40.50[3],
-                                             mean.MCAR.cov.95.AD.women.cl.40.50[3], mean.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.women.cl.40.50 <- ggplot(mean.MCAR.women.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.mean.MCAR.women.cl.40.50.png",
-       plot = plot.mean.MCAR.women.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-mean.MCAR.men.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                     
-                                     F = c(mean.MCAR.cov.35.AD.men.cl.40.50[2], mean.MCAR.cov.40.AD.men.cl.40.50[2],
-                                           mean.MCAR.cov.45.AD.men.cl.40.50[2], mean.MCAR.cov.50.AD.men.cl.40.50[2],
-                                           mean.MCAR.cov.55.AD.men.cl.40.50[2], mean.MCAR.cov.60.AD.men.cl.40.50[2],
-                                           mean.MCAR.cov.65.AD.men.cl.40.50[2], mean.MCAR.cov.70.AD.men.cl.40.50[2],
-                                           mean.MCAR.cov.75.AD.men.cl.40.50[2], mean.MCAR.cov.80.AD.men.cl.40.50[2],
-                                           mean.MCAR.cov.85.AD.men.cl.40.50[2], mean.MCAR.cov.90.AD.men.cl.40.50[2],
-                                           mean.MCAR.cov.95.AD.men.cl.40.50[2], mean.AD.num.men.true.cov.100.40.50[2]),
-                                     
-                                     L = c(mean.MCAR.cov.35.AD.men.cl.40.50[1], mean.MCAR.cov.40.AD.men.cl.40.50[1],
-                                           mean.MCAR.cov.45.AD.men.cl.40.50[1], mean.MCAR.cov.50.AD.men.cl.40.50[1],
-                                           mean.MCAR.cov.55.AD.men.cl.40.50[1], mean.MCAR.cov.60.AD.men.cl.40.50[1],
-                                           mean.MCAR.cov.65.AD.men.cl.40.50[1], mean.MCAR.cov.70.AD.men.cl.40.50[1],
-                                           mean.MCAR.cov.75.AD.men.cl.40.50[1], mean.MCAR.cov.80.AD.men.cl.40.50[1],
-                                           mean.MCAR.cov.85.AD.men.cl.40.50[1], mean.MCAR.cov.90.AD.men.cl.40.50[1],
-                                           mean.MCAR.cov.95.AD.men.cl.40.50[1], mean.AD.num.men.true.cov.100.40.50[1]),
-                                     
-                                     U = c(mean.MCAR.cov.35.AD.men.cl.40.50[3], mean.MCAR.cov.40.AD.men.cl.40.50[3],
-                                           mean.MCAR.cov.45.AD.men.cl.40.50[3], mean.MCAR.cov.50.AD.men.cl.40.50[3],
-                                           mean.MCAR.cov.55.AD.men.cl.40.50[3], mean.MCAR.cov.60.AD.men.cl.40.50[3],
-                                           mean.MCAR.cov.65.AD.men.cl.40.50[3], mean.MCAR.cov.70.AD.men.cl.40.50[3],
-                                           mean.MCAR.cov.75.AD.men.cl.40.50[3], mean.MCAR.cov.80.AD.men.cl.40.50[3],
-                                           mean.MCAR.cov.85.AD.men.cl.40.50[3], mean.MCAR.cov.90.AD.men.cl.40.50[3],
-                                           mean.MCAR.cov.95.AD.men.cl.40.50[3], mean.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.mean.MCAR.men.cl.40.50 <- ggplot(mean.MCAR.men.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.men.cl.40.50.png",
-       plot = plot.mean.MCAR.men.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-## Median
-
-# Women 15.25
-
-med.MCAR.women.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                      
-                                      F = c(med.MCAR.cov.35.AD.women.cl.15.25[2], med.MCAR.cov.40.AD.women.cl.15.25[2],
-                                            med.MCAR.cov.45.AD.women.cl.15.25[2], med.MCAR.cov.50.AD.women.cl.15.25[2],
-                                            med.MCAR.cov.55.AD.women.cl.15.25[2], med.MCAR.cov.60.AD.women.cl.15.25[2],
-                                            med.MCAR.cov.65.AD.women.cl.15.25[2], med.MCAR.cov.70.AD.women.cl.15.25[2],
-                                            med.MCAR.cov.75.AD.women.cl.15.25[2], med.MCAR.cov.80.AD.women.cl.15.25[2],
-                                            med.MCAR.cov.85.AD.women.cl.15.25[2], med.MCAR.cov.90.AD.women.cl.15.25[2],
-                                            med.MCAR.cov.95.AD.women.cl.15.25[2], med.AD.num.women.true.cov.100.15.25[2]),
-                                      
-                                      L = c(med.MCAR.cov.35.AD.women.cl.15.25[1], med.MCAR.cov.40.AD.women.cl.15.25[1],
-                                            med.MCAR.cov.45.AD.women.cl.15.25[1], med.MCAR.cov.50.AD.women.cl.15.25[1],
-                                            med.MCAR.cov.55.AD.women.cl.15.25[1], med.MCAR.cov.60.AD.women.cl.15.25[1],
-                                            med.MCAR.cov.65.AD.women.cl.15.25[1], med.MCAR.cov.70.AD.women.cl.15.25[1],
-                                            med.MCAR.cov.75.AD.women.cl.15.25[1], med.MCAR.cov.80.AD.women.cl.15.25[1],
-                                            med.MCAR.cov.85.AD.women.cl.15.25[1], med.MCAR.cov.90.AD.women.cl.15.25[1],
-                                            med.MCAR.cov.95.AD.women.cl.15.25[1], med.AD.num.women.true.cov.100.15.25[1]),
-                                      
-                                      U = c(med.MCAR.cov.35.AD.women.cl.15.25[3], med.MCAR.cov.40.AD.women.cl.15.25[3],
-                                            med.MCAR.cov.45.AD.women.cl.15.25[3], med.MCAR.cov.50.AD.women.cl.15.25[3],
-                                            med.MCAR.cov.55.AD.women.cl.15.25[3], med.MCAR.cov.60.AD.women.cl.15.25[3],
-                                            med.MCAR.cov.65.AD.women.cl.15.25[3], med.MCAR.cov.70.AD.women.cl.15.25[3],
-                                            med.MCAR.cov.75.AD.women.cl.15.25[3], med.MCAR.cov.80.AD.women.cl.15.25[3],
-                                            med.MCAR.cov.85.AD.women.cl.15.25[3], med.MCAR.cov.90.AD.women.cl.15.25[3],
-                                            med.MCAR.cov.95.AD.women.cl.15.25[3], med.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.med.MCAR.women.cl.15.25 <- ggplot(med.MCAR.women.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.cl.15.25.png",
-       plot = plot.med.MCAR.women.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-med.MCAR.men.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                    
-                                    F = c(med.MCAR.cov.35.AD.men.cl.15.25[2], med.MCAR.cov.40.AD.men.cl.15.25[2],
-                                          med.MCAR.cov.45.AD.men.cl.15.25[2], med.MCAR.cov.50.AD.men.cl.15.25[2],
-                                          med.MCAR.cov.55.AD.men.cl.15.25[2], med.MCAR.cov.60.AD.men.cl.15.25[2],
-                                          med.MCAR.cov.65.AD.men.cl.15.25[2], med.MCAR.cov.70.AD.men.cl.15.25[2],
-                                          med.MCAR.cov.75.AD.men.cl.15.25[2], med.MCAR.cov.80.AD.men.cl.15.25[2],
-                                          med.MCAR.cov.85.AD.men.cl.15.25[2], med.MCAR.cov.90.AD.men.cl.15.25[2],
-                                          med.MCAR.cov.95.AD.men.cl.15.25[2], med.AD.num.men.true.cov.100.15.25[2]),
-                                    
-                                    L = c(med.MCAR.cov.35.AD.men.cl.15.25[1], med.MCAR.cov.40.AD.men.cl.15.25[1],
-                                          med.MCAR.cov.45.AD.men.cl.15.25[1], med.MCAR.cov.50.AD.men.cl.15.25[1],
-                                          med.MCAR.cov.55.AD.men.cl.15.25[1], med.MCAR.cov.60.AD.men.cl.15.25[1],
-                                          med.MCAR.cov.65.AD.men.cl.15.25[1], med.MCAR.cov.70.AD.men.cl.15.25[1],
-                                          med.MCAR.cov.75.AD.men.cl.15.25[1], med.MCAR.cov.80.AD.men.cl.15.25[1],
-                                          med.MCAR.cov.85.AD.men.cl.15.25[1], med.MCAR.cov.90.AD.men.cl.15.25[1],
-                                          med.MCAR.cov.95.AD.men.cl.15.25[1], med.AD.num.men.true.cov.100.15.25[1]),
-                                    
-                                    U = c(med.MCAR.cov.35.AD.men.cl.15.25[3], med.MCAR.cov.40.AD.men.cl.15.25[3],
-                                          med.MCAR.cov.45.AD.men.cl.15.25[3], med.MCAR.cov.50.AD.men.cl.15.25[3],
-                                          med.MCAR.cov.55.AD.men.cl.15.25[3], med.MCAR.cov.60.AD.men.cl.15.25[3],
-                                          med.MCAR.cov.65.AD.men.cl.15.25[3], med.MCAR.cov.70.AD.men.cl.15.25[3],
-                                          med.MCAR.cov.75.AD.men.cl.15.25[3], med.MCAR.cov.80.AD.men.cl.15.25[3],
-                                          med.MCAR.cov.85.AD.men.cl.15.25[3], med.MCAR.cov.90.AD.men.cl.15.25[3],
-                                          med.MCAR.cov.95.AD.men.cl.15.25[3], med.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.med.MCAR.men.cl.15.25 <- ggplot(med.MCAR.men.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.cl.15.25.png",
-       plot = plot.med.MCAR.men.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-med.MCAR.women.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                      
-                                      F = c(med.MCAR.cov.35.AD.women.cl.25.40[2], med.MCAR.cov.40.AD.women.cl.25.40[2],
-                                            med.MCAR.cov.45.AD.women.cl.25.40[2], med.MCAR.cov.50.AD.women.cl.25.40[2],
-                                            med.MCAR.cov.55.AD.women.cl.25.40[2], med.MCAR.cov.60.AD.women.cl.25.40[2],
-                                            med.MCAR.cov.65.AD.women.cl.25.40[2], med.MCAR.cov.70.AD.women.cl.25.40[2],
-                                            med.MCAR.cov.75.AD.women.cl.25.40[2], med.MCAR.cov.80.AD.women.cl.25.40[2],
-                                            med.MCAR.cov.85.AD.women.cl.25.40[2], med.MCAR.cov.90.AD.women.cl.25.40[2],
-                                            med.MCAR.cov.95.AD.women.cl.25.40[2], med.AD.num.women.true.cov.100.25.40[2]),
-                                      
-                                      L = c(med.MCAR.cov.35.AD.women.cl.25.40[1], med.MCAR.cov.40.AD.women.cl.25.40[1],
-                                            med.MCAR.cov.45.AD.women.cl.25.40[1], med.MCAR.cov.50.AD.women.cl.25.40[1],
-                                            med.MCAR.cov.55.AD.women.cl.25.40[1], med.MCAR.cov.60.AD.women.cl.25.40[1],
-                                            med.MCAR.cov.65.AD.women.cl.25.40[1], med.MCAR.cov.70.AD.women.cl.25.40[1],
-                                            med.MCAR.cov.75.AD.women.cl.25.40[1], med.MCAR.cov.80.AD.women.cl.25.40[1],
-                                            med.MCAR.cov.85.AD.women.cl.25.40[1], med.MCAR.cov.90.AD.women.cl.25.40[1],
-                                            med.MCAR.cov.95.AD.women.cl.25.40[1], med.AD.num.women.true.cov.100.25.40[1]),
-                                      
-                                      U = c(med.MCAR.cov.35.AD.women.cl.25.40[3], med.MCAR.cov.40.AD.women.cl.25.40[3],
-                                            med.MCAR.cov.45.AD.women.cl.25.40[3], med.MCAR.cov.50.AD.women.cl.25.40[3],
-                                            med.MCAR.cov.55.AD.women.cl.25.40[3], med.MCAR.cov.60.AD.women.cl.25.40[3],
-                                            med.MCAR.cov.65.AD.women.cl.25.40[3], med.MCAR.cov.70.AD.women.cl.25.40[3],
-                                            med.MCAR.cov.75.AD.women.cl.25.40[3], med.MCAR.cov.80.AD.women.cl.25.40[3],
-                                            med.MCAR.cov.85.AD.women.cl.25.40[3], med.MCAR.cov.90.AD.women.cl.25.40[3],
-                                            med.MCAR.cov.95.AD.women.cl.25.40[3], med.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.med.MCAR.women.cl.25.40 <- ggplot(med.MCAR.women.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.cl.25.40.png",
-       plot = plot.med.MCAR.women.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Men: 25.40
-
-med.MCAR.men.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                    
-                                    F = c(med.MCAR.cov.35.AD.men.cl.25.40[2], med.MCAR.cov.40.AD.men.cl.25.40[2],
-                                          med.MCAR.cov.45.AD.men.cl.25.40[2], med.MCAR.cov.50.AD.men.cl.25.40[2],
-                                          med.MCAR.cov.55.AD.men.cl.25.40[2], med.MCAR.cov.60.AD.men.cl.25.40[2],
-                                          med.MCAR.cov.65.AD.men.cl.25.40[2], med.MCAR.cov.70.AD.men.cl.25.40[2],
-                                          med.MCAR.cov.75.AD.men.cl.25.40[2], med.MCAR.cov.80.AD.men.cl.25.40[2],
-                                          med.MCAR.cov.85.AD.men.cl.25.40[2], med.MCAR.cov.90.AD.men.cl.25.40[2],
-                                          med.MCAR.cov.95.AD.men.cl.25.40[2], med.AD.num.men.true.cov.100.25.40[2]),
-                                    
-                                    L = c(med.MCAR.cov.35.AD.men.cl.25.40[1], med.MCAR.cov.40.AD.men.cl.25.40[1],
-                                          med.MCAR.cov.45.AD.men.cl.25.40[1], med.MCAR.cov.50.AD.men.cl.25.40[1],
-                                          med.MCAR.cov.55.AD.men.cl.25.40[1], med.MCAR.cov.60.AD.men.cl.25.40[1],
-                                          med.MCAR.cov.65.AD.men.cl.25.40[1], med.MCAR.cov.70.AD.men.cl.25.40[1],
-                                          med.MCAR.cov.75.AD.men.cl.25.40[1], med.MCAR.cov.80.AD.men.cl.25.40[1],
-                                          med.MCAR.cov.85.AD.men.cl.25.40[1], med.MCAR.cov.90.AD.men.cl.25.40[1],
-                                          med.MCAR.cov.95.AD.men.cl.25.40[1], med.AD.num.men.true.cov.100.25.40[1]),
-                                    
-                                    U = c(med.MCAR.cov.35.AD.men.cl.25.40[3], med.MCAR.cov.40.AD.men.cl.25.40[3],
-                                          med.MCAR.cov.45.AD.men.cl.25.40[3], med.MCAR.cov.50.AD.men.cl.25.40[3],
-                                          med.MCAR.cov.55.AD.men.cl.25.40[3], med.MCAR.cov.60.AD.men.cl.25.40[3],
-                                          med.MCAR.cov.65.AD.men.cl.25.40[3], med.MCAR.cov.70.AD.men.cl.25.40[3],
-                                          med.MCAR.cov.75.AD.men.cl.25.40[3], med.MCAR.cov.80.AD.men.cl.25.40[3],
-                                          med.MCAR.cov.85.AD.men.cl.25.40[3], med.MCAR.cov.90.AD.men.cl.25.40[3],
-                                          med.MCAR.cov.95.AD.men.cl.25.40[3], med.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.med.MCAR.men.cl.25.40 <- ggplot(med.MCAR.men.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.cl.25.40.png",
-       plot = plot.med.MCAR.men.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 40.50
-
-med.MCAR.women.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                      
-                                      F = c(med.MCAR.cov.35.AD.women.cl.40.50[2], med.MCAR.cov.40.AD.women.cl.40.50[2],
-                                            med.MCAR.cov.45.AD.women.cl.40.50[2], med.MCAR.cov.50.AD.women.cl.40.50[2],
-                                            med.MCAR.cov.55.AD.women.cl.40.50[2], med.MCAR.cov.60.AD.women.cl.40.50[2],
-                                            med.MCAR.cov.65.AD.women.cl.40.50[2], med.MCAR.cov.70.AD.women.cl.40.50[2],
-                                            med.MCAR.cov.75.AD.women.cl.40.50[2], med.MCAR.cov.80.AD.women.cl.40.50[2],
-                                            med.MCAR.cov.85.AD.women.cl.40.50[2], med.MCAR.cov.90.AD.women.cl.40.50[2],
-                                            med.MCAR.cov.95.AD.women.cl.40.50[2], med.AD.num.women.true.cov.100.40.50[2]),
-                                      
-                                      L = c(med.MCAR.cov.35.AD.women.cl.40.50[1], med.MCAR.cov.40.AD.women.cl.40.50[1],
-                                            med.MCAR.cov.45.AD.women.cl.40.50[1], med.MCAR.cov.50.AD.women.cl.40.50[1],
-                                            med.MCAR.cov.55.AD.women.cl.40.50[1], med.MCAR.cov.60.AD.women.cl.40.50[1],
-                                            med.MCAR.cov.65.AD.women.cl.40.50[1], med.MCAR.cov.70.AD.women.cl.40.50[1],
-                                            med.MCAR.cov.75.AD.women.cl.40.50[1], med.MCAR.cov.80.AD.women.cl.40.50[1],
-                                            med.MCAR.cov.85.AD.women.cl.40.50[1], med.MCAR.cov.90.AD.women.cl.40.50[1],
-                                            med.MCAR.cov.95.AD.women.cl.40.50[1], med.AD.num.women.true.cov.100.40.50[1]),
-                                      
-                                      U = c(med.MCAR.cov.35.AD.women.cl.40.50[3], med.MCAR.cov.40.AD.women.cl.40.50[3],
-                                            med.MCAR.cov.45.AD.women.cl.40.50[3], med.MCAR.cov.50.AD.women.cl.40.50[3],
-                                            med.MCAR.cov.55.AD.women.cl.40.50[3], med.MCAR.cov.60.AD.women.cl.40.50[3],
-                                            med.MCAR.cov.65.AD.women.cl.40.50[3], med.MCAR.cov.70.AD.women.cl.40.50[3],
-                                            med.MCAR.cov.75.AD.women.cl.40.50[3], med.MCAR.cov.80.AD.women.cl.40.50[3],
-                                            med.MCAR.cov.85.AD.women.cl.40.50[3], med.MCAR.cov.90.AD.women.cl.40.50[3],
-                                            med.MCAR.cov.95.AD.women.cl.40.50[3], med.AD.num.women.true.cov.100.40.50[3]))
-
-
-plot.med.MCAR.women.cl.40.50 <- ggplot(med.MCAR.women.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.cl.40.50.png",
-       plot = plot.med.MCAR.women.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-med.MCAR.men.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                    
-                                    F = c(med.MCAR.cov.35.AD.men.cl.40.50[2], med.MCAR.cov.40.AD.men.cl.40.50[2],
-                                          med.MCAR.cov.45.AD.men.cl.40.50[2], med.MCAR.cov.50.AD.men.cl.40.50[2],
-                                          med.MCAR.cov.55.AD.men.cl.40.50[2], med.MCAR.cov.60.AD.men.cl.40.50[2],
-                                          med.MCAR.cov.65.AD.men.cl.40.50[2], med.MCAR.cov.70.AD.men.cl.40.50[2],
-                                          med.MCAR.cov.75.AD.men.cl.40.50[2], med.MCAR.cov.80.AD.men.cl.40.50[2],
-                                          med.MCAR.cov.85.AD.men.cl.40.50[2], med.MCAR.cov.90.AD.men.cl.40.50[2],
-                                          med.MCAR.cov.95.AD.men.cl.40.50[2], med.AD.num.men.true.cov.100.40.50[2]),
-                                    
-                                    L = c(med.MCAR.cov.35.AD.men.cl.40.50[1], med.MCAR.cov.40.AD.men.cl.40.50[1],
-                                          med.MCAR.cov.45.AD.men.cl.40.50[1], med.MCAR.cov.50.AD.men.cl.40.50[1],
-                                          med.MCAR.cov.55.AD.men.cl.40.50[1], med.MCAR.cov.60.AD.men.cl.40.50[1],
-                                          med.MCAR.cov.65.AD.men.cl.40.50[1], med.MCAR.cov.70.AD.men.cl.40.50[1],
-                                          med.MCAR.cov.75.AD.men.cl.40.50[1], med.MCAR.cov.80.AD.men.cl.40.50[1],
-                                          med.MCAR.cov.85.AD.men.cl.40.50[1], med.MCAR.cov.90.AD.men.cl.40.50[1],
-                                          med.MCAR.cov.95.AD.men.cl.40.50[1], med.AD.num.men.true.cov.100.40.50[1]),
-                                    
-                                    U = c(med.MCAR.cov.35.AD.men.cl.40.50[3], med.MCAR.cov.40.AD.men.cl.40.50[3],
-                                          med.MCAR.cov.45.AD.men.cl.40.50[3], med.MCAR.cov.50.AD.men.cl.40.50[3],
-                                          med.MCAR.cov.55.AD.men.cl.40.50[3], med.MCAR.cov.60.AD.men.cl.40.50[3],
-                                          med.MCAR.cov.65.AD.men.cl.40.50[3], med.MCAR.cov.70.AD.men.cl.40.50[3],
-                                          med.MCAR.cov.75.AD.men.cl.40.50[3], med.MCAR.cov.80.AD.men.cl.40.50[3],
-                                          med.MCAR.cov.85.AD.men.cl.40.50[3], med.MCAR.cov.90.AD.men.cl.40.50[3],
-                                          med.MCAR.cov.95.AD.men.cl.40.50[3], med.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.med.MCAR.men.cl.40.50 <- ggplot(med.MCAR.men.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.cl.40.50.png",
-       plot = plot.med.MCAR.men.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-## Standard deviation
-
-
-# Women 15.25
-
-sd.MCAR.women.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                     
-                                     F = c(sd.MCAR.cov.35.AD.women.cl.15.25[2], sd.MCAR.cov.40.AD.women.cl.15.25[2],
-                                           sd.MCAR.cov.45.AD.women.cl.15.25[2], sd.MCAR.cov.50.AD.women.cl.15.25[2],
-                                           sd.MCAR.cov.55.AD.women.cl.15.25[2], sd.MCAR.cov.60.AD.women.cl.15.25[2],
-                                           sd.MCAR.cov.65.AD.women.cl.15.25[2], sd.MCAR.cov.70.AD.women.cl.15.25[2],
-                                           sd.MCAR.cov.75.AD.women.cl.15.25[2], sd.MCAR.cov.80.AD.women.cl.15.25[2],
-                                           sd.MCAR.cov.85.AD.women.cl.15.25[2], sd.MCAR.cov.90.AD.women.cl.15.25[2],
-                                           sd.MCAR.cov.95.AD.women.cl.15.25[2], sd.AD.num.women.true.cov.100.15.25[2]),
-                                     
-                                     L = c(sd.MCAR.cov.35.AD.women.cl.15.25[1], sd.MCAR.cov.40.AD.women.cl.15.25[1],
-                                           sd.MCAR.cov.45.AD.women.cl.15.25[1], sd.MCAR.cov.50.AD.women.cl.15.25[1],
-                                           sd.MCAR.cov.55.AD.women.cl.15.25[1], sd.MCAR.cov.60.AD.women.cl.15.25[1],
-                                           sd.MCAR.cov.65.AD.women.cl.15.25[1], sd.MCAR.cov.70.AD.women.cl.15.25[1],
-                                           sd.MCAR.cov.75.AD.women.cl.15.25[1], sd.MCAR.cov.80.AD.women.cl.15.25[1],
-                                           sd.MCAR.cov.85.AD.women.cl.15.25[1], sd.MCAR.cov.90.AD.women.cl.15.25[1],
-                                           sd.MCAR.cov.95.AD.women.cl.15.25[1], sd.AD.num.women.true.cov.100.15.25[1]),
-                                     
-                                     U = c(sd.MCAR.cov.35.AD.women.cl.15.25[3], sd.MCAR.cov.40.AD.women.cl.15.25[3],
-                                           sd.MCAR.cov.45.AD.women.cl.15.25[3], sd.MCAR.cov.50.AD.women.cl.15.25[3],
-                                           sd.MCAR.cov.55.AD.women.cl.15.25[3], sd.MCAR.cov.60.AD.women.cl.15.25[3],
-                                           sd.MCAR.cov.65.AD.women.cl.15.25[3], sd.MCAR.cov.70.AD.women.cl.15.25[3],
-                                           sd.MCAR.cov.75.AD.women.cl.15.25[3], sd.MCAR.cov.80.AD.women.cl.15.25[3],
-                                           sd.MCAR.cov.85.AD.women.cl.15.25[3], sd.MCAR.cov.90.AD.women.cl.15.25[3],
-                                           sd.MCAR.cov.95.AD.women.cl.15.25[3], sd.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.sd.MCAR.women.cl.15.25 <- ggplot(sd.MCAR.women.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.cl.15.25.png",
-       plot = plot.sd.MCAR.women.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-sd.MCAR.men.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                   
-                                   F = c(sd.MCAR.cov.35.AD.men.cl.15.25[2], sd.MCAR.cov.40.AD.men.cl.15.25[2],
-                                         sd.MCAR.cov.45.AD.men.cl.15.25[2], sd.MCAR.cov.50.AD.men.cl.15.25[2],
-                                         sd.MCAR.cov.55.AD.men.cl.15.25[2], sd.MCAR.cov.60.AD.men.cl.15.25[2],
-                                         sd.MCAR.cov.65.AD.men.cl.15.25[2], sd.MCAR.cov.70.AD.men.cl.15.25[2],
-                                         sd.MCAR.cov.75.AD.men.cl.15.25[2], sd.MCAR.cov.80.AD.men.cl.15.25[2],
-                                         sd.MCAR.cov.85.AD.men.cl.15.25[2], sd.MCAR.cov.90.AD.men.cl.15.25[2],
-                                         sd.MCAR.cov.95.AD.men.cl.15.25[2], sd.AD.num.men.true.cov.100.15.25[2]),
-                                   
-                                   L = c(sd.MCAR.cov.35.AD.men.cl.15.25[1], sd.MCAR.cov.40.AD.men.cl.15.25[1],
-                                         sd.MCAR.cov.45.AD.men.cl.15.25[1], sd.MCAR.cov.50.AD.men.cl.15.25[1],
-                                         sd.MCAR.cov.55.AD.men.cl.15.25[1], sd.MCAR.cov.60.AD.men.cl.15.25[1],
-                                         sd.MCAR.cov.65.AD.men.cl.15.25[1], sd.MCAR.cov.70.AD.men.cl.15.25[1],
-                                         sd.MCAR.cov.75.AD.men.cl.15.25[1], sd.MCAR.cov.80.AD.men.cl.15.25[1],
-                                         sd.MCAR.cov.85.AD.men.cl.15.25[1], sd.MCAR.cov.90.AD.men.cl.15.25[1],
-                                         sd.MCAR.cov.95.AD.men.cl.15.25[1], sd.AD.num.men.true.cov.100.15.25[1]),
-                                   
-                                   U = c(sd.MCAR.cov.35.AD.men.cl.15.25[3], sd.MCAR.cov.40.AD.men.cl.15.25[3],
-                                         sd.MCAR.cov.45.AD.men.cl.15.25[3], sd.MCAR.cov.50.AD.men.cl.15.25[3],
-                                         sd.MCAR.cov.55.AD.men.cl.15.25[3], sd.MCAR.cov.60.AD.men.cl.15.25[3],
-                                         sd.MCAR.cov.65.AD.men.cl.15.25[3], sd.MCAR.cov.70.AD.men.cl.15.25[3],
-                                         sd.MCAR.cov.75.AD.men.cl.15.25[3], sd.MCAR.cov.80.AD.men.cl.15.25[3],
-                                         sd.MCAR.cov.85.AD.men.cl.15.25[3], sd.MCAR.cov.90.AD.men.cl.15.25[3],
-                                         sd.MCAR.cov.95.AD.men.cl.15.25[3], sd.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.sd.MCAR.men.cl.15.25 <- ggplot(sd.MCAR.men.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.sd.MCAR.men.cl.15.25.png",
-       plot = plot.sd.MCAR.men.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-sd.MCAR.women.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                     
-                                     F = c(sd.MCAR.cov.35.AD.women.cl.25.40[2], sd.MCAR.cov.40.AD.women.cl.25.40[2],
-                                           sd.MCAR.cov.45.AD.women.cl.25.40[2], sd.MCAR.cov.50.AD.women.cl.25.40[2],
-                                           sd.MCAR.cov.55.AD.women.cl.25.40[2], sd.MCAR.cov.60.AD.women.cl.25.40[2],
-                                           sd.MCAR.cov.65.AD.women.cl.25.40[2], sd.MCAR.cov.70.AD.women.cl.25.40[2],
-                                           sd.MCAR.cov.75.AD.women.cl.25.40[2], sd.MCAR.cov.80.AD.women.cl.25.40[2],
-                                           sd.MCAR.cov.85.AD.women.cl.25.40[2], sd.MCAR.cov.90.AD.women.cl.25.40[2],
-                                           sd.MCAR.cov.95.AD.women.cl.25.40[2], sd.AD.num.women.true.cov.100.25.40[2]),
-                                     
-                                     L = c(sd.MCAR.cov.35.AD.women.cl.25.40[1], sd.MCAR.cov.40.AD.women.cl.25.40[1],
-                                           sd.MCAR.cov.45.AD.women.cl.25.40[1], sd.MCAR.cov.50.AD.women.cl.25.40[1],
-                                           sd.MCAR.cov.55.AD.women.cl.25.40[1], sd.MCAR.cov.60.AD.women.cl.25.40[1],
-                                           sd.MCAR.cov.65.AD.women.cl.25.40[1], sd.MCAR.cov.70.AD.women.cl.25.40[1],
-                                           sd.MCAR.cov.75.AD.women.cl.25.40[1], sd.MCAR.cov.80.AD.women.cl.25.40[1],
-                                           sd.MCAR.cov.85.AD.women.cl.25.40[1], sd.MCAR.cov.90.AD.women.cl.25.40[1],
-                                           sd.MCAR.cov.95.AD.women.cl.25.40[1], sd.AD.num.women.true.cov.100.25.40[1]),
-                                     
-                                     U = c(sd.MCAR.cov.35.AD.women.cl.25.40[3], sd.MCAR.cov.40.AD.women.cl.25.40[3],
-                                           sd.MCAR.cov.45.AD.women.cl.25.40[3], sd.MCAR.cov.50.AD.women.cl.25.40[3],
-                                           sd.MCAR.cov.55.AD.women.cl.25.40[3], sd.MCAR.cov.60.AD.women.cl.25.40[3],
-                                           sd.MCAR.cov.65.AD.women.cl.25.40[3], sd.MCAR.cov.70.AD.women.cl.25.40[3],
-                                           sd.MCAR.cov.75.AD.women.cl.25.40[3], sd.MCAR.cov.80.AD.women.cl.25.40[3],
-                                           sd.MCAR.cov.85.AD.women.cl.25.40[3], sd.MCAR.cov.90.AD.women.cl.25.40[3],
-                                           sd.MCAR.cov.95.AD.women.cl.25.40[3], sd.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.sd.MCAR.women.cl.25.40 <- ggplot(sd.MCAR.women.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.cl.25.40.png",
-       plot = plot.sd.MCAR.women.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Men: 25.40
-
-sd.MCAR.men.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                   
-                                   F = c(sd.MCAR.cov.35.AD.men.cl.25.40[2], sd.MCAR.cov.40.AD.men.cl.25.40[2],
-                                         sd.MCAR.cov.45.AD.men.cl.25.40[2], sd.MCAR.cov.50.AD.men.cl.25.40[2],
-                                         sd.MCAR.cov.55.AD.men.cl.25.40[2], sd.MCAR.cov.60.AD.men.cl.25.40[2],
-                                         sd.MCAR.cov.65.AD.men.cl.25.40[2], sd.MCAR.cov.70.AD.men.cl.25.40[2],
-                                         sd.MCAR.cov.75.AD.men.cl.25.40[2], sd.MCAR.cov.80.AD.men.cl.25.40[2],
-                                         sd.MCAR.cov.85.AD.men.cl.25.40[2], sd.MCAR.cov.90.AD.men.cl.25.40[2],
-                                         sd.MCAR.cov.95.AD.men.cl.25.40[2], sd.AD.num.men.true.cov.100.25.40[2]),
-                                   
-                                   L = c(sd.MCAR.cov.35.AD.men.cl.25.40[1], sd.MCAR.cov.40.AD.men.cl.25.40[1],
-                                         sd.MCAR.cov.45.AD.men.cl.25.40[1], sd.MCAR.cov.50.AD.men.cl.25.40[1],
-                                         sd.MCAR.cov.55.AD.men.cl.25.40[1], sd.MCAR.cov.60.AD.men.cl.25.40[1],
-                                         sd.MCAR.cov.65.AD.men.cl.25.40[1], sd.MCAR.cov.70.AD.men.cl.25.40[1],
-                                         sd.MCAR.cov.75.AD.men.cl.25.40[1], sd.MCAR.cov.80.AD.men.cl.25.40[1],
-                                         sd.MCAR.cov.85.AD.men.cl.25.40[1], sd.MCAR.cov.90.AD.men.cl.25.40[1],
-                                         sd.MCAR.cov.95.AD.men.cl.25.40[1], sd.AD.num.men.true.cov.100.25.40[1]),
-                                   
-                                   U = c(sd.MCAR.cov.35.AD.men.cl.25.40[3], sd.MCAR.cov.40.AD.men.cl.25.40[3],
-                                         sd.MCAR.cov.45.AD.men.cl.25.40[3], sd.MCAR.cov.50.AD.men.cl.25.40[3],
-                                         sd.MCAR.cov.55.AD.men.cl.25.40[3], sd.MCAR.cov.60.AD.men.cl.25.40[3],
-                                         sd.MCAR.cov.65.AD.men.cl.25.40[3], sd.MCAR.cov.70.AD.men.cl.25.40[3],
-                                         sd.MCAR.cov.75.AD.men.cl.25.40[3], sd.MCAR.cov.80.AD.men.cl.25.40[3],
-                                         sd.MCAR.cov.85.AD.men.cl.25.40[3], sd.MCAR.cov.90.AD.men.cl.25.40[3],
-                                         sd.MCAR.cov.95.AD.men.cl.25.40[3], sd.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.sd.MCAR.men.cl.25.40 <- ggplot(sd.MCAR.men.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.sd.MCAR.men.cl.25.40.png",
-       plot = plot.sd.MCAR.men.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: 40.50
-
-sd.MCAR.women.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                     
-                                     F = c(sd.MCAR.cov.35.AD.women.cl.40.50[2], sd.MCAR.cov.40.AD.women.cl.40.50[2],
-                                           sd.MCAR.cov.45.AD.women.cl.40.50[2], sd.MCAR.cov.50.AD.women.cl.40.50[2],
-                                           sd.MCAR.cov.55.AD.women.cl.40.50[2], sd.MCAR.cov.60.AD.women.cl.40.50[2],
-                                           sd.MCAR.cov.65.AD.women.cl.40.50[2], sd.MCAR.cov.70.AD.women.cl.40.50[2],
-                                           sd.MCAR.cov.75.AD.women.cl.40.50[2], sd.MCAR.cov.80.AD.women.cl.40.50[2],
-                                           sd.MCAR.cov.85.AD.women.cl.40.50[2], sd.MCAR.cov.90.AD.women.cl.40.50[2],
-                                           sd.MCAR.cov.95.AD.women.cl.40.50[2], sd.AD.num.women.true.cov.100.40.50[2]),
-                                     
-                                     L = c(sd.MCAR.cov.35.AD.women.cl.40.50[1], sd.MCAR.cov.40.AD.women.cl.40.50[1],
-                                           sd.MCAR.cov.45.AD.women.cl.40.50[1], sd.MCAR.cov.50.AD.women.cl.40.50[1],
-                                           sd.MCAR.cov.55.AD.women.cl.40.50[1], sd.MCAR.cov.60.AD.women.cl.40.50[1],
-                                           sd.MCAR.cov.65.AD.women.cl.40.50[1], sd.MCAR.cov.70.AD.women.cl.40.50[1],
-                                           sd.MCAR.cov.75.AD.women.cl.40.50[1], sd.MCAR.cov.80.AD.women.cl.40.50[1],
-                                           sd.MCAR.cov.85.AD.women.cl.40.50[1], sd.MCAR.cov.90.AD.women.cl.40.50[1],
-                                           sd.MCAR.cov.95.AD.women.cl.40.50[1], sd.AD.num.women.true.cov.100.40.50[1]),
-                                     
-                                     U = c(sd.MCAR.cov.35.AD.women.cl.40.50[3], sd.MCAR.cov.40.AD.women.cl.40.50[3],
-                                           sd.MCAR.cov.45.AD.women.cl.40.50[3], sd.MCAR.cov.50.AD.women.cl.40.50[3],
-                                           sd.MCAR.cov.55.AD.women.cl.40.50[3], sd.MCAR.cov.60.AD.women.cl.40.50[3],
-                                           sd.MCAR.cov.65.AD.women.cl.40.50[3], sd.MCAR.cov.70.AD.women.cl.40.50[3],
-                                           sd.MCAR.cov.75.AD.women.cl.40.50[3], sd.MCAR.cov.80.AD.women.cl.40.50[3],
-                                           sd.MCAR.cov.85.AD.women.cl.40.50[3], sd.MCAR.cov.90.AD.women.cl.40.50[3],
-                                           sd.MCAR.cov.95.AD.women.cl.40.50[3], sd.AD.num.women.true.cov.100.40.50[3]))
-
-
-plot.sd.MCAR.women.cl.40.50 <- ggplot(sd.MCAR.women.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.cl.40.50.png",
-       plot = plot.sd.MCAR.women.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-sd.MCAR.men.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                   
-                                   F = c(sd.MCAR.cov.35.AD.men.cl.40.50[2], sd.MCAR.cov.40.AD.men.cl.40.50[2],
-                                         sd.MCAR.cov.45.AD.men.cl.40.50[2], sd.MCAR.cov.50.AD.men.cl.40.50[2],
-                                         sd.MCAR.cov.55.AD.men.cl.40.50[2], sd.MCAR.cov.60.AD.men.cl.40.50[2],
-                                         sd.MCAR.cov.65.AD.men.cl.40.50[2], sd.MCAR.cov.70.AD.men.cl.40.50[2],
-                                         sd.MCAR.cov.75.AD.men.cl.40.50[2], sd.MCAR.cov.80.AD.men.cl.40.50[2],
-                                         sd.MCAR.cov.85.AD.men.cl.40.50[2], sd.MCAR.cov.90.AD.men.cl.40.50[2],
-                                         sd.MCAR.cov.95.AD.men.cl.40.50[2], sd.AD.num.men.true.cov.100.40.50[2]),
-                                   
-                                   L = c(sd.MCAR.cov.35.AD.men.cl.40.50[1], sd.MCAR.cov.40.AD.men.cl.40.50[1],
-                                         sd.MCAR.cov.45.AD.men.cl.40.50[1], sd.MCAR.cov.50.AD.men.cl.40.50[1],
-                                         sd.MCAR.cov.55.AD.men.cl.40.50[1], sd.MCAR.cov.60.AD.men.cl.40.50[1],
-                                         sd.MCAR.cov.65.AD.men.cl.40.50[1], sd.MCAR.cov.70.AD.men.cl.40.50[1],
-                                         sd.MCAR.cov.75.AD.men.cl.40.50[1], sd.MCAR.cov.80.AD.men.cl.40.50[1],
-                                         sd.MCAR.cov.85.AD.men.cl.40.50[1], sd.MCAR.cov.90.AD.men.cl.40.50[1],
-                                         sd.MCAR.cov.95.AD.men.cl.40.50[1], sd.AD.num.men.true.cov.100.40.50[1]),
-                                   
-                                   U = c(sd.MCAR.cov.35.AD.men.cl.40.50[3], sd.MCAR.cov.40.AD.men.cl.40.50[3],
-                                         sd.MCAR.cov.45.AD.men.cl.40.50[3], sd.MCAR.cov.50.AD.men.cl.40.50[3],
-                                         sd.MCAR.cov.55.AD.men.cl.40.50[3], sd.MCAR.cov.60.AD.men.cl.40.50[3],
-                                         sd.MCAR.cov.65.AD.men.cl.40.50[3], sd.MCAR.cov.70.AD.men.cl.40.50[3],
-                                         sd.MCAR.cov.75.AD.men.cl.40.50[3], sd.MCAR.cov.80.AD.men.cl.40.50[3],
-                                         sd.MCAR.cov.85.AD.men.cl.40.50[3], sd.MCAR.cov.90.AD.men.cl.40.50[3],
-                                         sd.MCAR.cov.95.AD.men.cl.40.50[3], sd.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.sd.MCAR.men.cl.40.50 <- ggplot(sd.MCAR.men.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.men.cl.40.50.png",
-       plot = plot.sd.MCAR.men.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
+ggsave(filename = "plot.sd.men.AD.df.pdf",
+       plot = plot.sd.men.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+plot.sd.women.AD.df <- ggplot(sd.women.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Women's  sd age difference value") # +
+# ggtitle("Pairings across age groups")
+ggsave(filename = "plot.sd.women.AD.df.pdf",
+       plot = plot.sd.women.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+plotall.sd.AD <- ggpubr::ggarrange(plot.sd.men.AD.df, plot.sd.women.AD.df)
+ggsave(filename = "plotall.sd.AD.pdf",
+       plot = plotall.sd.AD,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
 
@@ -13251,7 +10317,7 @@ rownames(AD.stats.true) <- c("mean.AD.women.true.cl.15.25", "mean.AD.men.true.cl
                              "sd.AD.women.true.cl.25.40", "sd.AD.men.true.cl.25.40",
                              "sd.AD.women.true.cl.40.50", "sd.AD.men.true.cl.40.50") 
 
-write.csv(AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/true.stats.AD.clust.csv")
+write.csv(AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.stats.AD.clust.MCAR.csv")
 
 
 CI.AD.stats.true <- matrix(c(paste(mean.MCAR.cov.35.AD.women.true.cl.15.25[2], "[", mean.MCAR.cov.35.AD.women.true.cl.15.25[1], "-", mean.MCAR.cov.35.AD.women.true.cl.15.25[3], "]"), 
@@ -13552,13 +10618,17 @@ rownames(CI.AD.stats.true) <- c("mean.AD.women.true.cl.15.25", "mean.AD.men.true
                                 "sd.AD.women.true.cl.25.40", "sd.AD.men.true.cl.25.40",
                                 "sd.AD.women.true.cl.40.50", "sd.AD.men.true.cl.40.50") 
 
-write.csv(CI.AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/true.stats.AD.clust_CI.csv")
+write.csv(CI.AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/true.stats.AD.clust_CI.MCAR.csv")
 
 
 
 
+# Visualisation of true AD statistics --------------------------------------
 
-# mean.women.15.25-------------------- mean.MCAR.cov.55.AD.men.true.true.cl.40.50
+# Mean
+
+
+# mean.women.15.25-------------------- 
 
 true.mean.AD.women.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                               "cov.50", "cov.55", "cov.60",
@@ -13590,7 +10660,7 @@ true.mean.AD.women.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                                 mean.MCAR.cov.85.AD.women.true.cl.15.25[3], mean.MCAR.cov.90.AD.women.true.cl.15.25[3], 
                                                 mean.MCAR.cov.95.AD.women.true.cl.15.25[3], mean.AD.num.women.true.cov.100.15.25[3]))
 
-true.mean.AD.women.15.25.df$parameter <- "mean.AD.women.15.25"
+true.mean.AD.women.15.25.df$parameter <- "true.mean.AD.women.15.25"
 
 
 
@@ -13627,7 +10697,7 @@ true.mean.AD.men.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                               mean.MCAR.cov.85.AD.men.true.cl.15.25[3], mean.MCAR.cov.90.AD.men.true.cl.15.25[3], 
                                               mean.MCAR.cov.95.AD.men.true.cl.15.25[3], mean.AD.num.men.true.cov.100.15.25[3]))
 
-true.mean.AD.men.15.25.df$parameter <- "mean.AD.men.15.25"
+true.mean.AD.men.15.25.df$parameter <- "true.mean.AD.men.15.25"
 
 
 
@@ -13664,7 +10734,7 @@ true.mean.AD.women.25.40.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                                 mean.MCAR.cov.85.AD.women.true.cl.25.40[3], mean.MCAR.cov.90.AD.women.true.cl.25.40[3], 
                                                 mean.MCAR.cov.95.AD.women.true.cl.25.40[3], mean.AD.num.women.true.cov.100.25.40[3]))
 
-true.mean.AD.women.25.40.df$parameter <- "mean.AD.women.25.40"
+true.mean.AD.women.25.40.df$parameter <- "true.mean.AD.women.25.40"
 
 
 
@@ -13701,7 +10771,7 @@ true.mean.AD.men.25.40.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                               mean.MCAR.cov.85.AD.men.true.cl.25.40[3], mean.MCAR.cov.90.AD.men.true.cl.25.40[3], 
                                               mean.MCAR.cov.95.AD.men.true.cl.25.40[3], mean.AD.num.men.true.cov.100.25.40[3]))
 
-true.mean.AD.men.25.40.df$parameter <- "mean.AD.men.25.40"
+true.mean.AD.men.25.40.df$parameter <- "true.mean.AD.men.25.40"
 
 
 
@@ -13739,7 +10809,7 @@ true.mean.AD.women.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                                 mean.MCAR.cov.85.AD.women.true.cl.40.50[3], mean.MCAR.cov.90.AD.women.true.cl.40.50[3], 
                                                 mean.MCAR.cov.95.AD.women.true.cl.40.50[3], mean.AD.num.women.true.cov.100.40.50[3]))
 
-true.mean.AD.women.40.50.df$parameter <- "mean.AD.women.40.50"
+true.mean.AD.women.40.50.df$parameter <- "true.mean.AD.women.40.50"
 
 
 
@@ -13776,26 +10846,52 @@ true.mean.AD.men.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                               mean.MCAR.cov.85.AD.men.true.cl.40.50[3], mean.MCAR.cov.90.AD.men.true.cl.40.50[3], 
                                               mean.MCAR.cov.95.AD.men.true.cl.40.50[3], mean.AD.num.men.true.cov.100.40.50[3]))
 
-true.mean.AD.men.40.50.df$parameter <- "mean.AD.men.40.50"
+true.mean.AD.men.40.50.df$parameter <- "true.mean.AD.men.40.50"
 
 
-true.mean.AD.df <- rbind(true.mean.AD.women.15.25.df, true.mean.AD.men.15.25.df,
-                         true.mean.AD.women.25.40.df, true.mean.AD.men.25.40.df,
-                         true.mean.AD.women.40.50.df, true.mean.AD.men.40.50.df)
+
+true.mean.men.AD.df <- rbind(true.mean.AD.men.15.25.df,
+                             true.mean.AD.men.25.40.df,
+                             true.mean.AD.men.40.50.df)
+
+true.mean.women.AD.df <- rbind(true.mean.AD.women.15.25.df,
+                               true.mean.AD.women.25.40.df,
+                               true.mean.AD.women.40.50.df)
 
 
-plot.true.mean.AD.df <- ggplot(true.mean.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+plot.true.mean.men.AD.df <- ggplot(true.mean.men.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
   # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
   # geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Mean age difference value") # +
+  xlab("Sample size") + ylab("Men's  mean age difference value") # +
 # ggtitle("Pairings across age groups")
+ggsave(filename = "plot.true.mean.men.AD.df.pdf",
+       plot = plot.true.mean.men.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+plot.true.mean.women.AD.df <- ggplot(true.mean.women.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Women's  mean age difference value") # +
+# ggtitle("Pairings across age groups")
+ggsave(filename = "plot.true.mean.women.AD.df.pdf",
+       plot = plot.true.mean.women.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+plotall.true.mean.AD <- ggpubr::ggarrange(plot.true.mean.men.AD.df, plot.true.mean.women.AD.df)
+ggsave(filename = "plotall.true.mean.AD.pdf",
+       plot = plotall.true.mean.AD,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
 
+# Median
 
 
-# med.women.15.25-------------------- med.MCAR.cov.55.AD.men.true.true.cl.40.50
+# med.women.15.25-------------------- 
 
 true.med.AD.women.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                              "cov.50", "cov.55", "cov.60",
@@ -13827,7 +10923,7 @@ true.med.AD.women.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                                med.MCAR.cov.85.AD.women.true.cl.15.25[3], med.MCAR.cov.90.AD.women.true.cl.15.25[3], 
                                                med.MCAR.cov.95.AD.women.true.cl.15.25[3], med.AD.num.women.true.cov.100.15.25[3]))
 
-true.med.AD.women.15.25.df$parameter <- "med.AD.women.15.25"
+true.med.AD.women.15.25.df$parameter <- "true.med.AD.women.15.25"
 
 
 
@@ -13864,7 +10960,7 @@ true.med.AD.men.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                              med.MCAR.cov.85.AD.men.true.cl.15.25[3], med.MCAR.cov.90.AD.men.true.cl.15.25[3], 
                                              med.MCAR.cov.95.AD.men.true.cl.15.25[3], med.AD.num.men.true.cov.100.15.25[3]))
 
-true.med.AD.men.15.25.df$parameter <- "med.AD.men.15.25"
+true.med.AD.men.15.25.df$parameter <- "true.med.AD.men.15.25"
 
 
 
@@ -13901,7 +10997,7 @@ true.med.AD.women.25.40.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                                med.MCAR.cov.85.AD.women.true.cl.25.40[3], med.MCAR.cov.90.AD.women.true.cl.25.40[3], 
                                                med.MCAR.cov.95.AD.women.true.cl.25.40[3], med.AD.num.women.true.cov.100.25.40[3]))
 
-true.med.AD.women.25.40.df$parameter <- "med.AD.women.25.40"
+true.med.AD.women.25.40.df$parameter <- "true.med.AD.women.25.40"
 
 
 
@@ -13938,7 +11034,7 @@ true.med.AD.men.25.40.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                              med.MCAR.cov.85.AD.men.true.cl.25.40[3], med.MCAR.cov.90.AD.men.true.cl.25.40[3], 
                                              med.MCAR.cov.95.AD.men.true.cl.25.40[3], med.AD.num.men.true.cov.100.25.40[3]))
 
-true.med.AD.men.25.40.df$parameter <- "med.AD.men.25.40"
+true.med.AD.men.25.40.df$parameter <- "true.med.AD.men.25.40"
 
 
 
@@ -13976,7 +11072,7 @@ true.med.AD.women.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                                med.MCAR.cov.85.AD.women.true.cl.40.50[3], med.MCAR.cov.90.AD.women.true.cl.40.50[3], 
                                                med.MCAR.cov.95.AD.women.true.cl.40.50[3], med.AD.num.women.true.cov.100.40.50[3]))
 
-true.med.AD.women.40.50.df$parameter <- "med.AD.women.40.50"
+true.med.AD.women.40.50.df$parameter <- "true.med.AD.women.40.50"
 
 
 
@@ -14013,24 +11109,51 @@ true.med.AD.men.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                              med.MCAR.cov.85.AD.men.true.cl.40.50[3], med.MCAR.cov.90.AD.men.true.cl.40.50[3], 
                                              med.MCAR.cov.95.AD.men.true.cl.40.50[3], med.AD.num.men.true.cov.100.40.50[3]))
 
-true.med.AD.men.40.50.df$parameter <- "med.AD.men.40.50"
+true.med.AD.men.40.50.df$parameter <- "true.med.AD.men.40.50"
 
 
-true.med.AD.df <- rbind(true.med.AD.women.15.25.df, true.med.AD.men.15.25.df,
-                        true.med.AD.women.25.40.df, true.med.AD.men.25.40.df,
-                        true.med.AD.women.40.50.df, true.med.AD.men.40.50.df)
+
+true.med.men.AD.df <- rbind(true.med.AD.men.15.25.df,
+                            true.med.AD.men.25.40.df,
+                            true.med.AD.men.40.50.df)
+
+true.med.women.AD.df <- rbind(true.med.AD.women.15.25.df,
+                              true.med.AD.women.25.40.df,
+                              true.med.AD.women.40.50.df)
 
 
-plot.true.med.AD.df <- ggplot(true.med.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+plot.true.med.men.AD.df <- ggplot(true.med.men.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
   # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
   # geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Median age difference value") # +
+  xlab("Sample size") + ylab("Men's  med age difference value") # +
 # ggtitle("Pairings across age groups")
+ggsave(filename = "plot.true.med.men.AD.df.pdf",
+       plot = plot.true.med.men.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+plot.true.med.women.AD.df <- ggplot(true.med.women.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Women's  med age difference value") # +
+# ggtitle("Pairings across age groups")
+ggsave(filename = "plot.true.med.women.AD.df.pdf",
+       plot = plot.true.med.women.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
+
+
+plotall.true.med.AD <- ggpubr::ggarrange(plot.true.med.men.AD.df, plot.true.med.women.AD.df)
+ggsave(filename = "plotall.true.med.AD.pdf",
+       plot = plotall.true.med.AD,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
 
-# sd.women.15.25-------------------- sd.MCAR.cov.55.AD.men.true.true.cl.40.50
+# Standard deviation
+
+# sd.women.15.25-------------------- 
 
 true.sd.AD.women.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                             "cov.50", "cov.55", "cov.60",
@@ -14062,7 +11185,7 @@ true.sd.AD.women.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                               sd.MCAR.cov.85.AD.women.true.cl.15.25[3], sd.MCAR.cov.90.AD.women.true.cl.15.25[3], 
                                               sd.MCAR.cov.95.AD.women.true.cl.15.25[3], sd.AD.num.women.true.cov.100.15.25[3]))
 
-true.sd.AD.women.15.25.df$parameter <- "sd.AD.women.15.25"
+true.sd.AD.women.15.25.df$parameter <- "true.sd.AD.women.15.25"
 
 
 
@@ -14099,7 +11222,7 @@ true.sd.AD.men.15.25.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                             sd.MCAR.cov.85.AD.men.true.cl.15.25[3], sd.MCAR.cov.90.AD.men.true.cl.15.25[3], 
                                             sd.MCAR.cov.95.AD.men.true.cl.15.25[3], sd.AD.num.men.true.cov.100.15.25[3]))
 
-true.sd.AD.men.15.25.df$parameter <- "sd.AD.men.15.25"
+true.sd.AD.men.15.25.df$parameter <- "true.sd.AD.men.15.25"
 
 
 
@@ -14136,7 +11259,7 @@ true.sd.AD.women.25.40.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                               sd.MCAR.cov.85.AD.women.true.cl.25.40[3], sd.MCAR.cov.90.AD.women.true.cl.25.40[3], 
                                               sd.MCAR.cov.95.AD.women.true.cl.25.40[3], sd.AD.num.women.true.cov.100.25.40[3]))
 
-true.sd.AD.women.25.40.df$parameter <- "sd.AD.women.25.40"
+true.sd.AD.women.25.40.df$parameter <- "true.sd.AD.women.25.40"
 
 
 
@@ -14173,7 +11296,7 @@ true.sd.AD.men.25.40.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                             sd.MCAR.cov.85.AD.men.true.cl.25.40[3], sd.MCAR.cov.90.AD.men.true.cl.25.40[3], 
                                             sd.MCAR.cov.95.AD.men.true.cl.25.40[3], sd.AD.num.men.true.cov.100.25.40[3]))
 
-true.sd.AD.men.25.40.df$parameter <- "sd.AD.men.25.40"
+true.sd.AD.men.25.40.df$parameter <- "true.sd.AD.men.25.40"
 
 
 
@@ -14211,7 +11334,7 @@ true.sd.AD.women.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                               sd.MCAR.cov.85.AD.women.true.cl.40.50[3], sd.MCAR.cov.90.AD.women.true.cl.40.50[3], 
                                               sd.MCAR.cov.95.AD.women.true.cl.40.50[3], sd.AD.num.women.true.cov.100.40.50[3]))
 
-true.sd.AD.women.40.50.df$parameter <- "sd.AD.women.40.50"
+true.sd.AD.women.40.50.df$parameter <- "true.sd.AD.women.40.50"
 
 
 
@@ -14248,2569 +11371,48 @@ true.sd.AD.men.40.50.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
                                             sd.MCAR.cov.85.AD.men.true.cl.40.50[3], sd.MCAR.cov.90.AD.men.true.cl.40.50[3], 
                                             sd.MCAR.cov.95.AD.men.true.cl.40.50[3], sd.AD.num.men.true.cov.100.40.50[3]))
 
-true.sd.AD.men.40.50.df$parameter <- "sd.AD.men.40.50"
+true.sd.AD.men.40.50.df$parameter <- "true.sd.AD.men.40.50"
 
 
-true.sd.AD.df <- rbind(true.sd.AD.women.15.25.df, true.sd.AD.men.15.25.df,
-                       true.sd.AD.women.25.40.df, true.sd.AD.men.25.40.df,
-                       true.sd.AD.women.40.50.df, true.sd.AD.men.40.50.df)
+
+true.sd.men.AD.df <- rbind(true.sd.AD.men.15.25.df,
+                           true.sd.AD.men.25.40.df,
+                           true.sd.AD.men.40.50.df)
+
+true.sd.women.AD.df <- rbind(true.sd.AD.women.15.25.df,
+                             true.sd.AD.women.25.40.df,
+                             true.sd.AD.women.40.50.df)
 
 
-plot.true.sd.AD.df <- ggplot(true.sd.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+plot.true.sd.men.AD.df <- ggplot(true.sd.men.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
   # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
   # geom_line(size=.3) +
   geom_point() + 
-  xlab("Sample size") + ylab("Standard deviation age difference value") # +
+  xlab("Sample size") + ylab("Men's  sd age difference value") # +
 # ggtitle("Pairings across age groups")
+ggsave(filename = "plot.true.sd.men.AD.df.pdf",
+       plot = plot.true.sd.men.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
+plot.true.sd.women.AD.df <- ggplot(true.sd.women.AD.df, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  # geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Women's  sd age difference value") # +
+# ggtitle("Pairings across age groups")
+ggsave(filename = "plot.true.sd.women.AD.df.pdf",
+       plot = plot.true.sd.women.AD.df,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
+plotall.true.sd.AD <- ggpubr::ggarrange(plot.true.sd.men.AD.df, plot.true.sd.women.AD.df)
+ggsave(filename = "plotall.true.sd.AD.pdf",
+       plot = plotall.true.sd.AD,
+       path = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR")
 
 
-# Visualisation of AD statistics from the truth of these individuals in transmission clusters ---------------------------
 
-
-## Mean
-
-
-
-# Women 15.25
-
-mean.MCAR.women.true.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(mean.MCAR.cov.35.AD.women.true.cl.15.25[2], mean.MCAR.cov.40.AD.women.true.cl.15.25[2],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.15.25[2], mean.MCAR.cov.50.AD.women.true.cl.15.25[2],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.15.25[2], mean.MCAR.cov.60.AD.women.true.cl.15.25[2],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.15.25[2], mean.MCAR.cov.70.AD.women.true.cl.15.25[2],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.15.25[2], mean.MCAR.cov.80.AD.women.true.cl.15.25[2],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.15.25[2], mean.MCAR.cov.90.AD.women.true.cl.15.25[2],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.15.25[2], mean.AD.num.women.true.cov.100.15.25[2]),
-                                            
-                                            L = c(mean.MCAR.cov.35.AD.women.true.cl.15.25[1], mean.MCAR.cov.40.AD.women.true.cl.15.25[1],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.15.25[1], mean.MCAR.cov.50.AD.women.true.cl.15.25[1],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.15.25[1], mean.MCAR.cov.60.AD.women.true.cl.15.25[1],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.15.25[1], mean.MCAR.cov.70.AD.women.true.cl.15.25[1],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.15.25[1], mean.MCAR.cov.80.AD.women.true.cl.15.25[1],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.15.25[1], mean.MCAR.cov.90.AD.women.true.cl.15.25[1],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.15.25[1], mean.AD.num.women.true.cov.100.15.25[1]),
-                                            
-                                            U = c(mean.MCAR.cov.35.AD.women.true.cl.15.25[3], mean.MCAR.cov.40.AD.women.true.cl.15.25[3],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.15.25[3], mean.MCAR.cov.50.AD.women.true.cl.15.25[3],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.15.25[3], mean.MCAR.cov.60.AD.women.true.cl.15.25[3],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.15.25[3], mean.MCAR.cov.70.AD.women.true.cl.15.25[3],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.15.25[3], mean.MCAR.cov.80.AD.women.true.cl.15.25[3],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.15.25[3], mean.MCAR.cov.90.AD.women.true.cl.15.25[3],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.15.25[3], mean.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.mean.MCAR.women.true.cl.15.25 <- ggplot(mean.MCAR.women.true.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.women.true.cl.15.25.png",
-       plot = plot.mean.MCAR.women.true.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-mean.MCAR.men.true.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                          
-                                          F = c(mean.MCAR.cov.35.AD.men.true.cl.15.25[2], mean.MCAR.cov.40.AD.men.true.cl.15.25[2],
-                                                mean.MCAR.cov.45.AD.men.true.cl.15.25[2], mean.MCAR.cov.50.AD.men.true.cl.15.25[2],
-                                                mean.MCAR.cov.55.AD.men.true.cl.15.25[2], mean.MCAR.cov.60.AD.men.true.cl.15.25[2],
-                                                mean.MCAR.cov.65.AD.men.true.cl.15.25[2], mean.MCAR.cov.70.AD.men.true.cl.15.25[2],
-                                                mean.MCAR.cov.75.AD.men.true.cl.15.25[2], mean.MCAR.cov.80.AD.men.true.cl.15.25[2],
-                                                mean.MCAR.cov.85.AD.men.true.cl.15.25[2], mean.MCAR.cov.90.AD.men.true.cl.15.25[2],
-                                                mean.MCAR.cov.95.AD.men.true.cl.15.25[2], mean.AD.num.men.true.cov.100.15.25[2]),
-                                          
-                                          L = c(mean.MCAR.cov.35.AD.men.true.cl.15.25[1], mean.MCAR.cov.40.AD.men.true.cl.15.25[1],
-                                                mean.MCAR.cov.45.AD.men.true.cl.15.25[1], mean.MCAR.cov.50.AD.men.true.cl.15.25[1],
-                                                mean.MCAR.cov.55.AD.men.true.cl.15.25[1], mean.MCAR.cov.60.AD.men.true.cl.15.25[1],
-                                                mean.MCAR.cov.65.AD.men.true.cl.15.25[1], mean.MCAR.cov.70.AD.men.true.cl.15.25[1],
-                                                mean.MCAR.cov.75.AD.men.true.cl.15.25[1], mean.MCAR.cov.80.AD.men.true.cl.15.25[1],
-                                                mean.MCAR.cov.85.AD.men.true.cl.15.25[1], mean.MCAR.cov.90.AD.men.true.cl.15.25[1],
-                                                mean.MCAR.cov.95.AD.men.true.cl.15.25[1], mean.AD.num.men.true.cov.100.15.25[1]),
-                                          
-                                          U = c(mean.MCAR.cov.35.AD.men.true.cl.15.25[3], mean.MCAR.cov.40.AD.men.true.cl.15.25[3],
-                                                mean.MCAR.cov.45.AD.men.true.cl.15.25[3], mean.MCAR.cov.50.AD.men.true.cl.15.25[3],
-                                                mean.MCAR.cov.55.AD.men.true.cl.15.25[3], mean.MCAR.cov.60.AD.men.true.cl.15.25[3],
-                                                mean.MCAR.cov.65.AD.men.true.cl.15.25[3], mean.MCAR.cov.70.AD.men.true.cl.15.25[3],
-                                                mean.MCAR.cov.75.AD.men.true.cl.15.25[3], mean.MCAR.cov.80.AD.men.true.cl.15.25[3],
-                                                mean.MCAR.cov.85.AD.men.true.cl.15.25[3], mean.MCAR.cov.90.AD.men.true.cl.15.25[3],
-                                                mean.MCAR.cov.95.AD.men.true.cl.15.25[3], mean.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.mean.MCAR.men.true.cl.15.25 <- ggplot(mean.MCAR.men.true.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.men.true.cl.15.25.png",
-       plot = plot.mean.MCAR.men.true.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-mean.MCAR.women.true.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(mean.MCAR.cov.35.AD.women.true.cl.25.40[2], mean.MCAR.cov.40.AD.women.true.cl.25.40[2],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.25.40[2], mean.MCAR.cov.50.AD.women.true.cl.25.40[2],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.25.40[2], mean.MCAR.cov.60.AD.women.true.cl.25.40[2],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.25.40[2], mean.MCAR.cov.70.AD.women.true.cl.25.40[2],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.25.40[2], mean.MCAR.cov.80.AD.women.true.cl.25.40[2],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.25.40[2], mean.MCAR.cov.90.AD.women.true.cl.25.40[2],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.25.40[2], mean.AD.num.women.true.cov.100.25.40[2]),
-                                            
-                                            L = c(mean.MCAR.cov.35.AD.women.true.cl.25.40[1], mean.MCAR.cov.40.AD.women.true.cl.25.40[1],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.25.40[1], mean.MCAR.cov.50.AD.women.true.cl.25.40[1],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.25.40[1], mean.MCAR.cov.60.AD.women.true.cl.25.40[1],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.25.40[1], mean.MCAR.cov.70.AD.women.true.cl.25.40[1],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.25.40[1], mean.MCAR.cov.80.AD.women.true.cl.25.40[1],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.25.40[1], mean.MCAR.cov.90.AD.women.true.cl.25.40[1],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.25.40[1], mean.AD.num.women.true.cov.100.25.40[1]),
-                                            
-                                            U = c(mean.MCAR.cov.35.AD.women.true.cl.25.40[3], mean.MCAR.cov.40.AD.women.true.cl.25.40[3],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.25.40[3], mean.MCAR.cov.50.AD.women.true.cl.25.40[3],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.25.40[3], mean.MCAR.cov.60.AD.women.true.cl.25.40[3],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.25.40[3], mean.MCAR.cov.70.AD.women.true.cl.25.40[3],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.25.40[3], mean.MCAR.cov.80.AD.women.true.cl.25.40[3],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.25.40[3], mean.MCAR.cov.90.AD.women.true.cl.25.40[3],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.25.40[3], mean.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.women.true.cl.25.40 <- ggplot(mean.MCAR.women.true.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.women.true.cl.25.40.png",
-       plot = plot.mean.MCAR.women.true.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: 25.40
-
-mean.MCAR.men.true.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                          
-                                          F = c(mean.MCAR.cov.35.AD.men.true.cl.25.40[2], mean.MCAR.cov.40.AD.men.true.cl.25.40[2],
-                                                mean.MCAR.cov.45.AD.men.true.cl.25.40[2], mean.MCAR.cov.50.AD.men.true.cl.25.40[2],
-                                                mean.MCAR.cov.55.AD.men.true.cl.25.40[2], mean.MCAR.cov.60.AD.men.true.cl.25.40[2],
-                                                mean.MCAR.cov.65.AD.men.true.cl.25.40[2], mean.MCAR.cov.70.AD.men.true.cl.25.40[2],
-                                                mean.MCAR.cov.75.AD.men.true.cl.25.40[2], mean.MCAR.cov.80.AD.men.true.cl.25.40[2],
-                                                mean.MCAR.cov.85.AD.men.true.cl.25.40[2], mean.MCAR.cov.90.AD.men.true.cl.25.40[2],
-                                                mean.MCAR.cov.95.AD.men.true.cl.25.40[2], mean.AD.num.men.true.cov.100.25.40[2]),
-                                          
-                                          L = c(mean.MCAR.cov.35.AD.men.true.cl.25.40[1], mean.MCAR.cov.40.AD.men.true.cl.25.40[1],
-                                                mean.MCAR.cov.45.AD.men.true.cl.25.40[1], mean.MCAR.cov.50.AD.men.true.cl.25.40[1],
-                                                mean.MCAR.cov.55.AD.men.true.cl.25.40[1], mean.MCAR.cov.60.AD.men.true.cl.25.40[1],
-                                                mean.MCAR.cov.65.AD.men.true.cl.25.40[1], mean.MCAR.cov.70.AD.men.true.cl.25.40[1],
-                                                mean.MCAR.cov.75.AD.men.true.cl.25.40[1], mean.MCAR.cov.80.AD.men.true.cl.25.40[1],
-                                                mean.MCAR.cov.85.AD.men.true.cl.25.40[1], mean.MCAR.cov.90.AD.men.true.cl.25.40[1],
-                                                mean.MCAR.cov.95.AD.men.true.cl.25.40[1], mean.AD.num.men.true.cov.100.25.40[1]),
-                                          
-                                          U = c(mean.MCAR.cov.35.AD.men.true.cl.25.40[3], mean.MCAR.cov.40.AD.men.true.cl.25.40[3],
-                                                mean.MCAR.cov.45.AD.men.true.cl.25.40[3], mean.MCAR.cov.50.AD.men.true.cl.25.40[3],
-                                                mean.MCAR.cov.55.AD.men.true.cl.25.40[3], mean.MCAR.cov.60.AD.men.true.cl.25.40[3],
-                                                mean.MCAR.cov.65.AD.men.true.cl.25.40[3], mean.MCAR.cov.70.AD.men.true.cl.25.40[3],
-                                                mean.MCAR.cov.75.AD.men.true.cl.25.40[3], mean.MCAR.cov.80.AD.men.true.cl.25.40[3],
-                                                mean.MCAR.cov.85.AD.men.true.cl.25.40[3], mean.MCAR.cov.90.AD.men.true.cl.25.40[3],
-                                                mean.MCAR.cov.95.AD.men.true.cl.25.40[3], mean.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.men.true.cl.25.40 <- ggplot(mean.MCAR.men.true.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.mean.MCAR.men.true.cl.25.40.png",
-       plot = plot.mean.MCAR.men.true.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 40.50
-
-mean.MCAR.women.true.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(mean.MCAR.cov.35.AD.women.true.cl.40.50[2], mean.MCAR.cov.40.AD.women.true.cl.40.50[2],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.40.50[2], mean.MCAR.cov.50.AD.women.true.cl.40.50[2],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.40.50[2], mean.MCAR.cov.60.AD.women.true.cl.40.50[2],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.40.50[2], mean.MCAR.cov.70.AD.women.true.cl.40.50[2],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.40.50[2], mean.MCAR.cov.80.AD.women.true.cl.40.50[2],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.40.50[2], mean.MCAR.cov.90.AD.women.true.cl.40.50[2],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.40.50[2], mean.AD.num.women.true.cov.100.25.40[2]),
-                                            
-                                            L = c(mean.MCAR.cov.35.AD.women.true.cl.40.50[1], mean.MCAR.cov.40.AD.women.true.cl.40.50[1],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.40.50[1], mean.MCAR.cov.50.AD.women.true.cl.40.50[1],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.40.50[1], mean.MCAR.cov.60.AD.women.true.cl.40.50[1],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.40.50[1], mean.MCAR.cov.70.AD.women.true.cl.40.50[1],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.40.50[1], mean.MCAR.cov.80.AD.women.true.cl.40.50[1],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.40.50[1], mean.MCAR.cov.90.AD.women.true.cl.40.50[1],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.40.50[1], mean.AD.num.women.true.cov.100.25.40[1]),
-                                            
-                                            U = c(mean.MCAR.cov.35.AD.women.true.cl.40.50[3], mean.MCAR.cov.40.AD.women.true.cl.40.50[3],
-                                                  mean.MCAR.cov.45.AD.women.true.cl.40.50[3], mean.MCAR.cov.50.AD.women.true.cl.40.50[3],
-                                                  mean.MCAR.cov.55.AD.women.true.cl.40.50[3], mean.MCAR.cov.60.AD.women.true.cl.40.50[3],
-                                                  mean.MCAR.cov.65.AD.women.true.cl.40.50[3], mean.MCAR.cov.70.AD.women.true.cl.40.50[3],
-                                                  mean.MCAR.cov.75.AD.women.true.cl.40.50[3], mean.MCAR.cov.80.AD.women.true.cl.40.50[3],
-                                                  mean.MCAR.cov.85.AD.women.true.cl.40.50[3], mean.MCAR.cov.90.AD.women.true.cl.40.50[3],
-                                                  mean.MCAR.cov.95.AD.women.true.cl.40.50[3], mean.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.women.true.cl.40.50 <- ggplot(mean.MCAR.women.true.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.mean.MCAR.women.true.cl.40.50.png",
-       plot = plot.mean.MCAR.women.true.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-mean.MCAR.men.true.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                          
-                                          F = c(mean.MCAR.cov.35.AD.men.true.cl.40.50[2], mean.MCAR.cov.40.AD.men.true.cl.40.50[2],
-                                                mean.MCAR.cov.45.AD.men.true.cl.40.50[2], mean.MCAR.cov.50.AD.men.true.cl.40.50[2],
-                                                mean.MCAR.cov.55.AD.men.true.cl.40.50[2], mean.MCAR.cov.60.AD.men.true.cl.40.50[2],
-                                                mean.MCAR.cov.65.AD.men.true.cl.40.50[2], mean.MCAR.cov.70.AD.men.true.cl.40.50[2],
-                                                mean.MCAR.cov.75.AD.men.true.cl.40.50[2], mean.MCAR.cov.80.AD.men.true.cl.40.50[2],
-                                                mean.MCAR.cov.85.AD.men.true.cl.40.50[2], mean.MCAR.cov.90.AD.men.true.cl.40.50[2],
-                                                mean.MCAR.cov.95.AD.men.true.cl.40.50[2], mean.AD.num.men.true.cov.100.40.50[2]),
-                                          
-                                          L = c(mean.MCAR.cov.35.AD.men.true.cl.40.50[1], mean.MCAR.cov.40.AD.men.true.cl.40.50[1],
-                                                mean.MCAR.cov.45.AD.men.true.cl.40.50[1], mean.MCAR.cov.50.AD.men.true.cl.40.50[1],
-                                                mean.MCAR.cov.55.AD.men.true.cl.40.50[1], mean.MCAR.cov.60.AD.men.true.cl.40.50[1],
-                                                mean.MCAR.cov.65.AD.men.true.cl.40.50[1], mean.MCAR.cov.70.AD.men.true.cl.40.50[1],
-                                                mean.MCAR.cov.75.AD.men.true.cl.40.50[1], mean.MCAR.cov.80.AD.men.true.cl.40.50[1],
-                                                mean.MCAR.cov.85.AD.men.true.cl.40.50[1], mean.MCAR.cov.90.AD.men.true.cl.40.50[1],
-                                                mean.MCAR.cov.95.AD.men.true.cl.40.50[1], mean.AD.num.men.true.cov.100.40.50[1]),
-                                          
-                                          U = c(mean.MCAR.cov.35.AD.men.true.cl.40.50[3], mean.MCAR.cov.40.AD.men.true.cl.40.50[3],
-                                                mean.MCAR.cov.45.AD.men.true.cl.40.50[3], mean.MCAR.cov.50.AD.men.true.cl.40.50[3],
-                                                mean.MCAR.cov.55.AD.men.true.cl.40.50[3], mean.MCAR.cov.60.AD.men.true.cl.40.50[3],
-                                                mean.MCAR.cov.65.AD.men.true.cl.40.50[3], mean.MCAR.cov.70.AD.men.true.cl.40.50[3],
-                                                mean.MCAR.cov.75.AD.men.true.cl.40.50[3], mean.MCAR.cov.80.AD.men.true.cl.40.50[3],
-                                                mean.MCAR.cov.85.AD.men.true.cl.40.50[3], mean.MCAR.cov.90.AD.men.true.cl.40.50[3],
-                                                mean.MCAR.cov.95.AD.men.true.cl.40.50[3], mean.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.mean.MCAR.men.true.cl.40.50 <- ggplot(mean.MCAR.men.true.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.men.true.cl.40.50.png",
-       plot = plot.mean.MCAR.men.true.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-## Median
-
-# Women 15.25
-
-med.MCAR.women.true.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                           
-                                           F = c(med.MCAR.cov.35.AD.women.true.cl.15.25[2], med.MCAR.cov.40.AD.women.true.cl.15.25[2],
-                                                 med.MCAR.cov.45.AD.women.true.cl.15.25[2], med.MCAR.cov.50.AD.women.true.cl.15.25[2],
-                                                 med.MCAR.cov.55.AD.women.true.cl.15.25[2], med.MCAR.cov.60.AD.women.true.cl.15.25[2],
-                                                 med.MCAR.cov.65.AD.women.true.cl.15.25[2], med.MCAR.cov.70.AD.women.true.cl.15.25[2],
-                                                 med.MCAR.cov.75.AD.women.true.cl.15.25[2], med.MCAR.cov.80.AD.women.true.cl.15.25[2],
-                                                 med.MCAR.cov.85.AD.women.true.cl.15.25[2], med.MCAR.cov.90.AD.women.true.cl.15.25[2],
-                                                 med.MCAR.cov.95.AD.women.true.cl.15.25[2], med.AD.num.women.true.cov.100.15.25[2]),
-                                           
-                                           L = c(med.MCAR.cov.35.AD.women.true.cl.15.25[1], med.MCAR.cov.40.AD.women.true.cl.15.25[1],
-                                                 med.MCAR.cov.45.AD.women.true.cl.15.25[1], med.MCAR.cov.50.AD.women.true.cl.15.25[1],
-                                                 med.MCAR.cov.55.AD.women.true.cl.15.25[1], med.MCAR.cov.60.AD.women.true.cl.15.25[1],
-                                                 med.MCAR.cov.65.AD.women.true.cl.15.25[1], med.MCAR.cov.70.AD.women.true.cl.15.25[1],
-                                                 med.MCAR.cov.75.AD.women.true.cl.15.25[1], med.MCAR.cov.80.AD.women.true.cl.15.25[1],
-                                                 med.MCAR.cov.85.AD.women.true.cl.15.25[1], med.MCAR.cov.90.AD.women.true.cl.15.25[1],
-                                                 med.MCAR.cov.95.AD.women.true.cl.15.25[1], med.AD.num.women.true.cov.100.15.25[1]),
-                                           
-                                           U = c(med.MCAR.cov.35.AD.women.true.cl.15.25[3], med.MCAR.cov.40.AD.women.true.cl.15.25[3],
-                                                 med.MCAR.cov.45.AD.women.true.cl.15.25[3], med.MCAR.cov.50.AD.women.true.cl.15.25[3],
-                                                 med.MCAR.cov.55.AD.women.true.cl.15.25[3], med.MCAR.cov.60.AD.women.true.cl.15.25[3],
-                                                 med.MCAR.cov.65.AD.women.true.cl.15.25[3], med.MCAR.cov.70.AD.women.true.cl.15.25[3],
-                                                 med.MCAR.cov.75.AD.women.true.cl.15.25[3], med.MCAR.cov.80.AD.women.true.cl.15.25[3],
-                                                 med.MCAR.cov.85.AD.women.true.cl.15.25[3], med.MCAR.cov.90.AD.women.true.cl.15.25[3],
-                                                 med.MCAR.cov.95.AD.women.true.cl.15.25[3], med.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.med.MCAR.women.true.cl.15.25 <- ggplot(med.MCAR.women.true.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.true.cl.15.25.png",
-       plot = plot.med.MCAR.women.true.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-med.MCAR.men.true.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(med.MCAR.cov.35.AD.men.true.cl.15.25[2], med.MCAR.cov.40.AD.men.true.cl.15.25[2],
-                                               med.MCAR.cov.45.AD.men.true.cl.15.25[2], med.MCAR.cov.50.AD.men.true.cl.15.25[2],
-                                               med.MCAR.cov.55.AD.men.true.cl.15.25[2], med.MCAR.cov.60.AD.men.true.cl.15.25[2],
-                                               med.MCAR.cov.65.AD.men.true.cl.15.25[2], med.MCAR.cov.70.AD.men.true.cl.15.25[2],
-                                               med.MCAR.cov.75.AD.men.true.cl.15.25[2], med.MCAR.cov.80.AD.men.true.cl.15.25[2],
-                                               med.MCAR.cov.85.AD.men.true.cl.15.25[2], med.MCAR.cov.90.AD.men.true.cl.15.25[2],
-                                               med.MCAR.cov.95.AD.men.true.cl.15.25[2], med.AD.num.men.true.cov.100.15.25[2]),
-                                         
-                                         L = c(med.MCAR.cov.35.AD.men.true.cl.15.25[1], med.MCAR.cov.40.AD.men.true.cl.15.25[1],
-                                               med.MCAR.cov.45.AD.men.true.cl.15.25[1], med.MCAR.cov.50.AD.men.true.cl.15.25[1],
-                                               med.MCAR.cov.55.AD.men.true.cl.15.25[1], med.MCAR.cov.60.AD.men.true.cl.15.25[1],
-                                               med.MCAR.cov.65.AD.men.true.cl.15.25[1], med.MCAR.cov.70.AD.men.true.cl.15.25[1],
-                                               med.MCAR.cov.75.AD.men.true.cl.15.25[1], med.MCAR.cov.80.AD.men.true.cl.15.25[1],
-                                               med.MCAR.cov.85.AD.men.true.cl.15.25[1], med.MCAR.cov.90.AD.men.true.cl.15.25[1],
-                                               med.MCAR.cov.95.AD.men.true.cl.15.25[1], med.AD.num.men.true.cov.100.15.25[1]),
-                                         
-                                         U = c(med.MCAR.cov.35.AD.men.true.cl.15.25[3], med.MCAR.cov.40.AD.men.true.cl.15.25[3],
-                                               med.MCAR.cov.45.AD.men.true.cl.15.25[3], med.MCAR.cov.50.AD.men.true.cl.15.25[3],
-                                               med.MCAR.cov.55.AD.men.true.cl.15.25[3], med.MCAR.cov.60.AD.men.true.cl.15.25[3],
-                                               med.MCAR.cov.65.AD.men.true.cl.15.25[3], med.MCAR.cov.70.AD.men.true.cl.15.25[3],
-                                               med.MCAR.cov.75.AD.men.true.cl.15.25[3], med.MCAR.cov.80.AD.men.true.cl.15.25[3],
-                                               med.MCAR.cov.85.AD.men.true.cl.15.25[3], med.MCAR.cov.90.AD.men.true.cl.15.25[3],
-                                               med.MCAR.cov.95.AD.men.true.cl.15.25[3], med.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.med.MCAR.men.true.cl.15.25 <- ggplot(med.MCAR.men.true.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.true.cl.15.25.png",
-       plot = plot.med.MCAR.men.true.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-med.MCAR.women.true.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                           
-                                           F = c(med.MCAR.cov.35.AD.women.true.cl.25.40[2], med.MCAR.cov.40.AD.women.true.cl.25.40[2],
-                                                 med.MCAR.cov.45.AD.women.true.cl.25.40[2], med.MCAR.cov.50.AD.women.true.cl.25.40[2],
-                                                 med.MCAR.cov.55.AD.women.true.cl.25.40[2], med.MCAR.cov.60.AD.women.true.cl.25.40[2],
-                                                 med.MCAR.cov.65.AD.women.true.cl.25.40[2], med.MCAR.cov.70.AD.women.true.cl.25.40[2],
-                                                 med.MCAR.cov.75.AD.women.true.cl.25.40[2], med.MCAR.cov.80.AD.women.true.cl.25.40[2],
-                                                 med.MCAR.cov.85.AD.women.true.cl.25.40[2], med.MCAR.cov.90.AD.women.true.cl.25.40[2],
-                                                 med.MCAR.cov.95.AD.women.true.cl.25.40[2], med.AD.num.women.true.cov.100.25.40[2]),
-                                           
-                                           L = c(med.MCAR.cov.35.AD.women.true.cl.25.40[1], med.MCAR.cov.40.AD.women.true.cl.25.40[1],
-                                                 med.MCAR.cov.45.AD.women.true.cl.25.40[1], med.MCAR.cov.50.AD.women.true.cl.25.40[1],
-                                                 med.MCAR.cov.55.AD.women.true.cl.25.40[1], med.MCAR.cov.60.AD.women.true.cl.25.40[1],
-                                                 med.MCAR.cov.65.AD.women.true.cl.25.40[1], med.MCAR.cov.70.AD.women.true.cl.25.40[1],
-                                                 med.MCAR.cov.75.AD.women.true.cl.25.40[1], med.MCAR.cov.80.AD.women.true.cl.25.40[1],
-                                                 med.MCAR.cov.85.AD.women.true.cl.25.40[1], med.MCAR.cov.90.AD.women.true.cl.25.40[1],
-                                                 med.MCAR.cov.95.AD.women.true.cl.25.40[1], med.AD.num.women.true.cov.100.25.40[1]),
-                                           
-                                           U = c(med.MCAR.cov.35.AD.women.true.cl.25.40[3], med.MCAR.cov.40.AD.women.true.cl.25.40[3],
-                                                 med.MCAR.cov.45.AD.women.true.cl.25.40[3], med.MCAR.cov.50.AD.women.true.cl.25.40[3],
-                                                 med.MCAR.cov.55.AD.women.true.cl.25.40[3], med.MCAR.cov.60.AD.women.true.cl.25.40[3],
-                                                 med.MCAR.cov.65.AD.women.true.cl.25.40[3], med.MCAR.cov.70.AD.women.true.cl.25.40[3],
-                                                 med.MCAR.cov.75.AD.women.true.cl.25.40[3], med.MCAR.cov.80.AD.women.true.cl.25.40[3],
-                                                 med.MCAR.cov.85.AD.women.true.cl.25.40[3], med.MCAR.cov.90.AD.women.true.cl.25.40[3],
-                                                 med.MCAR.cov.95.AD.women.true.cl.25.40[3], med.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.med.MCAR.women.true.cl.25.40 <- ggplot(med.MCAR.women.true.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.true.cl.25.40.png",
-       plot = plot.med.MCAR.women.true.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Men: 25.40
-
-med.MCAR.men.true.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(med.MCAR.cov.35.AD.men.true.cl.25.40[2], med.MCAR.cov.40.AD.men.true.cl.25.40[2],
-                                               med.MCAR.cov.45.AD.men.true.cl.25.40[2], med.MCAR.cov.50.AD.men.true.cl.25.40[2],
-                                               med.MCAR.cov.55.AD.men.true.cl.25.40[2], med.MCAR.cov.60.AD.men.true.cl.25.40[2],
-                                               med.MCAR.cov.65.AD.men.true.cl.25.40[2], med.MCAR.cov.70.AD.men.true.cl.25.40[2],
-                                               med.MCAR.cov.75.AD.men.true.cl.25.40[2], med.MCAR.cov.80.AD.men.true.cl.25.40[2],
-                                               med.MCAR.cov.85.AD.men.true.cl.25.40[2], med.MCAR.cov.90.AD.men.true.cl.25.40[2],
-                                               med.MCAR.cov.95.AD.men.true.cl.25.40[2], med.AD.num.men.true.cov.100.25.40[2]),
-                                         
-                                         L = c(med.MCAR.cov.35.AD.men.true.cl.25.40[1], med.MCAR.cov.40.AD.men.true.cl.25.40[1],
-                                               med.MCAR.cov.45.AD.men.true.cl.25.40[1], med.MCAR.cov.50.AD.men.true.cl.25.40[1],
-                                               med.MCAR.cov.55.AD.men.true.cl.25.40[1], med.MCAR.cov.60.AD.men.true.cl.25.40[1],
-                                               med.MCAR.cov.65.AD.men.true.cl.25.40[1], med.MCAR.cov.70.AD.men.true.cl.25.40[1],
-                                               med.MCAR.cov.75.AD.men.true.cl.25.40[1], med.MCAR.cov.80.AD.men.true.cl.25.40[1],
-                                               med.MCAR.cov.85.AD.men.true.cl.25.40[1], med.MCAR.cov.90.AD.men.true.cl.25.40[1],
-                                               med.MCAR.cov.95.AD.men.true.cl.25.40[1], med.AD.num.men.true.cov.100.25.40[1]),
-                                         
-                                         U = c(med.MCAR.cov.35.AD.men.true.cl.25.40[3], med.MCAR.cov.40.AD.men.true.cl.25.40[3],
-                                               med.MCAR.cov.45.AD.men.true.cl.25.40[3], med.MCAR.cov.50.AD.men.true.cl.25.40[3],
-                                               med.MCAR.cov.55.AD.men.true.cl.25.40[3], med.MCAR.cov.60.AD.men.true.cl.25.40[3],
-                                               med.MCAR.cov.65.AD.men.true.cl.25.40[3], med.MCAR.cov.70.AD.men.true.cl.25.40[3],
-                                               med.MCAR.cov.75.AD.men.true.cl.25.40[3], med.MCAR.cov.80.AD.men.true.cl.25.40[3],
-                                               med.MCAR.cov.85.AD.men.true.cl.25.40[3], med.MCAR.cov.90.AD.men.true.cl.25.40[3],
-                                               med.MCAR.cov.95.AD.men.true.cl.25.40[3], med.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.med.MCAR.men.true.cl.25.40 <- ggplot(med.MCAR.men.true.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.true.cl.25.40.png",
-       plot = plot.med.MCAR.men.true.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 40.50
-
-med.MCAR.women.true.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                           
-                                           F = c(med.MCAR.cov.35.AD.women.true.cl.40.50[2], med.MCAR.cov.40.AD.women.true.cl.40.50[2],
-                                                 med.MCAR.cov.45.AD.women.true.cl.40.50[2], med.MCAR.cov.50.AD.women.true.cl.40.50[2],
-                                                 med.MCAR.cov.55.AD.women.true.cl.40.50[2], med.MCAR.cov.60.AD.women.true.cl.40.50[2],
-                                                 med.MCAR.cov.65.AD.women.true.cl.40.50[2], med.MCAR.cov.70.AD.women.true.cl.40.50[2],
-                                                 med.MCAR.cov.75.AD.women.true.cl.40.50[2], med.MCAR.cov.80.AD.women.true.cl.40.50[2],
-                                                 med.MCAR.cov.85.AD.women.true.cl.40.50[2], med.MCAR.cov.90.AD.women.true.cl.40.50[2],
-                                                 med.MCAR.cov.95.AD.women.true.cl.40.50[2], med.AD.num.women.true.cov.100.40.50[2]),
-                                           
-                                           L = c(med.MCAR.cov.35.AD.women.true.cl.40.50[1], med.MCAR.cov.40.AD.women.true.cl.40.50[1],
-                                                 med.MCAR.cov.45.AD.women.true.cl.40.50[1], med.MCAR.cov.50.AD.women.true.cl.40.50[1],
-                                                 med.MCAR.cov.55.AD.women.true.cl.40.50[1], med.MCAR.cov.60.AD.women.true.cl.40.50[1],
-                                                 med.MCAR.cov.65.AD.women.true.cl.40.50[1], med.MCAR.cov.70.AD.women.true.cl.40.50[1],
-                                                 med.MCAR.cov.75.AD.women.true.cl.40.50[1], med.MCAR.cov.80.AD.women.true.cl.40.50[1],
-                                                 med.MCAR.cov.85.AD.women.true.cl.40.50[1], med.MCAR.cov.90.AD.women.true.cl.40.50[1],
-                                                 med.MCAR.cov.95.AD.women.true.cl.40.50[1], med.AD.num.women.true.cov.100.40.50[1]),
-                                           
-                                           U = c(med.MCAR.cov.35.AD.women.true.cl.40.50[3], med.MCAR.cov.40.AD.women.true.cl.40.50[3],
-                                                 med.MCAR.cov.45.AD.women.true.cl.40.50[3], med.MCAR.cov.50.AD.women.true.cl.40.50[3],
-                                                 med.MCAR.cov.55.AD.women.true.cl.40.50[3], med.MCAR.cov.60.AD.women.true.cl.40.50[3],
-                                                 med.MCAR.cov.65.AD.women.true.cl.40.50[3], med.MCAR.cov.70.AD.women.true.cl.40.50[3],
-                                                 med.MCAR.cov.75.AD.women.true.cl.40.50[3], med.MCAR.cov.80.AD.women.true.cl.40.50[3],
-                                                 med.MCAR.cov.85.AD.women.true.cl.40.50[3], med.MCAR.cov.90.AD.women.true.cl.40.50[3],
-                                                 med.MCAR.cov.95.AD.women.true.cl.40.50[3], med.AD.num.women.true.cov.100.40.50[3]))
-
-
-plot.med.MCAR.women.true.cl.40.50 <- ggplot(med.MCAR.women.true.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.true.cl.40.50.png",
-       plot = plot.med.MCAR.women.true.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-med.MCAR.men.true.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                         
-                                         F = c(med.MCAR.cov.35.AD.men.true.cl.40.50[2], med.MCAR.cov.40.AD.men.true.cl.40.50[2],
-                                               med.MCAR.cov.45.AD.men.true.cl.40.50[2], med.MCAR.cov.50.AD.men.true.cl.40.50[2],
-                                               med.MCAR.cov.55.AD.men.true.cl.40.50[2], med.MCAR.cov.60.AD.men.true.cl.40.50[2],
-                                               med.MCAR.cov.65.AD.men.true.cl.40.50[2], med.MCAR.cov.70.AD.men.true.cl.40.50[2],
-                                               med.MCAR.cov.75.AD.men.true.cl.40.50[2], med.MCAR.cov.80.AD.men.true.cl.40.50[2],
-                                               med.MCAR.cov.85.AD.men.true.cl.40.50[2], med.MCAR.cov.90.AD.men.true.cl.40.50[2],
-                                               med.MCAR.cov.95.AD.men.true.cl.40.50[2], med.AD.num.men.true.cov.100.40.50[2]),
-                                         
-                                         L = c(med.MCAR.cov.35.AD.men.true.cl.40.50[1], med.MCAR.cov.40.AD.men.true.cl.40.50[1],
-                                               med.MCAR.cov.45.AD.men.true.cl.40.50[1], med.MCAR.cov.50.AD.men.true.cl.40.50[1],
-                                               med.MCAR.cov.55.AD.men.true.cl.40.50[1], med.MCAR.cov.60.AD.men.true.cl.40.50[1],
-                                               med.MCAR.cov.65.AD.men.true.cl.40.50[1], med.MCAR.cov.70.AD.men.true.cl.40.50[1],
-                                               med.MCAR.cov.75.AD.men.true.cl.40.50[1], med.MCAR.cov.80.AD.men.true.cl.40.50[1],
-                                               med.MCAR.cov.85.AD.men.true.cl.40.50[1], med.MCAR.cov.90.AD.men.true.cl.40.50[1],
-                                               med.MCAR.cov.95.AD.men.true.cl.40.50[1], med.AD.num.men.true.cov.100.40.50[1]),
-                                         
-                                         U = c(med.MCAR.cov.35.AD.men.true.cl.40.50[3], med.MCAR.cov.40.AD.men.true.cl.40.50[3],
-                                               med.MCAR.cov.45.AD.men.true.cl.40.50[3], med.MCAR.cov.50.AD.men.true.cl.40.50[3],
-                                               med.MCAR.cov.55.AD.men.true.cl.40.50[3], med.MCAR.cov.60.AD.men.true.cl.40.50[3],
-                                               med.MCAR.cov.65.AD.men.true.cl.40.50[3], med.MCAR.cov.70.AD.men.true.cl.40.50[3],
-                                               med.MCAR.cov.75.AD.men.true.cl.40.50[3], med.MCAR.cov.80.AD.men.true.cl.40.50[3],
-                                               med.MCAR.cov.85.AD.men.true.cl.40.50[3], med.MCAR.cov.90.AD.men.true.cl.40.50[3],
-                                               med.MCAR.cov.95.AD.men.true.cl.40.50[3], med.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.med.MCAR.men.true.cl.40.50 <- ggplot(med.MCAR.men.true.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.true.cl.40.50.png",
-       plot = plot.med.MCAR.men.true.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-## Standard deviation
-
-
-# Women 15.25
-
-sd.MCAR.women.true.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                          
-                                          F = c(sd.MCAR.cov.35.AD.women.true.cl.15.25[2], sd.MCAR.cov.40.AD.women.true.cl.15.25[2],
-                                                sd.MCAR.cov.45.AD.women.true.cl.15.25[2], sd.MCAR.cov.50.AD.women.true.cl.15.25[2],
-                                                sd.MCAR.cov.55.AD.women.true.cl.15.25[2], sd.MCAR.cov.60.AD.women.true.cl.15.25[2],
-                                                sd.MCAR.cov.65.AD.women.true.cl.15.25[2], sd.MCAR.cov.70.AD.women.true.cl.15.25[2],
-                                                sd.MCAR.cov.75.AD.women.true.cl.15.25[2], sd.MCAR.cov.80.AD.women.true.cl.15.25[2],
-                                                sd.MCAR.cov.85.AD.women.true.cl.15.25[2], sd.MCAR.cov.90.AD.women.true.cl.15.25[2],
-                                                sd.MCAR.cov.95.AD.women.true.cl.15.25[2], sd.AD.num.women.true.cov.100.15.25[2]),
-                                          
-                                          L = c(sd.MCAR.cov.35.AD.women.true.cl.15.25[1], sd.MCAR.cov.40.AD.women.true.cl.15.25[1],
-                                                sd.MCAR.cov.45.AD.women.true.cl.15.25[1], sd.MCAR.cov.50.AD.women.true.cl.15.25[1],
-                                                sd.MCAR.cov.55.AD.women.true.cl.15.25[1], sd.MCAR.cov.60.AD.women.true.cl.15.25[1],
-                                                sd.MCAR.cov.65.AD.women.true.cl.15.25[1], sd.MCAR.cov.70.AD.women.true.cl.15.25[1],
-                                                sd.MCAR.cov.75.AD.women.true.cl.15.25[1], sd.MCAR.cov.80.AD.women.true.cl.15.25[1],
-                                                sd.MCAR.cov.85.AD.women.true.cl.15.25[1], sd.MCAR.cov.90.AD.women.true.cl.15.25[1],
-                                                sd.MCAR.cov.95.AD.women.true.cl.15.25[1], sd.AD.num.women.true.cov.100.15.25[1]),
-                                          
-                                          U = c(sd.MCAR.cov.35.AD.women.true.cl.15.25[3], sd.MCAR.cov.40.AD.women.true.cl.15.25[3],
-                                                sd.MCAR.cov.45.AD.women.true.cl.15.25[3], sd.MCAR.cov.50.AD.women.true.cl.15.25[3],
-                                                sd.MCAR.cov.55.AD.women.true.cl.15.25[3], sd.MCAR.cov.60.AD.women.true.cl.15.25[3],
-                                                sd.MCAR.cov.65.AD.women.true.cl.15.25[3], sd.MCAR.cov.70.AD.women.true.cl.15.25[3],
-                                                sd.MCAR.cov.75.AD.women.true.cl.15.25[3], sd.MCAR.cov.80.AD.women.true.cl.15.25[3],
-                                                sd.MCAR.cov.85.AD.women.true.cl.15.25[3], sd.MCAR.cov.90.AD.women.true.cl.15.25[3],
-                                                sd.MCAR.cov.95.AD.women.true.cl.15.25[3], sd.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.sd.MCAR.women.true.cl.15.25 <- ggplot(sd.MCAR.women.true.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.true.cl.15.25.png",
-       plot = plot.sd.MCAR.women.true.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-sd.MCAR.men.true.cl.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                        
-                                        F = c(sd.MCAR.cov.35.AD.men.true.cl.15.25[2], sd.MCAR.cov.40.AD.men.true.cl.15.25[2],
-                                              sd.MCAR.cov.45.AD.men.true.cl.15.25[2], sd.MCAR.cov.50.AD.men.true.cl.15.25[2],
-                                              sd.MCAR.cov.55.AD.men.true.cl.15.25[2], sd.MCAR.cov.60.AD.men.true.cl.15.25[2],
-                                              sd.MCAR.cov.65.AD.men.true.cl.15.25[2], sd.MCAR.cov.70.AD.men.true.cl.15.25[2],
-                                              sd.MCAR.cov.75.AD.men.true.cl.15.25[2], sd.MCAR.cov.80.AD.men.true.cl.15.25[2],
-                                              sd.MCAR.cov.85.AD.men.true.cl.15.25[2], sd.MCAR.cov.90.AD.men.true.cl.15.25[2],
-                                              sd.MCAR.cov.95.AD.men.true.cl.15.25[2], sd.AD.num.men.true.cov.100.15.25[2]),
-                                        
-                                        L = c(sd.MCAR.cov.35.AD.men.true.cl.15.25[1], sd.MCAR.cov.40.AD.men.true.cl.15.25[1],
-                                              sd.MCAR.cov.45.AD.men.true.cl.15.25[1], sd.MCAR.cov.50.AD.men.true.cl.15.25[1],
-                                              sd.MCAR.cov.55.AD.men.true.cl.15.25[1], sd.MCAR.cov.60.AD.men.true.cl.15.25[1],
-                                              sd.MCAR.cov.65.AD.men.true.cl.15.25[1], sd.MCAR.cov.70.AD.men.true.cl.15.25[1],
-                                              sd.MCAR.cov.75.AD.men.true.cl.15.25[1], sd.MCAR.cov.80.AD.men.true.cl.15.25[1],
-                                              sd.MCAR.cov.85.AD.men.true.cl.15.25[1], sd.MCAR.cov.90.AD.men.true.cl.15.25[1],
-                                              sd.MCAR.cov.95.AD.men.true.cl.15.25[1], sd.AD.num.men.true.cov.100.15.25[1]),
-                                        
-                                        U = c(sd.MCAR.cov.35.AD.men.true.cl.15.25[3], sd.MCAR.cov.40.AD.men.true.cl.15.25[3],
-                                              sd.MCAR.cov.45.AD.men.true.cl.15.25[3], sd.MCAR.cov.50.AD.men.true.cl.15.25[3],
-                                              sd.MCAR.cov.55.AD.men.true.cl.15.25[3], sd.MCAR.cov.60.AD.men.true.cl.15.25[3],
-                                              sd.MCAR.cov.65.AD.men.true.cl.15.25[3], sd.MCAR.cov.70.AD.men.true.cl.15.25[3],
-                                              sd.MCAR.cov.75.AD.men.true.cl.15.25[3], sd.MCAR.cov.80.AD.men.true.cl.15.25[3],
-                                              sd.MCAR.cov.85.AD.men.true.cl.15.25[3], sd.MCAR.cov.90.AD.men.true.cl.15.25[3],
-                                              sd.MCAR.cov.95.AD.men.true.cl.15.25[3], sd.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.sd.MCAR.men.true.cl.15.25 <- ggplot(sd.MCAR.men.true.cl.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.sd.MCAR.men.true.cl.15.25.png",
-       plot = plot.sd.MCAR.men.true.cl.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-sd.MCAR.women.true.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                          
-                                          F = c(sd.MCAR.cov.35.AD.women.true.cl.25.40[2], sd.MCAR.cov.40.AD.women.true.cl.25.40[2],
-                                                sd.MCAR.cov.45.AD.women.true.cl.25.40[2], sd.MCAR.cov.50.AD.women.true.cl.25.40[2],
-                                                sd.MCAR.cov.55.AD.women.true.cl.25.40[2], sd.MCAR.cov.60.AD.women.true.cl.25.40[2],
-                                                sd.MCAR.cov.65.AD.women.true.cl.25.40[2], sd.MCAR.cov.70.AD.women.true.cl.25.40[2],
-                                                sd.MCAR.cov.75.AD.women.true.cl.25.40[2], sd.MCAR.cov.80.AD.women.true.cl.25.40[2],
-                                                sd.MCAR.cov.85.AD.women.true.cl.25.40[2], sd.MCAR.cov.90.AD.women.true.cl.25.40[2],
-                                                sd.MCAR.cov.95.AD.women.true.cl.25.40[2], sd.AD.num.women.true.cov.100.25.40[2]),
-                                          
-                                          L = c(sd.MCAR.cov.35.AD.women.true.cl.25.40[1], sd.MCAR.cov.40.AD.women.true.cl.25.40[1],
-                                                sd.MCAR.cov.45.AD.women.true.cl.25.40[1], sd.MCAR.cov.50.AD.women.true.cl.25.40[1],
-                                                sd.MCAR.cov.55.AD.women.true.cl.25.40[1], sd.MCAR.cov.60.AD.women.true.cl.25.40[1],
-                                                sd.MCAR.cov.65.AD.women.true.cl.25.40[1], sd.MCAR.cov.70.AD.women.true.cl.25.40[1],
-                                                sd.MCAR.cov.75.AD.women.true.cl.25.40[1], sd.MCAR.cov.80.AD.women.true.cl.25.40[1],
-                                                sd.MCAR.cov.85.AD.women.true.cl.25.40[1], sd.MCAR.cov.90.AD.women.true.cl.25.40[1],
-                                                sd.MCAR.cov.95.AD.women.true.cl.25.40[1], sd.AD.num.women.true.cov.100.25.40[1]),
-                                          
-                                          U = c(sd.MCAR.cov.35.AD.women.true.cl.25.40[3], sd.MCAR.cov.40.AD.women.true.cl.25.40[3],
-                                                sd.MCAR.cov.45.AD.women.true.cl.25.40[3], sd.MCAR.cov.50.AD.women.true.cl.25.40[3],
-                                                sd.MCAR.cov.55.AD.women.true.cl.25.40[3], sd.MCAR.cov.60.AD.women.true.cl.25.40[3],
-                                                sd.MCAR.cov.65.AD.women.true.cl.25.40[3], sd.MCAR.cov.70.AD.women.true.cl.25.40[3],
-                                                sd.MCAR.cov.75.AD.women.true.cl.25.40[3], sd.MCAR.cov.80.AD.women.true.cl.25.40[3],
-                                                sd.MCAR.cov.85.AD.women.true.cl.25.40[3], sd.MCAR.cov.90.AD.women.true.cl.25.40[3],
-                                                sd.MCAR.cov.95.AD.women.true.cl.25.40[3], sd.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.sd.MCAR.women.true.cl.25.40 <- ggplot(sd.MCAR.women.true.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.true.cl.25.40.png",
-       plot = plot.sd.MCAR.women.true.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Men: 25.40
-
-sd.MCAR.men.true.cl.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                        
-                                        F = c(sd.MCAR.cov.35.AD.men.true.cl.25.40[2], sd.MCAR.cov.40.AD.men.true.cl.25.40[2],
-                                              sd.MCAR.cov.45.AD.men.true.cl.25.40[2], sd.MCAR.cov.50.AD.men.true.cl.25.40[2],
-                                              sd.MCAR.cov.55.AD.men.true.cl.25.40[2], sd.MCAR.cov.60.AD.men.true.cl.25.40[2],
-                                              sd.MCAR.cov.65.AD.men.true.cl.25.40[2], sd.MCAR.cov.70.AD.men.true.cl.25.40[2],
-                                              sd.MCAR.cov.75.AD.men.true.cl.25.40[2], sd.MCAR.cov.80.AD.men.true.cl.25.40[2],
-                                              sd.MCAR.cov.85.AD.men.true.cl.25.40[2], sd.MCAR.cov.90.AD.men.true.cl.25.40[2],
-                                              sd.MCAR.cov.95.AD.men.true.cl.25.40[2], sd.AD.num.men.true.cov.100.25.40[2]),
-                                        
-                                        L = c(sd.MCAR.cov.35.AD.men.true.cl.25.40[1], sd.MCAR.cov.40.AD.men.true.cl.25.40[1],
-                                              sd.MCAR.cov.45.AD.men.true.cl.25.40[1], sd.MCAR.cov.50.AD.men.true.cl.25.40[1],
-                                              sd.MCAR.cov.55.AD.men.true.cl.25.40[1], sd.MCAR.cov.60.AD.men.true.cl.25.40[1],
-                                              sd.MCAR.cov.65.AD.men.true.cl.25.40[1], sd.MCAR.cov.70.AD.men.true.cl.25.40[1],
-                                              sd.MCAR.cov.75.AD.men.true.cl.25.40[1], sd.MCAR.cov.80.AD.men.true.cl.25.40[1],
-                                              sd.MCAR.cov.85.AD.men.true.cl.25.40[1], sd.MCAR.cov.90.AD.men.true.cl.25.40[1],
-                                              sd.MCAR.cov.95.AD.men.true.cl.25.40[1], sd.AD.num.men.true.cov.100.25.40[1]),
-                                        
-                                        U = c(sd.MCAR.cov.35.AD.men.true.cl.25.40[3], sd.MCAR.cov.40.AD.men.true.cl.25.40[3],
-                                              sd.MCAR.cov.45.AD.men.true.cl.25.40[3], sd.MCAR.cov.50.AD.men.true.cl.25.40[3],
-                                              sd.MCAR.cov.55.AD.men.true.cl.25.40[3], sd.MCAR.cov.60.AD.men.true.cl.25.40[3],
-                                              sd.MCAR.cov.65.AD.men.true.cl.25.40[3], sd.MCAR.cov.70.AD.men.true.cl.25.40[3],
-                                              sd.MCAR.cov.75.AD.men.true.cl.25.40[3], sd.MCAR.cov.80.AD.men.true.cl.25.40[3],
-                                              sd.MCAR.cov.85.AD.men.true.cl.25.40[3], sd.MCAR.cov.90.AD.men.true.cl.25.40[3],
-                                              sd.MCAR.cov.95.AD.men.true.cl.25.40[3], sd.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.sd.MCAR.men.true.cl.25.40 <- ggplot(sd.MCAR.men.true.cl.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.sd.MCAR.men.true.cl.25.40.png",
-       plot = plot.sd.MCAR.men.true.cl.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: 40.50
-
-sd.MCAR.women.true.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                          
-                                          F = c(sd.MCAR.cov.35.AD.women.true.cl.40.50[2], sd.MCAR.cov.40.AD.women.true.cl.40.50[2],
-                                                sd.MCAR.cov.45.AD.women.true.cl.40.50[2], sd.MCAR.cov.50.AD.women.true.cl.40.50[2],
-                                                sd.MCAR.cov.55.AD.women.true.cl.40.50[2], sd.MCAR.cov.60.AD.women.true.cl.40.50[2],
-                                                sd.MCAR.cov.65.AD.women.true.cl.40.50[2], sd.MCAR.cov.70.AD.women.true.cl.40.50[2],
-                                                sd.MCAR.cov.75.AD.women.true.cl.40.50[2], sd.MCAR.cov.80.AD.women.true.cl.40.50[2],
-                                                sd.MCAR.cov.85.AD.women.true.cl.40.50[2], sd.MCAR.cov.90.AD.women.true.cl.40.50[2],
-                                                sd.MCAR.cov.95.AD.women.true.cl.40.50[2], sd.AD.num.women.true.cov.100.40.50[2]),
-                                          
-                                          L = c(sd.MCAR.cov.35.AD.women.true.cl.40.50[1], sd.MCAR.cov.40.AD.women.true.cl.40.50[1],
-                                                sd.MCAR.cov.45.AD.women.true.cl.40.50[1], sd.MCAR.cov.50.AD.women.true.cl.40.50[1],
-                                                sd.MCAR.cov.55.AD.women.true.cl.40.50[1], sd.MCAR.cov.60.AD.women.true.cl.40.50[1],
-                                                sd.MCAR.cov.65.AD.women.true.cl.40.50[1], sd.MCAR.cov.70.AD.women.true.cl.40.50[1],
-                                                sd.MCAR.cov.75.AD.women.true.cl.40.50[1], sd.MCAR.cov.80.AD.women.true.cl.40.50[1],
-                                                sd.MCAR.cov.85.AD.women.true.cl.40.50[1], sd.MCAR.cov.90.AD.women.true.cl.40.50[1],
-                                                sd.MCAR.cov.95.AD.women.true.cl.40.50[1], sd.AD.num.women.true.cov.100.40.50[1]),
-                                          
-                                          U = c(sd.MCAR.cov.35.AD.women.true.cl.40.50[3], sd.MCAR.cov.40.AD.women.true.cl.40.50[3],
-                                                sd.MCAR.cov.45.AD.women.true.cl.40.50[3], sd.MCAR.cov.50.AD.women.true.cl.40.50[3],
-                                                sd.MCAR.cov.55.AD.women.true.cl.40.50[3], sd.MCAR.cov.60.AD.women.true.cl.40.50[3],
-                                                sd.MCAR.cov.65.AD.women.true.cl.40.50[3], sd.MCAR.cov.70.AD.women.true.cl.40.50[3],
-                                                sd.MCAR.cov.75.AD.women.true.cl.40.50[3], sd.MCAR.cov.80.AD.women.true.cl.40.50[3],
-                                                sd.MCAR.cov.85.AD.women.true.cl.40.50[3], sd.MCAR.cov.90.AD.women.true.cl.40.50[3],
-                                                sd.MCAR.cov.95.AD.women.true.cl.40.50[3], sd.AD.num.women.true.cov.100.40.50[3]))
-
-
-plot.sd.MCAR.women.true.cl.40.50 <- ggplot(sd.MCAR.women.true.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.true.cl.40.50.png",
-       plot = plot.sd.MCAR.women.true.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-sd.MCAR.men.true.cl.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                        
-                                        F = c(sd.MCAR.cov.35.AD.men.true.cl.40.50[2], sd.MCAR.cov.40.AD.men.true.cl.40.50[2],
-                                              sd.MCAR.cov.45.AD.men.true.cl.40.50[2], sd.MCAR.cov.50.AD.men.true.cl.40.50[2],
-                                              sd.MCAR.cov.55.AD.men.true.cl.40.50[2], sd.MCAR.cov.60.AD.men.true.cl.40.50[2],
-                                              sd.MCAR.cov.65.AD.men.true.cl.40.50[2], sd.MCAR.cov.70.AD.men.true.cl.40.50[2],
-                                              sd.MCAR.cov.75.AD.men.true.cl.40.50[2], sd.MCAR.cov.80.AD.men.true.cl.40.50[2],
-                                              sd.MCAR.cov.85.AD.men.true.cl.40.50[2], sd.MCAR.cov.90.AD.men.true.cl.40.50[2],
-                                              sd.MCAR.cov.95.AD.men.true.cl.40.50[2], sd.AD.num.men.true.cov.100.40.50[2]),
-                                        
-                                        L = c(sd.MCAR.cov.35.AD.men.true.cl.40.50[1], sd.MCAR.cov.40.AD.men.true.cl.40.50[1],
-                                              sd.MCAR.cov.45.AD.men.true.cl.40.50[1], sd.MCAR.cov.50.AD.men.true.cl.40.50[1],
-                                              sd.MCAR.cov.55.AD.men.true.cl.40.50[1], sd.MCAR.cov.60.AD.men.true.cl.40.50[1],
-                                              sd.MCAR.cov.65.AD.men.true.cl.40.50[1], sd.MCAR.cov.70.AD.men.true.cl.40.50[1],
-                                              sd.MCAR.cov.75.AD.men.true.cl.40.50[1], sd.MCAR.cov.80.AD.men.true.cl.40.50[1],
-                                              sd.MCAR.cov.85.AD.men.true.cl.40.50[1], sd.MCAR.cov.90.AD.men.true.cl.40.50[1],
-                                              sd.MCAR.cov.95.AD.men.true.cl.40.50[1], sd.AD.num.men.true.cov.100.40.50[1]),
-                                        
-                                        U = c(sd.MCAR.cov.35.AD.men.true.cl.40.50[3], sd.MCAR.cov.40.AD.men.true.cl.40.50[3],
-                                              sd.MCAR.cov.45.AD.men.true.cl.40.50[3], sd.MCAR.cov.50.AD.men.true.cl.40.50[3],
-                                              sd.MCAR.cov.55.AD.men.true.cl.40.50[3], sd.MCAR.cov.60.AD.men.true.cl.40.50[3],
-                                              sd.MCAR.cov.65.AD.men.true.cl.40.50[3], sd.MCAR.cov.70.AD.men.true.cl.40.50[3],
-                                              sd.MCAR.cov.75.AD.men.true.cl.40.50[3], sd.MCAR.cov.80.AD.men.true.cl.40.50[3],
-                                              sd.MCAR.cov.85.AD.men.true.cl.40.50[3], sd.MCAR.cov.90.AD.men.true.cl.40.50[3],
-                                              sd.MCAR.cov.95.AD.men.true.cl.40.50[3], sd.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.sd.MCAR.men.true.cl.40.50 <- ggplot(sd.MCAR.men.true.cl.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.men.true.cl.40.50.png",
-       plot = plot.sd.MCAR.men.true.cl.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-# AD statistics from the truth of these individuals in the entire phylogenetic tree ---------------------------
-
-
-
-# Truth from the entire phylogenetic tree
-
-
-
-# Cov 35
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.35.AD.women.tree.trans.15.25 <- AD.MCAR.cov.35[,37]
-vector.mean.MCAR.cov.35.AD.men.tree.trans.15.25 <- AD.MCAR.cov.35[,38]
-
-vector.mean.MCAR.cov.35.AD.women.tree.trans.25.40 <- AD.MCAR.cov.35[,39]
-vector.mean.MCAR.cov.35.AD.men.tree.trans.25.40 <- AD.MCAR.cov.35[,40]
-
-vector.mean.MCAR.cov.35.AD.women.tree.trans.40.50 <- AD.MCAR.cov.35[,41]
-vector.mean.MCAR.cov.35.AD.men.tree.trans.40.50 <- AD.MCAR.cov.35[,42]
-
-# Median
-
-vector.med.MCAR.cov.35.AD.women.tree.trans.15.25 <- AD.MCAR.cov.35[,43]
-vector.med.MCAR.cov.35.AD.men.tree.trans.15.25 <- AD.MCAR.cov.35[,44]
-
-vector.med.MCAR.cov.35.AD.women.tree.trans.25.40 <- AD.MCAR.cov.35[,45]
-vector.med.MCAR.cov.35.AD.men.tree.trans.25.40 <- AD.MCAR.cov.35[,46]
-
-vector.med.MCAR.cov.35.AD.women.tree.trans.40.50 <- AD.MCAR.cov.35[,47]
-vector.med.MCAR.cov.35.AD.men.tree.trans.40.50 <- AD.MCAR.cov.35[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.35.AD.women.tree.trans.15.25 <- AD.MCAR.cov.35[,49]
-vector.sd.MCAR.cov.35.AD.men.tree.trans.15.25 <- AD.MCAR.cov.35[,50]
-
-vector.sd.MCAR.cov.35.AD.women.tree.trans.25.40 <- AD.MCAR.cov.35[,51]
-vector.sd.MCAR.cov.35.AD.men.tree.trans.25.40 <- AD.MCAR.cov.35[,52]
-
-vector.sd.MCAR.cov.35.AD.women.tree.trans.40.50 <- AD.MCAR.cov.35[,53]
-vector.sd.MCAR.cov.35.AD.men.tree.trans.40.50 <- AD.MCAR.cov.35[,54]
-
-
-## Summarised
-
-# Mean
-
-mean.MCAR.cov.35.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.35[,37])
-mean.MCAR.cov.35.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.35[,38])
-
-mean.MCAR.cov.35.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.35[,39])
-mean.MCAR.cov.35.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.35[,40])
-
-mean.MCAR.cov.35.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.35[,41])
-mean.MCAR.cov.35.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.35[,42])
-
-# Median
-
-med.MCAR.cov.35.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.35[,43])
-med.MCAR.cov.35.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.35[,44])
-
-med.MCAR.cov.35.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.35[,45])
-med.MCAR.cov.35.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.35[,46])
-
-med.MCAR.cov.35.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.35[,47])
-med.MCAR.cov.35.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.35[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.35.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.35[,49])
-sd.MCAR.cov.35.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.35[,50])
-
-sd.MCAR.cov.35.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.35[,51])
-sd.MCAR.cov.35.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.35[,52])
-
-sd.MCAR.cov.35.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.35[,53])
-sd.MCAR.cov.35.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.35[,54])
-
-
-# Cov 40
-
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.40.AD.women.tree.trans.15.25 <- AD.MCAR.cov.40[,37]
-vector.mean.MCAR.cov.40.AD.men.tree.trans.15.25 <- AD.MCAR.cov.40[,38]
-
-vector.mean.MCAR.cov.40.AD.women.tree.trans.25.40 <- AD.MCAR.cov.40[,39]
-vector.mean.MCAR.cov.40.AD.men.tree.trans.25.40 <- AD.MCAR.cov.40[,40]
-
-vector.mean.MCAR.cov.40.AD.women.tree.trans.40.50 <- AD.MCAR.cov.40[,41]
-vector.mean.MCAR.cov.40.AD.men.tree.trans.40.50 <- AD.MCAR.cov.40[,42]
-
-# Median
-
-vector.med.MCAR.cov.40.AD.women.tree.trans.15.25 <- AD.MCAR.cov.40[,43]
-vector.med.MCAR.cov.40.AD.men.tree.trans.15.25 <- AD.MCAR.cov.40[,44]
-
-vector.med.MCAR.cov.40.AD.women.tree.trans.25.40 <- AD.MCAR.cov.40[,45]
-vector.med.MCAR.cov.40.AD.men.tree.trans.25.40 <- AD.MCAR.cov.40[,46]
-
-vector.med.MCAR.cov.40.AD.women.tree.trans.40.50 <- AD.MCAR.cov.40[,47]
-vector.med.MCAR.cov.40.AD.men.tree.trans.40.50 <- AD.MCAR.cov.40[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.40.AD.women.tree.trans.15.25 <- AD.MCAR.cov.40[,49]
-vector.sd.MCAR.cov.40.AD.men.tree.trans.15.25 <- AD.MCAR.cov.40[,50]
-
-vector.sd.MCAR.cov.40.AD.women.tree.trans.25.40 <- AD.MCAR.cov.40[,51]
-vector.sd.MCAR.cov.40.AD.men.tree.trans.25.40 <- AD.MCAR.cov.40[,52]
-
-vector.sd.MCAR.cov.40.AD.women.tree.trans.40.50 <- AD.MCAR.cov.40[,53]
-vector.sd.MCAR.cov.40.AD.men.tree.trans.40.50 <- AD.MCAR.cov.40[,54]
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.40.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.40[,37])
-mean.MCAR.cov.40.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.40[,38])
-
-mean.MCAR.cov.40.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.40[,39])
-mean.MCAR.cov.40.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.40[,40])
-
-mean.MCAR.cov.40.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.40[,41])
-mean.MCAR.cov.40.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.40[,42])
-
-# Median
-
-med.MCAR.cov.40.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.40[,43])
-med.MCAR.cov.40.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.40[,44])
-
-med.MCAR.cov.40.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.40[,45])
-med.MCAR.cov.40.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.40[,46])
-
-med.MCAR.cov.40.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.40[,47])
-med.MCAR.cov.40.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.40[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.40.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.40[,49])
-sd.MCAR.cov.40.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.40[,50])
-
-sd.MCAR.cov.40.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.40[,51])
-sd.MCAR.cov.40.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.40[,52])
-
-sd.MCAR.cov.40.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.40[,53])
-sd.MCAR.cov.40.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.40[,54])
-
-
-
-# Cov 45
-
-
-
-# Vector
-
-
-# Mean
-
-vector.mean.MCAR.cov.45.AD.women.tree.trans.15.25 <- AD.MCAR.cov.45[,37]
-vector.mean.MCAR.cov.45.AD.men.tree.trans.15.25 <- AD.MCAR.cov.45[,38]
-
-vector.mean.MCAR.cov.45.AD.women.tree.trans.25.40 <- AD.MCAR.cov.45[,39]
-vector.mean.MCAR.cov.45.AD.men.tree.trans.25.40 <- AD.MCAR.cov.45[,40]
-
-vector.mean.MCAR.cov.45.AD.women.tree.trans.40.50 <- AD.MCAR.cov.45[,41]
-vector.mean.MCAR.cov.45.AD.men.tree.trans.40.50 <- AD.MCAR.cov.45[,42]
-
-# Median
-
-vector.med.MCAR.cov.45.AD.women.tree.trans.15.25 <- AD.MCAR.cov.45[,43]
-vector.med.MCAR.cov.45.AD.men.tree.trans.15.25 <- AD.MCAR.cov.45[,44]
-
-vector.med.MCAR.cov.45.AD.women.tree.trans.25.40 <- AD.MCAR.cov.45[,45]
-vector.med.MCAR.cov.45.AD.men.tree.trans.25.40 <- AD.MCAR.cov.45[,46]
-
-vector.med.MCAR.cov.45.AD.women.tree.trans.40.50 <- AD.MCAR.cov.45[,47]
-vector.med.MCAR.cov.45.AD.men.tree.trans.40.50 <- AD.MCAR.cov.45[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.45.AD.women.tree.trans.15.25 <- AD.MCAR.cov.45[,49]
-vector.sd.MCAR.cov.45.AD.men.tree.trans.15.25 <- AD.MCAR.cov.45[,50]
-
-vector.sd.MCAR.cov.45.AD.women.tree.trans.25.40 <- AD.MCAR.cov.45[,51]
-vector.sd.MCAR.cov.45.AD.men.tree.trans.25.40 <- AD.MCAR.cov.45[,52]
-
-vector.sd.MCAR.cov.45.AD.women.tree.trans.40.50 <- AD.MCAR.cov.45[,53]
-vector.sd.MCAR.cov.45.AD.men.tree.trans.40.50 <- AD.MCAR.cov.45[,54]
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.45.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.45[,37])
-mean.MCAR.cov.45.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.45[,38])
-
-mean.MCAR.cov.45.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.45[,39])
-mean.MCAR.cov.45.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.45[,40])
-
-mean.MCAR.cov.45.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.45[,41])
-mean.MCAR.cov.45.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.45[,42])
-
-# Median
-
-med.MCAR.cov.45.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.45[,43])
-med.MCAR.cov.45.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.45[,44])
-
-med.MCAR.cov.45.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.45[,45])
-med.MCAR.cov.45.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.45[,46])
-
-med.MCAR.cov.45.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.45[,47])
-med.MCAR.cov.45.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.45[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.45.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.45[,49])
-sd.MCAR.cov.45.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.45[,50])
-
-sd.MCAR.cov.45.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.45[,51])
-sd.MCAR.cov.45.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.45[,52])
-
-sd.MCAR.cov.45.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.45[,53])
-sd.MCAR.cov.45.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.45[,54])
-
-
-# Cov 50
-
-
-## Vector
-
-
-# Mean
-
-vector.mean.MCAR.cov.50.AD.women.tree.trans.15.25 <- AD.MCAR.cov.50[,37]
-vector.mean.MCAR.cov.50.AD.men.tree.trans.15.25 <- AD.MCAR.cov.50[,38]
-
-vector.mean.MCAR.cov.50.AD.women.tree.trans.25.40 <- AD.MCAR.cov.50[,39]
-vector.mean.MCAR.cov.50.AD.men.tree.trans.25.40 <- AD.MCAR.cov.50[,40]
-
-vector.mean.MCAR.cov.50.AD.women.tree.trans.40.50 <- AD.MCAR.cov.50[,41]
-vector.mean.MCAR.cov.50.AD.men.tree.trans.40.50 <- AD.MCAR.cov.50[,42]
-
-# Median
-
-vector.med.MCAR.cov.50.AD.women.tree.trans.15.25 <- AD.MCAR.cov.50[,43]
-vector.med.MCAR.cov.50.AD.men.tree.trans.15.25 <- AD.MCAR.cov.50[,44]
-
-vector.med.MCAR.cov.50.AD.women.tree.trans.25.40 <- AD.MCAR.cov.50[,45]
-vector.med.MCAR.cov.50.AD.men.tree.trans.25.40 <- AD.MCAR.cov.50[,46]
-
-vector.med.MCAR.cov.50.AD.women.tree.trans.40.50 <- AD.MCAR.cov.50[,47]
-vector.med.MCAR.cov.50.AD.men.tree.trans.40.50 <- AD.MCAR.cov.50[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.50.AD.women.tree.trans.15.25 <- AD.MCAR.cov.50[,49]
-vector.sd.MCAR.cov.50.AD.men.tree.trans.15.25 <- AD.MCAR.cov.50[,50]
-
-vector.sd.MCAR.cov.50.AD.women.tree.trans.25.40 <- AD.MCAR.cov.50[,51]
-vector.sd.MCAR.cov.50.AD.men.tree.trans.25.40 <- AD.MCAR.cov.50[,52]
-
-vector.sd.MCAR.cov.50.AD.women.tree.trans.40.50 <- AD.MCAR.cov.50[,53]
-vector.sd.MCAR.cov.50.AD.men.tree.trans.40.50 <- AD.MCAR.cov.50[,54]
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.50.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.50[,37])
-mean.MCAR.cov.50.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.50[,38])
-
-mean.MCAR.cov.50.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.50[,39])
-mean.MCAR.cov.50.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.50[,40])
-
-mean.MCAR.cov.50.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.50[,41])
-mean.MCAR.cov.50.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.50[,42])
-
-# Median
-
-med.MCAR.cov.50.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.50[,43])
-med.MCAR.cov.50.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.50[,44])
-
-med.MCAR.cov.50.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.50[,45])
-med.MCAR.cov.50.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.50[,46])
-
-med.MCAR.cov.50.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.50[,47])
-med.MCAR.cov.50.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.50[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.50.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.50[,49])
-sd.MCAR.cov.50.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.50[,50])
-
-sd.MCAR.cov.50.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.50[,51])
-sd.MCAR.cov.50.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.50[,52])
-
-sd.MCAR.cov.50.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.50[,53])
-sd.MCAR.cov.50.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.50[,54])
-
-
-
-# Cov 55
-
-
-
-## Vector
-
-
-# Mean
-
-vector.mean.MCAR.cov.55.AD.women.tree.trans.15.25 <- AD.MCAR.cov.55[,37]
-vector.mean.MCAR.cov.55.AD.men.tree.trans.15.25 <- AD.MCAR.cov.55[,38]
-
-vector.mean.MCAR.cov.55.AD.women.tree.trans.25.40 <- AD.MCAR.cov.55[,39]
-vector.mean.MCAR.cov.55.AD.men.tree.trans.25.40 <- AD.MCAR.cov.55[,40]
-
-vector.mean.MCAR.cov.55.AD.women.tree.trans.40.50 <- AD.MCAR.cov.55[,41]
-vector.mean.MCAR.cov.55.AD.men.tree.trans.40.50 <- AD.MCAR.cov.55[,42]
-
-# Median
-
-vector.med.MCAR.cov.55.AD.women.tree.trans.15.25 <- AD.MCAR.cov.55[,43]
-vector.med.MCAR.cov.55.AD.men.tree.trans.15.25 <- AD.MCAR.cov.55[,44]
-
-vector.med.MCAR.cov.55.AD.women.tree.trans.25.40 <- AD.MCAR.cov.55[,45]
-vector.med.MCAR.cov.55.AD.men.tree.trans.25.40 <- AD.MCAR.cov.55[,46]
-
-vector.med.MCAR.cov.55.AD.women.tree.trans.40.50 <- AD.MCAR.cov.55[,47]
-vector.med.MCAR.cov.55.AD.men.tree.trans.40.50 <- AD.MCAR.cov.55[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.55.AD.women.tree.trans.15.25 <- AD.MCAR.cov.55[,49]
-vector.sd.MCAR.cov.55.AD.men.tree.trans.15.25 <- AD.MCAR.cov.55[,50]
-
-vector.sd.MCAR.cov.55.AD.women.tree.trans.25.40 <- AD.MCAR.cov.55[,51]
-vector.sd.MCAR.cov.55.AD.men.tree.trans.25.40 <- AD.MCAR.cov.55[,52]
-
-vector.sd.MCAR.cov.55.AD.women.tree.trans.40.50 <- AD.MCAR.cov.55[,53]
-vector.sd.MCAR.cov.55.AD.men.tree.trans.40.50 <- AD.MCAR.cov.55[,54]
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.55.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.55[,37])
-mean.MCAR.cov.55.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.55[,38])
-
-mean.MCAR.cov.55.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.55[,39])
-mean.MCAR.cov.55.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.55[,40])
-
-mean.MCAR.cov.55.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.55[,41])
-mean.MCAR.cov.55.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.55[,42])
-
-# Median
-
-med.MCAR.cov.55.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.55[,43])
-med.MCAR.cov.55.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.55[,44])
-
-med.MCAR.cov.55.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.55[,45])
-med.MCAR.cov.55.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.55[,46])
-
-med.MCAR.cov.55.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.55[,47])
-med.MCAR.cov.55.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.55[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.55.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.55[,49])
-sd.MCAR.cov.55.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.55[,50])
-
-sd.MCAR.cov.55.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.55[,51])
-sd.MCAR.cov.55.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.55[,52])
-
-sd.MCAR.cov.55.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.55[,53])
-sd.MCAR.cov.55.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.55[,54])
-
-
-
-# Cov 60
-
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.60.AD.women.tree.trans.15.25 <- AD.MCAR.cov.60[,37]
-vector.mean.MCAR.cov.60.AD.men.tree.trans.15.25 <- AD.MCAR.cov.60[,38]
-
-vector.mean.MCAR.cov.60.AD.women.tree.trans.25.40 <- AD.MCAR.cov.60[,39]
-vector.mean.MCAR.cov.60.AD.men.tree.trans.25.40 <- AD.MCAR.cov.60[,40]
-
-vector.mean.MCAR.cov.60.AD.women.tree.trans.40.50 <- AD.MCAR.cov.60[,41]
-vector.mean.MCAR.cov.60.AD.men.tree.trans.40.50 <- AD.MCAR.cov.60[,42]
-
-# Median
-
-vector.med.MCAR.cov.60.AD.women.tree.trans.15.25 <- AD.MCAR.cov.60[,43]
-vector.med.MCAR.cov.60.AD.men.tree.trans.15.25 <- AD.MCAR.cov.60[,44]
-
-vector.med.MCAR.cov.60.AD.women.tree.trans.25.40 <- AD.MCAR.cov.60[,45]
-vector.med.MCAR.cov.60.AD.men.tree.trans.25.40 <- AD.MCAR.cov.60[,46]
-
-vector.med.MCAR.cov.60.AD.women.tree.trans.40.50 <- AD.MCAR.cov.60[,47]
-vector.med.MCAR.cov.60.AD.men.tree.trans.40.50 <- AD.MCAR.cov.60[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.60.AD.women.tree.trans.15.25 <- AD.MCAR.cov.60[,49]
-vector.sd.MCAR.cov.60.AD.men.tree.trans.15.25 <- AD.MCAR.cov.60[,50]
-
-vector.sd.MCAR.cov.60.AD.women.tree.trans.25.40 <- AD.MCAR.cov.60[,51]
-vector.sd.MCAR.cov.60.AD.men.tree.trans.25.40 <- AD.MCAR.cov.60[,52]
-
-vector.sd.MCAR.cov.60.AD.women.tree.trans.40.50 <- AD.MCAR.cov.60[,53]
-vector.sd.MCAR.cov.60.AD.men.tree.trans.40.50 <- AD.MCAR.cov.60[,54]
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.60.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.60[,37])
-mean.MCAR.cov.60.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.60[,38])
-
-mean.MCAR.cov.60.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.60[,39])
-mean.MCAR.cov.60.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.60[,40])
-
-mean.MCAR.cov.60.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.60[,41])
-mean.MCAR.cov.60.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.60[,42])
-
-# Median
-
-med.MCAR.cov.60.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.60[,43])
-med.MCAR.cov.60.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.60[,44])
-
-med.MCAR.cov.60.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.60[,45])
-med.MCAR.cov.60.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.60[,46])
-
-med.MCAR.cov.60.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.60[,47])
-med.MCAR.cov.60.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.60[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.60.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.60[,49])
-sd.MCAR.cov.60.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.60[,50])
-
-sd.MCAR.cov.60.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.60[,51])
-sd.MCAR.cov.60.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.60[,52])
-
-sd.MCAR.cov.60.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.60[,53])
-sd.MCAR.cov.60.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.60[,54])
-
-
-
-# Cov 65
-
-
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.65.AD.women.tree.trans.15.25 <- AD.MCAR.cov.65[,37]
-vector.mean.MCAR.cov.65.AD.men.tree.trans.15.25 <- AD.MCAR.cov.65[,38]
-
-vector.mean.MCAR.cov.65.AD.women.tree.trans.25.40 <- AD.MCAR.cov.65[,39]
-vector.mean.MCAR.cov.65.AD.men.tree.trans.25.40 <- AD.MCAR.cov.65[,40]
-
-vector.mean.MCAR.cov.65.AD.women.tree.trans.40.50 <- AD.MCAR.cov.65[,41]
-vector.mean.MCAR.cov.65.AD.men.tree.trans.40.50 <- AD.MCAR.cov.65[,42]
-
-# Median
-
-vector.med.MCAR.cov.65.AD.women.tree.trans.15.25 <- AD.MCAR.cov.65[,43]
-vector.med.MCAR.cov.65.AD.men.tree.trans.15.25 <- AD.MCAR.cov.65[,44]
-
-vector.med.MCAR.cov.65.AD.women.tree.trans.25.40 <- AD.MCAR.cov.65[,45]
-vector.med.MCAR.cov.65.AD.men.tree.trans.25.40 <- AD.MCAR.cov.65[,46]
-
-vector.med.MCAR.cov.65.AD.women.tree.trans.40.50 <- AD.MCAR.cov.65[,47]
-vector.med.MCAR.cov.65.AD.men.tree.trans.40.50 <- AD.MCAR.cov.65[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.65.AD.women.tree.trans.15.25 <- AD.MCAR.cov.65[,49]
-vector.sd.MCAR.cov.65.AD.men.tree.trans.15.25 <- AD.MCAR.cov.65[,50]
-
-vector.sd.MCAR.cov.65.AD.women.tree.trans.25.40 <- AD.MCAR.cov.65[,51]
-vector.sd.MCAR.cov.65.AD.men.tree.trans.25.40 <- AD.MCAR.cov.65[,52]
-
-vector.sd.MCAR.cov.65.AD.women.tree.trans.40.50 <- AD.MCAR.cov.65[,53]
-vector.sd.MCAR.cov.65.AD.men.tree.trans.40.50 <- AD.MCAR.cov.65[,54]
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.65.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.65[,37])
-mean.MCAR.cov.65.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.65[,38])
-
-mean.MCAR.cov.65.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.65[,39])
-mean.MCAR.cov.65.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.65[,40])
-
-mean.MCAR.cov.65.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.65[,41])
-mean.MCAR.cov.65.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.65[,42])
-
-# Median
-
-med.MCAR.cov.65.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.65[,43])
-med.MCAR.cov.65.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.65[,44])
-
-med.MCAR.cov.65.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.65[,45])
-med.MCAR.cov.65.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.65[,46])
-
-med.MCAR.cov.65.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.65[,47])
-med.MCAR.cov.65.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.65[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.65.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.65[,49])
-sd.MCAR.cov.65.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.65[,50])
-
-sd.MCAR.cov.65.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.65[,51])
-sd.MCAR.cov.65.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.65[,52])
-
-sd.MCAR.cov.65.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.65[,53])
-sd.MCAR.cov.65.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.65[,54])
-
-
-
-# Cov 70
-
-
-
-## Vector
-
-
-# Mean
-
-vector.mean.MCAR.cov.70.AD.women.tree.trans.15.25 <- AD.MCAR.cov.70[,37]
-vector.mean.MCAR.cov.70.AD.men.tree.trans.15.25 <- AD.MCAR.cov.70[,38]
-
-vector.mean.MCAR.cov.70.AD.women.tree.trans.25.40 <- AD.MCAR.cov.70[,39]
-vector.mean.MCAR.cov.70.AD.men.tree.trans.25.40 <- AD.MCAR.cov.70[,40]
-
-vector.mean.MCAR.cov.70.AD.women.tree.trans.40.50 <- AD.MCAR.cov.70[,41]
-vector.mean.MCAR.cov.70.AD.men.tree.trans.40.50 <- AD.MCAR.cov.70[,42]
-
-# Median
-
-vector.med.MCAR.cov.70.AD.women.tree.trans.15.25 <- AD.MCAR.cov.70[,43]
-vector.med.MCAR.cov.70.AD.men.tree.trans.15.25 <- AD.MCAR.cov.70[,44]
-
-vector.med.MCAR.cov.70.AD.women.tree.trans.25.40 <- AD.MCAR.cov.70[,45]
-vector.med.MCAR.cov.70.AD.men.tree.trans.25.40 <- AD.MCAR.cov.70[,46]
-
-vector.med.MCAR.cov.70.AD.women.tree.trans.40.50 <- AD.MCAR.cov.70[,47]
-vector.med.MCAR.cov.70.AD.men.tree.trans.40.50 <- AD.MCAR.cov.70[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.70.AD.women.tree.trans.15.25 <- AD.MCAR.cov.70[,49]
-vector.sd.MCAR.cov.70.AD.men.tree.trans.15.25 <- AD.MCAR.cov.70[,50]
-
-vector.sd.MCAR.cov.70.AD.women.tree.trans.25.40 <- AD.MCAR.cov.70[,51]
-vector.sd.MCAR.cov.70.AD.men.tree.trans.25.40 <- AD.MCAR.cov.70[,52]
-
-vector.sd.MCAR.cov.70.AD.women.tree.trans.40.50 <- AD.MCAR.cov.70[,53]
-vector.sd.MCAR.cov.70.AD.men.tree.trans.40.50 <- AD.MCAR.cov.70[,54]
-
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.70.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.70[,37])
-mean.MCAR.cov.70.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.70[,38])
-
-mean.MCAR.cov.70.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.70[,39])
-mean.MCAR.cov.70.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.70[,40])
-
-mean.MCAR.cov.70.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.70[,41])
-mean.MCAR.cov.70.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.70[,42])
-
-# Median
-
-med.MCAR.cov.70.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.70[,43])
-med.MCAR.cov.70.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.70[,44])
-
-med.MCAR.cov.70.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.70[,45])
-med.MCAR.cov.70.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.70[,46])
-
-med.MCAR.cov.70.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.70[,47])
-med.MCAR.cov.70.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.70[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.70.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.70[,49])
-sd.MCAR.cov.70.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.70[,50])
-
-sd.MCAR.cov.70.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.70[,51])
-sd.MCAR.cov.70.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.70[,52])
-
-sd.MCAR.cov.70.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.70[,53])
-sd.MCAR.cov.70.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.70[,54])
-
-
-
-# Cov 75
-
-
-## Vector
-
-
-# Mean
-
-vector.mean.MCAR.cov.75.AD.women.tree.trans.15.25 <- AD.MCAR.cov.75[,37]
-vector.mean.MCAR.cov.75.AD.men.tree.trans.15.25 <- AD.MCAR.cov.75[,38]
-
-vector.mean.MCAR.cov.75.AD.women.tree.trans.25.40 <- AD.MCAR.cov.75[,39]
-vector.mean.MCAR.cov.75.AD.men.tree.trans.25.40 <- AD.MCAR.cov.75[,40]
-
-vector.mean.MCAR.cov.75.AD.women.tree.trans.40.50 <- AD.MCAR.cov.75[,41]
-vector.mean.MCAR.cov.75.AD.men.tree.trans.40.50 <- AD.MCAR.cov.75[,42]
-
-# Median
-
-vector.med.MCAR.cov.75.AD.women.tree.trans.15.25 <- AD.MCAR.cov.75[,43]
-vector.med.MCAR.cov.75.AD.men.tree.trans.15.25 <- AD.MCAR.cov.75[,44]
-
-vector.med.MCAR.cov.75.AD.women.tree.trans.25.40 <- AD.MCAR.cov.75[,45]
-vector.med.MCAR.cov.75.AD.men.tree.trans.25.40 <- AD.MCAR.cov.75[,46]
-
-vector.med.MCAR.cov.75.AD.women.tree.trans.40.50 <- AD.MCAR.cov.75[,47]
-vector.med.MCAR.cov.75.AD.men.tree.trans.40.50 <- AD.MCAR.cov.75[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.75.AD.women.tree.trans.15.25 <- AD.MCAR.cov.75[,49]
-vector.sd.MCAR.cov.75.AD.men.tree.trans.15.25 <- AD.MCAR.cov.75[,50]
-
-vector.sd.MCAR.cov.75.AD.women.tree.trans.25.40 <- AD.MCAR.cov.75[,51]
-vector.sd.MCAR.cov.75.AD.men.tree.trans.25.40 <- AD.MCAR.cov.75[,52]
-
-vector.sd.MCAR.cov.75.AD.women.tree.trans.40.50 <- AD.MCAR.cov.75[,53]
-vector.sd.MCAR.cov.75.AD.men.tree.trans.40.50 <- AD.MCAR.cov.75[,54]
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.75.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.75[,37])
-mean.MCAR.cov.75.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.75[,38])
-
-mean.MCAR.cov.75.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.75[,39])
-mean.MCAR.cov.75.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.75[,40])
-
-mean.MCAR.cov.75.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.75[,41])
-mean.MCAR.cov.75.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.75[,42])
-
-# Median
-
-med.MCAR.cov.75.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.75[,43])
-med.MCAR.cov.75.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.75[,44])
-
-med.MCAR.cov.75.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.75[,45])
-med.MCAR.cov.75.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.75[,46])
-
-med.MCAR.cov.75.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.75[,47])
-med.MCAR.cov.75.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.75[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.75.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.75[,49])
-sd.MCAR.cov.75.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.75[,50])
-
-sd.MCAR.cov.75.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.75[,51])
-sd.MCAR.cov.75.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.75[,52])
-
-sd.MCAR.cov.75.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.75[,53])
-sd.MCAR.cov.75.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.75[,54])
-
-
-
-# Cov 80
-
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.80.AD.women.tree.trans.15.25 <- AD.MCAR.cov.80[,37]
-vector.mean.MCAR.cov.80.AD.men.tree.trans.15.25 <- AD.MCAR.cov.80[,38]
-
-vector.mean.MCAR.cov.80.AD.women.tree.trans.25.40 <- AD.MCAR.cov.80[,39]
-vector.mean.MCAR.cov.80.AD.men.tree.trans.25.40 <- AD.MCAR.cov.80[,40]
-
-vector.mean.MCAR.cov.80.AD.women.tree.trans.40.50 <- AD.MCAR.cov.80[,41]
-vector.mean.MCAR.cov.80.AD.men.tree.trans.40.50 <- AD.MCAR.cov.80[,42]
-
-# Median
-
-vector.med.MCAR.cov.80.AD.women.tree.trans.15.25 <- AD.MCAR.cov.80[,43]
-vector.med.MCAR.cov.80.AD.men.tree.trans.15.25 <- AD.MCAR.cov.80[,44]
-
-vector.med.MCAR.cov.80.AD.women.tree.trans.25.40 <- AD.MCAR.cov.80[,45]
-vector.med.MCAR.cov.80.AD.men.tree.trans.25.40 <- AD.MCAR.cov.80[,46]
-
-vector.med.MCAR.cov.80.AD.women.tree.trans.40.50 <- AD.MCAR.cov.80[,47]
-vector.med.MCAR.cov.80.AD.men.tree.trans.40.50 <- AD.MCAR.cov.80[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.80.AD.women.tree.trans.15.25 <- AD.MCAR.cov.80[,49]
-vector.sd.MCAR.cov.80.AD.men.tree.trans.15.25 <- AD.MCAR.cov.80[,50]
-
-vector.sd.MCAR.cov.80.AD.women.tree.trans.25.40 <- AD.MCAR.cov.80[,51]
-vector.sd.MCAR.cov.80.AD.men.tree.trans.25.40 <- AD.MCAR.cov.80[,52]
-
-vector.sd.MCAR.cov.80.AD.women.tree.trans.40.50 <- AD.MCAR.cov.80[,53]
-vector.sd.MCAR.cov.80.AD.men.tree.trans.40.50 <- AD.MCAR.cov.80[,54]
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.80.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.80[,37])
-mean.MCAR.cov.80.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.80[,38])
-
-mean.MCAR.cov.80.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.80[,39])
-mean.MCAR.cov.80.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.80[,40])
-
-mean.MCAR.cov.80.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.80[,41])
-mean.MCAR.cov.80.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.80[,42])
-
-# Median
-
-med.MCAR.cov.80.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.80[,43])
-med.MCAR.cov.80.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.80[,44])
-
-med.MCAR.cov.80.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.80[,45])
-med.MCAR.cov.80.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.80[,46])
-
-med.MCAR.cov.80.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.80[,47])
-med.MCAR.cov.80.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.80[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.80.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.80[,49])
-sd.MCAR.cov.80.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.80[,50])
-
-sd.MCAR.cov.80.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.80[,51])
-sd.MCAR.cov.80.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.80[,52])
-
-sd.MCAR.cov.80.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.80[,53])
-sd.MCAR.cov.80.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.80[,54])
-
-
-
-# Cov 85
-
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.85.AD.women.tree.trans.15.25 <- AD.MCAR.cov.85[,37]
-vector.mean.MCAR.cov.85.AD.men.tree.trans.15.25 <- AD.MCAR.cov.85[,38]
-
-vector.mean.MCAR.cov.85.AD.women.tree.trans.25.40 <- AD.MCAR.cov.85[,39]
-vector.mean.MCAR.cov.85.AD.men.tree.trans.25.40 <- AD.MCAR.cov.85[,40]
-
-vector.mean.MCAR.cov.85.AD.women.tree.trans.40.50 <- AD.MCAR.cov.85[,41]
-vector.mean.MCAR.cov.85.AD.men.tree.trans.40.50 <- AD.MCAR.cov.85[,42]
-
-# Median
-
-vector.med.MCAR.cov.85.AD.women.tree.trans.15.25 <- AD.MCAR.cov.85[,43]
-vector.med.MCAR.cov.85.AD.men.tree.trans.15.25 <- AD.MCAR.cov.85[,44]
-
-vector.med.MCAR.cov.85.AD.women.tree.trans.25.40 <- AD.MCAR.cov.85[,45]
-vector.med.MCAR.cov.85.AD.men.tree.trans.25.40 <- AD.MCAR.cov.85[,46]
-
-vector.med.MCAR.cov.85.AD.women.tree.trans.40.50 <- AD.MCAR.cov.85[,47]
-vector.med.MCAR.cov.85.AD.men.tree.trans.40.50 <- AD.MCAR.cov.85[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.85.AD.women.tree.trans.15.25 <- AD.MCAR.cov.85[,49]
-vector.sd.MCAR.cov.85.AD.men.tree.trans.15.25 <- AD.MCAR.cov.85[,50]
-
-vector.sd.MCAR.cov.85.AD.women.tree.trans.25.40 <- AD.MCAR.cov.85[,51]
-vector.sd.MCAR.cov.85.AD.men.tree.trans.25.40 <- AD.MCAR.cov.85[,52]
-
-vector.sd.MCAR.cov.85.AD.women.tree.trans.40.50 <- AD.MCAR.cov.85[,53]
-vector.sd.MCAR.cov.85.AD.men.tree.trans.40.50 <- AD.MCAR.cov.85[,54]
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.85.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.85[,37])
-mean.MCAR.cov.85.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.85[,38])
-
-mean.MCAR.cov.85.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.85[,39])
-mean.MCAR.cov.85.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.85[,40])
-
-mean.MCAR.cov.85.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.85[,41])
-mean.MCAR.cov.85.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.85[,42])
-
-# Median
-
-med.MCAR.cov.85.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.85[,43])
-med.MCAR.cov.85.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.85[,44])
-
-med.MCAR.cov.85.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.85[,45])
-med.MCAR.cov.85.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.85[,46])
-
-med.MCAR.cov.85.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.85[,47])
-med.MCAR.cov.85.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.85[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.85.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.85[,49])
-sd.MCAR.cov.85.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.85[,50])
-
-sd.MCAR.cov.85.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.85[,51])
-sd.MCAR.cov.85.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.85[,52])
-
-sd.MCAR.cov.85.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.85[,53])
-sd.MCAR.cov.85.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.85[,54])
-
-
-
-# Cov 90
-
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.90.AD.women.tree.trans.15.25 <- AD.MCAR.cov.90[,37]
-vector.mean.MCAR.cov.90.AD.men.tree.trans.15.25 <- AD.MCAR.cov.90[,38]
-
-vector.mean.MCAR.cov.90.AD.women.tree.trans.25.40 <- AD.MCAR.cov.90[,39]
-vector.mean.MCAR.cov.90.AD.men.tree.trans.25.40 <- AD.MCAR.cov.90[,40]
-
-vector.mean.MCAR.cov.90.AD.women.tree.trans.40.50 <- AD.MCAR.cov.90[,41]
-vector.mean.MCAR.cov.90.AD.men.tree.trans.40.50 <- AD.MCAR.cov.90[,42]
-
-# Median
-
-vector.med.MCAR.cov.90.AD.women.tree.trans.15.25 <- AD.MCAR.cov.90[,43]
-vector.med.MCAR.cov.90.AD.men.tree.trans.15.25 <- AD.MCAR.cov.90[,44]
-
-vector.med.MCAR.cov.90.AD.women.tree.trans.25.40 <- AD.MCAR.cov.90[,45]
-vector.med.MCAR.cov.90.AD.men.tree.trans.25.40 <- AD.MCAR.cov.90[,46]
-
-vector.med.MCAR.cov.90.AD.women.tree.trans.40.50 <- AD.MCAR.cov.90[,47]
-vector.med.MCAR.cov.90.AD.men.tree.trans.40.50 <- AD.MCAR.cov.90[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.90.AD.women.tree.trans.15.25 <- AD.MCAR.cov.90[,49]
-vector.sd.MCAR.cov.90.AD.men.tree.trans.15.25 <- AD.MCAR.cov.90[,50]
-
-vector.sd.MCAR.cov.90.AD.women.tree.trans.25.40 <- AD.MCAR.cov.90[,51]
-vector.sd.MCAR.cov.90.AD.men.tree.trans.25.40 <- AD.MCAR.cov.90[,52]
-
-vector.sd.MCAR.cov.90.AD.women.tree.trans.40.50 <- AD.MCAR.cov.90[,53]
-vector.sd.MCAR.cov.90.AD.men.tree.trans.40.50 <- AD.MCAR.cov.90[,54]
-
-
-
-## Summarised
-
-
-# Mean
-
-mean.MCAR.cov.90.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.90[,37])
-mean.MCAR.cov.90.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.90[,38])
-
-mean.MCAR.cov.90.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.90[,39])
-mean.MCAR.cov.90.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.90[,40])
-
-mean.MCAR.cov.90.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.90[,41])
-mean.MCAR.cov.90.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.90[,42])
-
-# Median
-
-med.MCAR.cov.90.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.90[,43])
-med.MCAR.cov.90.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.90[,44])
-
-med.MCAR.cov.90.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.90[,45])
-med.MCAR.cov.90.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.90[,46])
-
-med.MCAR.cov.90.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.90[,47])
-med.MCAR.cov.90.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.90[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.90.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.90[,49])
-sd.MCAR.cov.90.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.90[,50])
-
-sd.MCAR.cov.90.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.90[,51])
-sd.MCAR.cov.90.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.90[,52])
-
-sd.MCAR.cov.90.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.90[,53])
-sd.MCAR.cov.90.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.90[,54])
-
-
-
-
-# Cov 95
-
-
-## Vector
-
-# Mean
-
-vector.mean.MCAR.cov.95.AD.women.tree.trans.15.25 <- AD.MCAR.cov.95[,37]
-vector.mean.MCAR.cov.95.AD.men.tree.trans.15.25 <- AD.MCAR.cov.95[,38]
-
-vector.mean.MCAR.cov.95.AD.women.tree.trans.25.40 <- AD.MCAR.cov.95[,39]
-vector.mean.MCAR.cov.95.AD.men.tree.trans.25.40 <- AD.MCAR.cov.95[,40]
-
-vector.mean.MCAR.cov.95.AD.women.tree.trans.40.50 <- AD.MCAR.cov.95[,41]
-vector.mean.MCAR.cov.95.AD.men.tree.trans.40.50 <- AD.MCAR.cov.95[,42]
-
-# Median
-
-vector.med.MCAR.cov.95.AD.women.tree.trans.15.25 <- AD.MCAR.cov.95[,43]
-vector.med.MCAR.cov.95.AD.men.tree.trans.15.25 <- AD.MCAR.cov.95[,44]
-
-vector.med.MCAR.cov.95.AD.women.tree.trans.25.40 <- AD.MCAR.cov.95[,45]
-vector.med.MCAR.cov.95.AD.men.tree.trans.25.40 <- AD.MCAR.cov.95[,46]
-
-vector.med.MCAR.cov.95.AD.women.tree.trans.40.50 <- AD.MCAR.cov.95[,47]
-vector.med.MCAR.cov.95.AD.men.tree.trans.40.50 <- AD.MCAR.cov.95[,48]
-
-# Standard deviation
-
-vector.sd.MCAR.cov.95.AD.women.tree.trans.15.25 <- AD.MCAR.cov.95[,49]
-vector.sd.MCAR.cov.95.AD.men.tree.trans.15.25 <- AD.MCAR.cov.95[,50]
-
-vector.sd.MCAR.cov.95.AD.women.tree.trans.25.40 <- AD.MCAR.cov.95[,51]
-vector.sd.MCAR.cov.95.AD.men.tree.trans.25.40 <- AD.MCAR.cov.95[,52]
-
-vector.sd.MCAR.cov.95.AD.women.tree.trans.40.50 <- AD.MCAR.cov.95[,53]
-vector.sd.MCAR.cov.95.AD.men.tree.trans.40.50 <- AD.MCAR.cov.95[,54]
-
-
-## Summarised
-
-# Mean
-
-mean.MCAR.cov.95.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.95[,37])
-mean.MCAR.cov.95.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.95[,38])
-
-mean.MCAR.cov.95.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.95[,39])
-mean.MCAR.cov.95.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.95[,40])
-
-mean.MCAR.cov.95.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.95[,41])
-mean.MCAR.cov.95.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.95[,42])
-
-# Median
-
-med.MCAR.cov.95.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.95[,43])
-med.MCAR.cov.95.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.95[,44])
-
-med.MCAR.cov.95.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.95[,45])
-med.MCAR.cov.95.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.95[,46])
-
-med.MCAR.cov.95.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.95[,47])
-med.MCAR.cov.95.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.95[,48])
-
-# Standard deviation
-
-sd.MCAR.cov.95.AD.women.tree.trans.15.25 <- quant.med(AD.MCAR.cov.95[,49])
-sd.MCAR.cov.95.AD.men.tree.trans.15.25 <- quant.med(AD.MCAR.cov.95[,50])
-
-sd.MCAR.cov.95.AD.women.tree.trans.25.40 <- quant.med(AD.MCAR.cov.95[,51])
-sd.MCAR.cov.95.AD.men.tree.trans.25.40 <- quant.med(AD.MCAR.cov.95[,52])
-
-sd.MCAR.cov.95.AD.women.tree.trans.40.50 <- quant.med(AD.MCAR.cov.95[,53])
-sd.MCAR.cov.95.AD.men.tree.trans.40.50 <- quant.med(AD.MCAR.cov.95[,54])
-
-
-
-# Visualisation of AD statistics from the truth of these individuals in the entire phylogenetic tree ---------------------------
-
-
-
-
-## Mean
-
-
-
-# Women 15.25
-
-mean.MCAR.women.tree.trans.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                               
-                                               F = c(mean.MCAR.cov.35.AD.women.tree.trans.15.25[2], mean.MCAR.cov.40.AD.women.tree.trans.15.25[2],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.15.25[2], mean.MCAR.cov.50.AD.women.tree.trans.15.25[2],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.15.25[2], mean.MCAR.cov.60.AD.women.tree.trans.15.25[2],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.15.25[2], mean.MCAR.cov.70.AD.women.tree.trans.15.25[2],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.15.25[2], mean.MCAR.cov.80.AD.women.tree.trans.15.25[2],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.15.25[2], mean.MCAR.cov.90.AD.women.tree.trans.15.25[2],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.15.25[2], mean.AD.num.women.true.cov.100.15.25[2]),
-                                               
-                                               L = c(mean.MCAR.cov.35.AD.women.tree.trans.15.25[1], mean.MCAR.cov.40.AD.women.tree.trans.15.25[1],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.15.25[1], mean.MCAR.cov.50.AD.women.tree.trans.15.25[1],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.15.25[1], mean.MCAR.cov.60.AD.women.tree.trans.15.25[1],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.15.25[1], mean.MCAR.cov.70.AD.women.tree.trans.15.25[1],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.15.25[1], mean.MCAR.cov.80.AD.women.tree.trans.15.25[1],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.15.25[1], mean.MCAR.cov.90.AD.women.tree.trans.15.25[1],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.15.25[1], mean.AD.num.women.true.cov.100.15.25[1]),
-                                               
-                                               U = c(mean.MCAR.cov.35.AD.women.tree.trans.15.25[3], mean.MCAR.cov.40.AD.women.tree.trans.15.25[3],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.15.25[3], mean.MCAR.cov.50.AD.women.tree.trans.15.25[3],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.15.25[3], mean.MCAR.cov.60.AD.women.tree.trans.15.25[3],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.15.25[3], mean.MCAR.cov.70.AD.women.tree.trans.15.25[3],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.15.25[3], mean.MCAR.cov.80.AD.women.tree.trans.15.25[3],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.15.25[3], mean.MCAR.cov.90.AD.women.tree.trans.15.25[3],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.15.25[3], mean.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.mean.MCAR.women.tree.trans.15.25 <- ggplot(mean.MCAR.women.tree.trans.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.women.tree.trans.15.25.png",
-       plot = plot.mean.MCAR.women.tree.trans.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-mean.MCAR.men.tree.trans.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                             
-                                             F = c(mean.MCAR.cov.35.AD.men.tree.trans.15.25[2], mean.MCAR.cov.40.AD.men.tree.trans.15.25[2],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.15.25[2], mean.MCAR.cov.50.AD.men.tree.trans.15.25[2],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.15.25[2], mean.MCAR.cov.60.AD.men.tree.trans.15.25[2],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.15.25[2], mean.MCAR.cov.70.AD.men.tree.trans.15.25[2],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.15.25[2], mean.MCAR.cov.80.AD.men.tree.trans.15.25[2],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.15.25[2], mean.MCAR.cov.90.AD.men.tree.trans.15.25[2],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.15.25[2], mean.AD.num.men.true.cov.100.15.25[2]),
-                                             
-                                             L = c(mean.MCAR.cov.35.AD.men.tree.trans.15.25[1], mean.MCAR.cov.40.AD.men.tree.trans.15.25[1],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.15.25[1], mean.MCAR.cov.50.AD.men.tree.trans.15.25[1],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.15.25[1], mean.MCAR.cov.60.AD.men.tree.trans.15.25[1],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.15.25[1], mean.MCAR.cov.70.AD.men.tree.trans.15.25[1],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.15.25[1], mean.MCAR.cov.80.AD.men.tree.trans.15.25[1],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.15.25[1], mean.MCAR.cov.90.AD.men.tree.trans.15.25[1],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.15.25[1], mean.AD.num.men.true.cov.100.15.25[1]),
-                                             
-                                             U = c(mean.MCAR.cov.35.AD.men.tree.trans.15.25[3], mean.MCAR.cov.40.AD.men.tree.trans.15.25[3],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.15.25[3], mean.MCAR.cov.50.AD.men.tree.trans.15.25[3],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.15.25[3], mean.MCAR.cov.60.AD.men.tree.trans.15.25[3],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.15.25[3], mean.MCAR.cov.70.AD.men.tree.trans.15.25[3],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.15.25[3], mean.MCAR.cov.80.AD.men.tree.trans.15.25[3],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.15.25[3], mean.MCAR.cov.90.AD.men.tree.trans.15.25[3],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.15.25[3], mean.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.mean.MCAR.men.tree.trans.15.25 <- ggplot(mean.MCAR.men.tree.trans.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.men.tree.trans.15.25.png",
-       plot = plot.mean.MCAR.men.tree.trans.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-mean.MCAR.women.tree.trans.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                               
-                                               F = c(mean.MCAR.cov.35.AD.women.tree.trans.25.40[2], mean.MCAR.cov.40.AD.women.tree.trans.25.40[2],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.25.40[2], mean.MCAR.cov.50.AD.women.tree.trans.25.40[2],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.25.40[2], mean.MCAR.cov.60.AD.women.tree.trans.25.40[2],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.25.40[2], mean.MCAR.cov.70.AD.women.tree.trans.25.40[2],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.25.40[2], mean.MCAR.cov.80.AD.women.tree.trans.25.40[2],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.25.40[2], mean.MCAR.cov.90.AD.women.tree.trans.25.40[2],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.25.40[2], mean.AD.num.women.true.cov.100.25.40[2]),
-                                               
-                                               L = c(mean.MCAR.cov.35.AD.women.tree.trans.25.40[1], mean.MCAR.cov.40.AD.women.tree.trans.25.40[1],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.25.40[1], mean.MCAR.cov.50.AD.women.tree.trans.25.40[1],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.25.40[1], mean.MCAR.cov.60.AD.women.tree.trans.25.40[1],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.25.40[1], mean.MCAR.cov.70.AD.women.tree.trans.25.40[1],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.25.40[1], mean.MCAR.cov.80.AD.women.tree.trans.25.40[1],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.25.40[1], mean.MCAR.cov.90.AD.women.tree.trans.25.40[1],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.25.40[1], mean.AD.num.women.true.cov.100.25.40[1]),
-                                               
-                                               U = c(mean.MCAR.cov.35.AD.women.tree.trans.25.40[3], mean.MCAR.cov.40.AD.women.tree.trans.25.40[3],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.25.40[3], mean.MCAR.cov.50.AD.women.tree.trans.25.40[3],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.25.40[3], mean.MCAR.cov.60.AD.women.tree.trans.25.40[3],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.25.40[3], mean.MCAR.cov.70.AD.women.tree.trans.25.40[3],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.25.40[3], mean.MCAR.cov.80.AD.women.tree.trans.25.40[3],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.25.40[3], mean.MCAR.cov.90.AD.women.tree.trans.25.40[3],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.25.40[3], mean.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.women.tree.trans.25.40 <- ggplot(mean.MCAR.women.tree.trans.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.women.tree.trans.25.40.png",
-       plot = plot.mean.MCAR.women.tree.trans.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-# Men: 25.40
-
-mean.MCAR.men.tree.trans.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                             
-                                             F = c(mean.MCAR.cov.35.AD.men.tree.trans.25.40[2], mean.MCAR.cov.40.AD.men.tree.trans.25.40[2],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.25.40[2], mean.MCAR.cov.50.AD.men.tree.trans.25.40[2],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.25.40[2], mean.MCAR.cov.60.AD.men.tree.trans.25.40[2],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.25.40[2], mean.MCAR.cov.70.AD.men.tree.trans.25.40[2],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.25.40[2], mean.MCAR.cov.80.AD.men.tree.trans.25.40[2],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.25.40[2], mean.MCAR.cov.90.AD.men.tree.trans.25.40[2],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.25.40[2], mean.AD.num.men.true.cov.100.25.40[2]),
-                                             
-                                             L = c(mean.MCAR.cov.35.AD.men.tree.trans.25.40[1], mean.MCAR.cov.40.AD.men.tree.trans.25.40[1],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.25.40[1], mean.MCAR.cov.50.AD.men.tree.trans.25.40[1],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.25.40[1], mean.MCAR.cov.60.AD.men.tree.trans.25.40[1],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.25.40[1], mean.MCAR.cov.70.AD.men.tree.trans.25.40[1],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.25.40[1], mean.MCAR.cov.80.AD.men.tree.trans.25.40[1],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.25.40[1], mean.MCAR.cov.90.AD.men.tree.trans.25.40[1],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.25.40[1], mean.AD.num.men.true.cov.100.25.40[1]),
-                                             
-                                             U = c(mean.MCAR.cov.35.AD.men.tree.trans.25.40[3], mean.MCAR.cov.40.AD.men.tree.trans.25.40[3],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.25.40[3], mean.MCAR.cov.50.AD.men.tree.trans.25.40[3],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.25.40[3], mean.MCAR.cov.60.AD.men.tree.trans.25.40[3],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.25.40[3], mean.MCAR.cov.70.AD.men.tree.trans.25.40[3],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.25.40[3], mean.MCAR.cov.80.AD.men.tree.trans.25.40[3],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.25.40[3], mean.MCAR.cov.90.AD.men.tree.trans.25.40[3],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.25.40[3], mean.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.men.tree.trans.25.40 <- ggplot(mean.MCAR.men.tree.trans.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.mean.MCAR.men.tree.trans.25.40.png",
-       plot = plot.mean.MCAR.men.tree.trans.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 40.50
-
-mean.MCAR.women.tree.trans.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                               
-                                               F = c(mean.MCAR.cov.35.AD.women.tree.trans.40.50[2], mean.MCAR.cov.40.AD.women.tree.trans.40.50[2],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.40.50[2], mean.MCAR.cov.50.AD.women.tree.trans.40.50[2],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.40.50[2], mean.MCAR.cov.60.AD.women.tree.trans.40.50[2],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.40.50[2], mean.MCAR.cov.70.AD.women.tree.trans.40.50[2],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.40.50[2], mean.MCAR.cov.80.AD.women.tree.trans.40.50[2],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.40.50[2], mean.MCAR.cov.90.AD.women.tree.trans.40.50[2],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.40.50[2], mean.AD.num.women.true.cov.100.25.40[2]),
-                                               
-                                               L = c(mean.MCAR.cov.35.AD.women.tree.trans.40.50[1], mean.MCAR.cov.40.AD.women.tree.trans.40.50[1],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.40.50[1], mean.MCAR.cov.50.AD.women.tree.trans.40.50[1],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.40.50[1], mean.MCAR.cov.60.AD.women.tree.trans.40.50[1],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.40.50[1], mean.MCAR.cov.70.AD.women.tree.trans.40.50[1],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.40.50[1], mean.MCAR.cov.80.AD.women.tree.trans.40.50[1],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.40.50[1], mean.MCAR.cov.90.AD.women.tree.trans.40.50[1],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.40.50[1], mean.AD.num.women.true.cov.100.25.40[1]),
-                                               
-                                               U = c(mean.MCAR.cov.35.AD.women.tree.trans.40.50[3], mean.MCAR.cov.40.AD.women.tree.trans.40.50[3],
-                                                     mean.MCAR.cov.45.AD.women.tree.trans.40.50[3], mean.MCAR.cov.50.AD.women.tree.trans.40.50[3],
-                                                     mean.MCAR.cov.55.AD.women.tree.trans.40.50[3], mean.MCAR.cov.60.AD.women.tree.trans.40.50[3],
-                                                     mean.MCAR.cov.65.AD.women.tree.trans.40.50[3], mean.MCAR.cov.70.AD.women.tree.trans.40.50[3],
-                                                     mean.MCAR.cov.75.AD.women.tree.trans.40.50[3], mean.MCAR.cov.80.AD.women.tree.trans.40.50[3],
-                                                     mean.MCAR.cov.85.AD.women.tree.trans.40.50[3], mean.MCAR.cov.90.AD.women.tree.trans.40.50[3],
-                                                     mean.MCAR.cov.95.AD.women.tree.trans.40.50[3], mean.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.mean.MCAR.women.tree.trans.40.50 <- ggplot(mean.MCAR.women.tree.trans.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.mean.MCAR.women.tree.trans.40.50.png",
-       plot = plot.mean.MCAR.women.tree.trans.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-mean.MCAR.men.tree.trans.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                             
-                                             F = c(mean.MCAR.cov.35.AD.men.tree.trans.40.50[2], mean.MCAR.cov.40.AD.men.tree.trans.40.50[2],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.40.50[2], mean.MCAR.cov.50.AD.men.tree.trans.40.50[2],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.40.50[2], mean.MCAR.cov.60.AD.men.tree.trans.40.50[2],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.40.50[2], mean.MCAR.cov.70.AD.men.tree.trans.40.50[2],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.40.50[2], mean.MCAR.cov.80.AD.men.tree.trans.40.50[2],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.40.50[2], mean.MCAR.cov.90.AD.men.tree.trans.40.50[2],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.40.50[2], mean.AD.num.men.true.cov.100.40.50[2]),
-                                             
-                                             L = c(mean.MCAR.cov.35.AD.men.tree.trans.40.50[1], mean.MCAR.cov.40.AD.men.tree.trans.40.50[1],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.40.50[1], mean.MCAR.cov.50.AD.men.tree.trans.40.50[1],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.40.50[1], mean.MCAR.cov.60.AD.men.tree.trans.40.50[1],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.40.50[1], mean.MCAR.cov.70.AD.men.tree.trans.40.50[1],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.40.50[1], mean.MCAR.cov.80.AD.men.tree.trans.40.50[1],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.40.50[1], mean.MCAR.cov.90.AD.men.tree.trans.40.50[1],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.40.50[1], mean.AD.num.men.true.cov.100.40.50[1]),
-                                             
-                                             U = c(mean.MCAR.cov.35.AD.men.tree.trans.40.50[3], mean.MCAR.cov.40.AD.men.tree.trans.40.50[3],
-                                                   mean.MCAR.cov.45.AD.men.tree.trans.40.50[3], mean.MCAR.cov.50.AD.men.tree.trans.40.50[3],
-                                                   mean.MCAR.cov.55.AD.men.tree.trans.40.50[3], mean.MCAR.cov.60.AD.men.tree.trans.40.50[3],
-                                                   mean.MCAR.cov.65.AD.men.tree.trans.40.50[3], mean.MCAR.cov.70.AD.men.tree.trans.40.50[3],
-                                                   mean.MCAR.cov.75.AD.men.tree.trans.40.50[3], mean.MCAR.cov.80.AD.men.tree.trans.40.50[3],
-                                                   mean.MCAR.cov.85.AD.men.tree.trans.40.50[3], mean.MCAR.cov.90.AD.men.tree.trans.40.50[3],
-                                                   mean.MCAR.cov.95.AD.men.tree.trans.40.50[3], mean.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.mean.MCAR.men.tree.trans.40.50 <- ggplot(mean.MCAR.men.tree.trans.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Mean age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.mean.MCAR.men.tree.trans.40.50.png",
-       plot = plot.mean.MCAR.men.tree.trans.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-
-## Median
-
-# Women 15.25
-
-med.MCAR.women.tree.trans.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(med.MCAR.cov.35.AD.women.tree.trans.15.25[2], med.MCAR.cov.40.AD.women.tree.trans.15.25[2],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.15.25[2], med.MCAR.cov.50.AD.women.tree.trans.15.25[2],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.15.25[2], med.MCAR.cov.60.AD.women.tree.trans.15.25[2],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.15.25[2], med.MCAR.cov.70.AD.women.tree.trans.15.25[2],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.15.25[2], med.MCAR.cov.80.AD.women.tree.trans.15.25[2],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.15.25[2], med.MCAR.cov.90.AD.women.tree.trans.15.25[2],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.15.25[2], med.AD.num.women.true.cov.100.15.25[2]),
-                                              
-                                              L = c(med.MCAR.cov.35.AD.women.tree.trans.15.25[1], med.MCAR.cov.40.AD.women.tree.trans.15.25[1],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.15.25[1], med.MCAR.cov.50.AD.women.tree.trans.15.25[1],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.15.25[1], med.MCAR.cov.60.AD.women.tree.trans.15.25[1],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.15.25[1], med.MCAR.cov.70.AD.women.tree.trans.15.25[1],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.15.25[1], med.MCAR.cov.80.AD.women.tree.trans.15.25[1],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.15.25[1], med.MCAR.cov.90.AD.women.tree.trans.15.25[1],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.15.25[1], med.AD.num.women.true.cov.100.15.25[1]),
-                                              
-                                              U = c(med.MCAR.cov.35.AD.women.tree.trans.15.25[3], med.MCAR.cov.40.AD.women.tree.trans.15.25[3],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.15.25[3], med.MCAR.cov.50.AD.women.tree.trans.15.25[3],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.15.25[3], med.MCAR.cov.60.AD.women.tree.trans.15.25[3],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.15.25[3], med.MCAR.cov.70.AD.women.tree.trans.15.25[3],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.15.25[3], med.MCAR.cov.80.AD.women.tree.trans.15.25[3],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.15.25[3], med.MCAR.cov.90.AD.women.tree.trans.15.25[3],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.15.25[3], med.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.med.MCAR.women.tree.trans.15.25 <- ggplot(med.MCAR.women.tree.trans.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.tree.trans.15.25.png",
-       plot = plot.med.MCAR.women.tree.trans.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-med.MCAR.men.tree.trans.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(med.MCAR.cov.35.AD.men.tree.trans.15.25[2], med.MCAR.cov.40.AD.men.tree.trans.15.25[2],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.15.25[2], med.MCAR.cov.50.AD.men.tree.trans.15.25[2],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.15.25[2], med.MCAR.cov.60.AD.men.tree.trans.15.25[2],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.15.25[2], med.MCAR.cov.70.AD.men.tree.trans.15.25[2],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.15.25[2], med.MCAR.cov.80.AD.men.tree.trans.15.25[2],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.15.25[2], med.MCAR.cov.90.AD.men.tree.trans.15.25[2],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.15.25[2], med.AD.num.men.true.cov.100.15.25[2]),
-                                            
-                                            L = c(med.MCAR.cov.35.AD.men.tree.trans.15.25[1], med.MCAR.cov.40.AD.men.tree.trans.15.25[1],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.15.25[1], med.MCAR.cov.50.AD.men.tree.trans.15.25[1],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.15.25[1], med.MCAR.cov.60.AD.men.tree.trans.15.25[1],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.15.25[1], med.MCAR.cov.70.AD.men.tree.trans.15.25[1],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.15.25[1], med.MCAR.cov.80.AD.men.tree.trans.15.25[1],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.15.25[1], med.MCAR.cov.90.AD.men.tree.trans.15.25[1],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.15.25[1], med.AD.num.men.true.cov.100.15.25[1]),
-                                            
-                                            U = c(med.MCAR.cov.35.AD.men.tree.trans.15.25[3], med.MCAR.cov.40.AD.men.tree.trans.15.25[3],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.15.25[3], med.MCAR.cov.50.AD.men.tree.trans.15.25[3],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.15.25[3], med.MCAR.cov.60.AD.men.tree.trans.15.25[3],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.15.25[3], med.MCAR.cov.70.AD.men.tree.trans.15.25[3],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.15.25[3], med.MCAR.cov.80.AD.men.tree.trans.15.25[3],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.15.25[3], med.MCAR.cov.90.AD.men.tree.trans.15.25[3],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.15.25[3], med.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.med.MCAR.men.tree.trans.15.25 <- ggplot(med.MCAR.men.tree.trans.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.tree.trans.15.25.png",
-       plot = plot.med.MCAR.men.tree.trans.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-med.MCAR.women.tree.trans.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(med.MCAR.cov.35.AD.women.tree.trans.25.40[2], med.MCAR.cov.40.AD.women.tree.trans.25.40[2],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.25.40[2], med.MCAR.cov.50.AD.women.tree.trans.25.40[2],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.25.40[2], med.MCAR.cov.60.AD.women.tree.trans.25.40[2],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.25.40[2], med.MCAR.cov.70.AD.women.tree.trans.25.40[2],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.25.40[2], med.MCAR.cov.80.AD.women.tree.trans.25.40[2],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.25.40[2], med.MCAR.cov.90.AD.women.tree.trans.25.40[2],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.25.40[2], med.AD.num.women.true.cov.100.25.40[2]),
-                                              
-                                              L = c(med.MCAR.cov.35.AD.women.tree.trans.25.40[1], med.MCAR.cov.40.AD.women.tree.trans.25.40[1],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.25.40[1], med.MCAR.cov.50.AD.women.tree.trans.25.40[1],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.25.40[1], med.MCAR.cov.60.AD.women.tree.trans.25.40[1],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.25.40[1], med.MCAR.cov.70.AD.women.tree.trans.25.40[1],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.25.40[1], med.MCAR.cov.80.AD.women.tree.trans.25.40[1],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.25.40[1], med.MCAR.cov.90.AD.women.tree.trans.25.40[1],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.25.40[1], med.AD.num.women.true.cov.100.25.40[1]),
-                                              
-                                              U = c(med.MCAR.cov.35.AD.women.tree.trans.25.40[3], med.MCAR.cov.40.AD.women.tree.trans.25.40[3],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.25.40[3], med.MCAR.cov.50.AD.women.tree.trans.25.40[3],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.25.40[3], med.MCAR.cov.60.AD.women.tree.trans.25.40[3],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.25.40[3], med.MCAR.cov.70.AD.women.tree.trans.25.40[3],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.25.40[3], med.MCAR.cov.80.AD.women.tree.trans.25.40[3],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.25.40[3], med.MCAR.cov.90.AD.women.tree.trans.25.40[3],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.25.40[3], med.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.med.MCAR.women.tree.trans.25.40 <- ggplot(med.MCAR.women.tree.trans.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.tree.trans.25.40.png",
-       plot = plot.med.MCAR.women.tree.trans.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Men: 25.40
-
-med.MCAR.men.tree.trans.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(med.MCAR.cov.35.AD.men.tree.trans.25.40[2], med.MCAR.cov.40.AD.men.tree.trans.25.40[2],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.25.40[2], med.MCAR.cov.50.AD.men.tree.trans.25.40[2],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.25.40[2], med.MCAR.cov.60.AD.men.tree.trans.25.40[2],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.25.40[2], med.MCAR.cov.70.AD.men.tree.trans.25.40[2],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.25.40[2], med.MCAR.cov.80.AD.men.tree.trans.25.40[2],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.25.40[2], med.MCAR.cov.90.AD.men.tree.trans.25.40[2],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.25.40[2], med.AD.num.men.true.cov.100.25.40[2]),
-                                            
-                                            L = c(med.MCAR.cov.35.AD.men.tree.trans.25.40[1], med.MCAR.cov.40.AD.men.tree.trans.25.40[1],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.25.40[1], med.MCAR.cov.50.AD.men.tree.trans.25.40[1],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.25.40[1], med.MCAR.cov.60.AD.men.tree.trans.25.40[1],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.25.40[1], med.MCAR.cov.70.AD.men.tree.trans.25.40[1],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.25.40[1], med.MCAR.cov.80.AD.men.tree.trans.25.40[1],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.25.40[1], med.MCAR.cov.90.AD.men.tree.trans.25.40[1],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.25.40[1], med.AD.num.men.true.cov.100.25.40[1]),
-                                            
-                                            U = c(med.MCAR.cov.35.AD.men.tree.trans.25.40[3], med.MCAR.cov.40.AD.men.tree.trans.25.40[3],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.25.40[3], med.MCAR.cov.50.AD.men.tree.trans.25.40[3],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.25.40[3], med.MCAR.cov.60.AD.men.tree.trans.25.40[3],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.25.40[3], med.MCAR.cov.70.AD.men.tree.trans.25.40[3],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.25.40[3], med.MCAR.cov.80.AD.men.tree.trans.25.40[3],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.25.40[3], med.MCAR.cov.90.AD.men.tree.trans.25.40[3],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.25.40[3], med.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.med.MCAR.men.tree.trans.25.40 <- ggplot(med.MCAR.men.tree.trans.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.tree.trans.25.40.png",
-       plot = plot.med.MCAR.men.tree.trans.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 40.50
-
-med.MCAR.women.tree.trans.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                              
-                                              F = c(med.MCAR.cov.35.AD.women.tree.trans.40.50[2], med.MCAR.cov.40.AD.women.tree.trans.40.50[2],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.40.50[2], med.MCAR.cov.50.AD.women.tree.trans.40.50[2],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.40.50[2], med.MCAR.cov.60.AD.women.tree.trans.40.50[2],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.40.50[2], med.MCAR.cov.70.AD.women.tree.trans.40.50[2],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.40.50[2], med.MCAR.cov.80.AD.women.tree.trans.40.50[2],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.40.50[2], med.MCAR.cov.90.AD.women.tree.trans.40.50[2],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.40.50[2], med.AD.num.women.true.cov.100.40.50[2]),
-                                              
-                                              L = c(med.MCAR.cov.35.AD.women.tree.trans.40.50[1], med.MCAR.cov.40.AD.women.tree.trans.40.50[1],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.40.50[1], med.MCAR.cov.50.AD.women.tree.trans.40.50[1],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.40.50[1], med.MCAR.cov.60.AD.women.tree.trans.40.50[1],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.40.50[1], med.MCAR.cov.70.AD.women.tree.trans.40.50[1],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.40.50[1], med.MCAR.cov.80.AD.women.tree.trans.40.50[1],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.40.50[1], med.MCAR.cov.90.AD.women.tree.trans.40.50[1],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.40.50[1], med.AD.num.women.true.cov.100.40.50[1]),
-                                              
-                                              U = c(med.MCAR.cov.35.AD.women.tree.trans.40.50[3], med.MCAR.cov.40.AD.women.tree.trans.40.50[3],
-                                                    med.MCAR.cov.45.AD.women.tree.trans.40.50[3], med.MCAR.cov.50.AD.women.tree.trans.40.50[3],
-                                                    med.MCAR.cov.55.AD.women.tree.trans.40.50[3], med.MCAR.cov.60.AD.women.tree.trans.40.50[3],
-                                                    med.MCAR.cov.65.AD.women.tree.trans.40.50[3], med.MCAR.cov.70.AD.women.tree.trans.40.50[3],
-                                                    med.MCAR.cov.75.AD.women.tree.trans.40.50[3], med.MCAR.cov.80.AD.women.tree.trans.40.50[3],
-                                                    med.MCAR.cov.85.AD.women.tree.trans.40.50[3], med.MCAR.cov.90.AD.women.tree.trans.40.50[3],
-                                                    med.MCAR.cov.95.AD.women.tree.trans.40.50[3], med.AD.num.women.true.cov.100.40.50[3]))
-
-
-plot.med.MCAR.women.tree.trans.40.50 <- ggplot(med.MCAR.women.tree.trans.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.women.tree.trans.40.50.png",
-       plot = plot.med.MCAR.women.tree.trans.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-med.MCAR.men.tree.trans.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                            
-                                            F = c(med.MCAR.cov.35.AD.men.tree.trans.40.50[2], med.MCAR.cov.40.AD.men.tree.trans.40.50[2],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.40.50[2], med.MCAR.cov.50.AD.men.tree.trans.40.50[2],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.40.50[2], med.MCAR.cov.60.AD.men.tree.trans.40.50[2],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.40.50[2], med.MCAR.cov.70.AD.men.tree.trans.40.50[2],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.40.50[2], med.MCAR.cov.80.AD.men.tree.trans.40.50[2],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.40.50[2], med.MCAR.cov.90.AD.men.tree.trans.40.50[2],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.40.50[2], med.AD.num.men.true.cov.100.40.50[2]),
-                                            
-                                            L = c(med.MCAR.cov.35.AD.men.tree.trans.40.50[1], med.MCAR.cov.40.AD.men.tree.trans.40.50[1],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.40.50[1], med.MCAR.cov.50.AD.men.tree.trans.40.50[1],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.40.50[1], med.MCAR.cov.60.AD.men.tree.trans.40.50[1],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.40.50[1], med.MCAR.cov.70.AD.men.tree.trans.40.50[1],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.40.50[1], med.MCAR.cov.80.AD.men.tree.trans.40.50[1],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.40.50[1], med.MCAR.cov.90.AD.men.tree.trans.40.50[1],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.40.50[1], med.AD.num.men.true.cov.100.40.50[1]),
-                                            
-                                            U = c(med.MCAR.cov.35.AD.men.tree.trans.40.50[3], med.MCAR.cov.40.AD.men.tree.trans.40.50[3],
-                                                  med.MCAR.cov.45.AD.men.tree.trans.40.50[3], med.MCAR.cov.50.AD.men.tree.trans.40.50[3],
-                                                  med.MCAR.cov.55.AD.men.tree.trans.40.50[3], med.MCAR.cov.60.AD.men.tree.trans.40.50[3],
-                                                  med.MCAR.cov.65.AD.men.tree.trans.40.50[3], med.MCAR.cov.70.AD.men.tree.trans.40.50[3],
-                                                  med.MCAR.cov.75.AD.men.tree.trans.40.50[3], med.MCAR.cov.80.AD.men.tree.trans.40.50[3],
-                                                  med.MCAR.cov.85.AD.men.tree.trans.40.50[3], med.MCAR.cov.90.AD.men.tree.trans.40.50[3],
-                                                  med.MCAR.cov.95.AD.men.tree.trans.40.50[3], med.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.med.MCAR.men.tree.trans.40.50 <- ggplot(med.MCAR.men.tree.trans.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("Median age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.med.MCAR.men.tree.trans.40.50.png",
-       plot = plot.med.MCAR.men.tree.trans.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-## Standard deviation
-
-
-# Women 15.25
-
-sd.MCAR.women.tree.trans.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                             
-                                             F = c(sd.MCAR.cov.35.AD.women.tree.trans.15.25[2], sd.MCAR.cov.40.AD.women.tree.trans.15.25[2],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.15.25[2], sd.MCAR.cov.50.AD.women.tree.trans.15.25[2],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.15.25[2], sd.MCAR.cov.60.AD.women.tree.trans.15.25[2],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.15.25[2], sd.MCAR.cov.70.AD.women.tree.trans.15.25[2],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.15.25[2], sd.MCAR.cov.80.AD.women.tree.trans.15.25[2],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.15.25[2], sd.MCAR.cov.90.AD.women.tree.trans.15.25[2],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.15.25[2], sd.AD.num.women.true.cov.100.15.25[2]),
-                                             
-                                             L = c(sd.MCAR.cov.35.AD.women.tree.trans.15.25[1], sd.MCAR.cov.40.AD.women.tree.trans.15.25[1],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.15.25[1], sd.MCAR.cov.50.AD.women.tree.trans.15.25[1],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.15.25[1], sd.MCAR.cov.60.AD.women.tree.trans.15.25[1],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.15.25[1], sd.MCAR.cov.70.AD.women.tree.trans.15.25[1],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.15.25[1], sd.MCAR.cov.80.AD.women.tree.trans.15.25[1],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.15.25[1], sd.MCAR.cov.90.AD.women.tree.trans.15.25[1],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.15.25[1], sd.AD.num.women.true.cov.100.15.25[1]),
-                                             
-                                             U = c(sd.MCAR.cov.35.AD.women.tree.trans.15.25[3], sd.MCAR.cov.40.AD.women.tree.trans.15.25[3],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.15.25[3], sd.MCAR.cov.50.AD.women.tree.trans.15.25[3],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.15.25[3], sd.MCAR.cov.60.AD.women.tree.trans.15.25[3],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.15.25[3], sd.MCAR.cov.70.AD.women.tree.trans.15.25[3],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.15.25[3], sd.MCAR.cov.80.AD.women.tree.trans.15.25[3],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.15.25[3], sd.MCAR.cov.90.AD.women.tree.trans.15.25[3],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.15.25[3], sd.AD.num.women.true.cov.100.15.25[3]))
-
-
-plot.sd.MCAR.women.tree.trans.15.25 <- ggplot(sd.MCAR.women.tree.trans.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.tree.trans.15.25.png",
-       plot = plot.sd.MCAR.women.tree.trans.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 15.25
-
-sd.MCAR.men.tree.trans.15.25 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                           
-                                           F = c(sd.MCAR.cov.35.AD.men.tree.trans.15.25[2], sd.MCAR.cov.40.AD.men.tree.trans.15.25[2],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.15.25[2], sd.MCAR.cov.50.AD.men.tree.trans.15.25[2],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.15.25[2], sd.MCAR.cov.60.AD.men.tree.trans.15.25[2],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.15.25[2], sd.MCAR.cov.70.AD.men.tree.trans.15.25[2],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.15.25[2], sd.MCAR.cov.80.AD.men.tree.trans.15.25[2],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.15.25[2], sd.MCAR.cov.90.AD.men.tree.trans.15.25[2],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.15.25[2], sd.AD.num.men.true.cov.100.15.25[2]),
-                                           
-                                           L = c(sd.MCAR.cov.35.AD.men.tree.trans.15.25[1], sd.MCAR.cov.40.AD.men.tree.trans.15.25[1],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.15.25[1], sd.MCAR.cov.50.AD.men.tree.trans.15.25[1],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.15.25[1], sd.MCAR.cov.60.AD.men.tree.trans.15.25[1],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.15.25[1], sd.MCAR.cov.70.AD.men.tree.trans.15.25[1],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.15.25[1], sd.MCAR.cov.80.AD.men.tree.trans.15.25[1],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.15.25[1], sd.MCAR.cov.90.AD.men.tree.trans.15.25[1],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.15.25[1], sd.AD.num.men.true.cov.100.15.25[1]),
-                                           
-                                           U = c(sd.MCAR.cov.35.AD.men.tree.trans.15.25[3], sd.MCAR.cov.40.AD.men.tree.trans.15.25[3],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.15.25[3], sd.MCAR.cov.50.AD.men.tree.trans.15.25[3],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.15.25[3], sd.MCAR.cov.60.AD.men.tree.trans.15.25[3],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.15.25[3], sd.MCAR.cov.70.AD.men.tree.trans.15.25[3],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.15.25[3], sd.MCAR.cov.80.AD.men.tree.trans.15.25[3],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.15.25[3], sd.MCAR.cov.90.AD.men.tree.trans.15.25[3],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.15.25[3], sd.AD.num.men.true.cov.100.15.25[3]))
-
-
-plot.sd.MCAR.men.tree.trans.15.25 <- ggplot(sd.MCAR.men.tree.trans.15.25, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 15 - 25 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.sd.MCAR.men.tree.trans.15.25.png",
-       plot = plot.sd.MCAR.men.tree.trans.15.25,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Women: 25.40
-
-sd.MCAR.women.tree.trans.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                             
-                                             F = c(sd.MCAR.cov.35.AD.women.tree.trans.25.40[2], sd.MCAR.cov.40.AD.women.tree.trans.25.40[2],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.25.40[2], sd.MCAR.cov.50.AD.women.tree.trans.25.40[2],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.25.40[2], sd.MCAR.cov.60.AD.women.tree.trans.25.40[2],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.25.40[2], sd.MCAR.cov.70.AD.women.tree.trans.25.40[2],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.25.40[2], sd.MCAR.cov.80.AD.women.tree.trans.25.40[2],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.25.40[2], sd.MCAR.cov.90.AD.women.tree.trans.25.40[2],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.25.40[2], sd.AD.num.women.true.cov.100.25.40[2]),
-                                             
-                                             L = c(sd.MCAR.cov.35.AD.women.tree.trans.25.40[1], sd.MCAR.cov.40.AD.women.tree.trans.25.40[1],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.25.40[1], sd.MCAR.cov.50.AD.women.tree.trans.25.40[1],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.25.40[1], sd.MCAR.cov.60.AD.women.tree.trans.25.40[1],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.25.40[1], sd.MCAR.cov.70.AD.women.tree.trans.25.40[1],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.25.40[1], sd.MCAR.cov.80.AD.women.tree.trans.25.40[1],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.25.40[1], sd.MCAR.cov.90.AD.women.tree.trans.25.40[1],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.25.40[1], sd.AD.num.women.true.cov.100.25.40[1]),
-                                             
-                                             U = c(sd.MCAR.cov.35.AD.women.tree.trans.25.40[3], sd.MCAR.cov.40.AD.women.tree.trans.25.40[3],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.25.40[3], sd.MCAR.cov.50.AD.women.tree.trans.25.40[3],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.25.40[3], sd.MCAR.cov.60.AD.women.tree.trans.25.40[3],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.25.40[3], sd.MCAR.cov.70.AD.women.tree.trans.25.40[3],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.25.40[3], sd.MCAR.cov.80.AD.women.tree.trans.25.40[3],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.25.40[3], sd.MCAR.cov.90.AD.women.tree.trans.25.40[3],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.25.40[3], sd.AD.num.women.true.cov.100.25.40[3]))
-
-
-plot.sd.MCAR.women.tree.trans.25.40 <- ggplot(sd.MCAR.women.tree.trans.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.tree.trans.25.40.png",
-       plot = plot.sd.MCAR.women.tree.trans.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Men: 25.40
-
-sd.MCAR.men.tree.trans.25.40 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                           
-                                           F = c(sd.MCAR.cov.35.AD.men.tree.trans.25.40[2], sd.MCAR.cov.40.AD.men.tree.trans.25.40[2],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.25.40[2], sd.MCAR.cov.50.AD.men.tree.trans.25.40[2],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.25.40[2], sd.MCAR.cov.60.AD.men.tree.trans.25.40[2],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.25.40[2], sd.MCAR.cov.70.AD.men.tree.trans.25.40[2],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.25.40[2], sd.MCAR.cov.80.AD.men.tree.trans.25.40[2],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.25.40[2], sd.MCAR.cov.90.AD.men.tree.trans.25.40[2],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.25.40[2], sd.AD.num.men.true.cov.100.25.40[2]),
-                                           
-                                           L = c(sd.MCAR.cov.35.AD.men.tree.trans.25.40[1], sd.MCAR.cov.40.AD.men.tree.trans.25.40[1],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.25.40[1], sd.MCAR.cov.50.AD.men.tree.trans.25.40[1],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.25.40[1], sd.MCAR.cov.60.AD.men.tree.trans.25.40[1],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.25.40[1], sd.MCAR.cov.70.AD.men.tree.trans.25.40[1],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.25.40[1], sd.MCAR.cov.80.AD.men.tree.trans.25.40[1],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.25.40[1], sd.MCAR.cov.90.AD.men.tree.trans.25.40[1],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.25.40[1], sd.AD.num.men.true.cov.100.25.40[1]),
-                                           
-                                           U = c(sd.MCAR.cov.35.AD.men.tree.trans.25.40[3], sd.MCAR.cov.40.AD.men.tree.trans.25.40[3],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.25.40[3], sd.MCAR.cov.50.AD.men.tree.trans.25.40[3],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.25.40[3], sd.MCAR.cov.60.AD.men.tree.trans.25.40[3],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.25.40[3], sd.MCAR.cov.70.AD.men.tree.trans.25.40[3],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.25.40[3], sd.MCAR.cov.80.AD.men.tree.trans.25.40[3],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.25.40[3], sd.MCAR.cov.90.AD.men.tree.trans.25.40[3],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.25.40[3], sd.AD.num.men.true.cov.100.25.40[3]))
-
-
-plot.sd.MCAR.men.tree.trans.25.40 <- ggplot(sd.MCAR.men.tree.trans.25.40, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 25 - 40 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-
-ggsave(filename = "plot.sd.MCAR.men.tree.trans.25.40.png",
-       plot = plot.sd.MCAR.men.tree.trans.25.40,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-
-# Women: 40.50
-
-sd.MCAR.women.tree.trans.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                             
-                                             F = c(sd.MCAR.cov.35.AD.women.tree.trans.40.50[2], sd.MCAR.cov.40.AD.women.tree.trans.40.50[2],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.40.50[2], sd.MCAR.cov.50.AD.women.tree.trans.40.50[2],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.40.50[2], sd.MCAR.cov.60.AD.women.tree.trans.40.50[2],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.40.50[2], sd.MCAR.cov.70.AD.women.tree.trans.40.50[2],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.40.50[2], sd.MCAR.cov.80.AD.women.tree.trans.40.50[2],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.40.50[2], sd.MCAR.cov.90.AD.women.tree.trans.40.50[2],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.40.50[2], sd.AD.num.women.true.cov.100.40.50[2]),
-                                             
-                                             L = c(sd.MCAR.cov.35.AD.women.tree.trans.40.50[1], sd.MCAR.cov.40.AD.women.tree.trans.40.50[1],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.40.50[1], sd.MCAR.cov.50.AD.women.tree.trans.40.50[1],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.40.50[1], sd.MCAR.cov.60.AD.women.tree.trans.40.50[1],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.40.50[1], sd.MCAR.cov.70.AD.women.tree.trans.40.50[1],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.40.50[1], sd.MCAR.cov.80.AD.women.tree.trans.40.50[1],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.40.50[1], sd.MCAR.cov.90.AD.women.tree.trans.40.50[1],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.40.50[1], sd.AD.num.women.true.cov.100.40.50[1]),
-                                             
-                                             U = c(sd.MCAR.cov.35.AD.women.tree.trans.40.50[3], sd.MCAR.cov.40.AD.women.tree.trans.40.50[3],
-                                                   sd.MCAR.cov.45.AD.women.tree.trans.40.50[3], sd.MCAR.cov.50.AD.women.tree.trans.40.50[3],
-                                                   sd.MCAR.cov.55.AD.women.tree.trans.40.50[3], sd.MCAR.cov.60.AD.women.tree.trans.40.50[3],
-                                                   sd.MCAR.cov.65.AD.women.tree.trans.40.50[3], sd.MCAR.cov.70.AD.women.tree.trans.40.50[3],
-                                                   sd.MCAR.cov.75.AD.women.tree.trans.40.50[3], sd.MCAR.cov.80.AD.women.tree.trans.40.50[3],
-                                                   sd.MCAR.cov.85.AD.women.tree.trans.40.50[3], sd.MCAR.cov.90.AD.women.tree.trans.40.50[3],
-                                                   sd.MCAR.cov.95.AD.women.tree.trans.40.50[3], sd.AD.num.women.true.cov.100.40.50[3]))
-
-
-plot.sd.MCAR.women.tree.trans.40.50 <- ggplot(sd.MCAR.women.tree.trans.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of women in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.women.tree.trans.40.50.png",
-       plot = plot.sd.MCAR.women.tree.trans.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
-
-
-# Men: 40.50
-
-sd.MCAR.men.tree.trans.40.50 <- data.frame(x=c(seq(from=35, to=100, by=5)),
-                                           
-                                           F = c(sd.MCAR.cov.35.AD.men.tree.trans.40.50[2], sd.MCAR.cov.40.AD.men.tree.trans.40.50[2],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.40.50[2], sd.MCAR.cov.50.AD.men.tree.trans.40.50[2],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.40.50[2], sd.MCAR.cov.60.AD.men.tree.trans.40.50[2],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.40.50[2], sd.MCAR.cov.70.AD.men.tree.trans.40.50[2],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.40.50[2], sd.MCAR.cov.80.AD.men.tree.trans.40.50[2],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.40.50[2], sd.MCAR.cov.90.AD.men.tree.trans.40.50[2],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.40.50[2], sd.AD.num.men.true.cov.100.40.50[2]),
-                                           
-                                           L = c(sd.MCAR.cov.35.AD.men.tree.trans.40.50[1], sd.MCAR.cov.40.AD.men.tree.trans.40.50[1],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.40.50[1], sd.MCAR.cov.50.AD.men.tree.trans.40.50[1],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.40.50[1], sd.MCAR.cov.60.AD.men.tree.trans.40.50[1],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.40.50[1], sd.MCAR.cov.70.AD.men.tree.trans.40.50[1],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.40.50[1], sd.MCAR.cov.80.AD.men.tree.trans.40.50[1],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.40.50[1], sd.MCAR.cov.90.AD.men.tree.trans.40.50[1],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.40.50[1], sd.AD.num.men.true.cov.100.40.50[1]),
-                                           
-                                           U = c(sd.MCAR.cov.35.AD.men.tree.trans.40.50[3], sd.MCAR.cov.40.AD.men.tree.trans.40.50[3],
-                                                 sd.MCAR.cov.45.AD.men.tree.trans.40.50[3], sd.MCAR.cov.50.AD.men.tree.trans.40.50[3],
-                                                 sd.MCAR.cov.55.AD.men.tree.trans.40.50[3], sd.MCAR.cov.60.AD.men.tree.trans.40.50[3],
-                                                 sd.MCAR.cov.65.AD.men.tree.trans.40.50[3], sd.MCAR.cov.70.AD.men.tree.trans.40.50[3],
-                                                 sd.MCAR.cov.75.AD.men.tree.trans.40.50[3], sd.MCAR.cov.80.AD.men.tree.trans.40.50[3],
-                                                 sd.MCAR.cov.85.AD.men.tree.trans.40.50[3], sd.MCAR.cov.90.AD.men.tree.trans.40.50[3],
-                                                 sd.MCAR.cov.95.AD.men.tree.trans.40.50[3], sd.AD.num.men.true.cov.100.40.50[3]))
-
-
-plot.sd.MCAR.men.tree.trans.40.50 <- ggplot(sd.MCAR.men.tree.trans.40.50, aes(x = x, y = F)) +
-  geom_point(size = 4) +
-  geom_errorbar(aes(ymax = U, ymin = L)) +
-  ggtitle("SD of age difference of men in 40 - 50 and their pairs (pairings) - MCAR") +
-  xlab("Sequence coverage scenarios") + ylab("Mean age difference")
-
-ggsave(filename = "plot.sd.MCAR.men.tree.trans.40.50.png",
-       plot = plot.sd.MCAR.men.tree.trans.40.50,
-       path = "~/age_mixing_AD_clusters",
-       width = 10, height = 8, units = "cm")
 
 
 
@@ -17460,7 +12062,7 @@ plot.MRE.error.infer.clust.cov.100.prop.men.15.25 <- ggplot(MRE.error.infer.clus
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.men.15.25.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.men.15.25,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -17484,7 +12086,7 @@ plot.MRE.error.infer.clust.cov.100.prop.women.15.25 <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.women.15.25.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.women.15.25,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR",
        width = 10, height = 8, units = "cm")
 
 
@@ -17511,7 +12113,7 @@ plot.MRE.error.infer.clust.cov.100.prop.men.25.40 <- ggplot(MRE.error.infer.clus
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.men.25.40.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.men.25.40,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -17535,7 +12137,7 @@ plot.MRE.error.infer.clust.cov.100.prop.women.25.40 <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.women.25.40.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.women.25.40,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -17559,7 +12161,7 @@ plot.MRE.error.infer.clust.cov.100.prop.men.40.50 <- ggplot(MRE.error.infer.clus
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.men.40.50.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.men.40.50,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -17583,7 +12185,7 @@ plot.MRE.error.infer.clust.cov.100.prop.women.40.50 <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.women.40.50.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.women.40.50,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -17687,10 +12289,6 @@ RMSE.error.infer.clust.cov.100.women.25.40.cov.35.sd <- RMSE(error.infer.clust.c
 MAE.error.infer.clust.cov.100.women.25.40.cov.35.sd <- MAE(error.infer.clust.cov.100.women.25.40.cov.35.sd)
 ARMSE.error.infer.clust.cov.100.women.25.40.cov.35.sd <- ARMSE(v1=vector.sd.AD.num.women.true.cov.100.25.40, v2=vector.sd.MCAR.cov.35.AD.women.cl.25.40)
 MRE.error.infer.clust.cov.100.women.25.40.cov.35.sd <- MRE(error.infer.clust.cov.100.women.25.40.cov.35.sd)
-
-
-# Aho nagarukirije uno musi ku murango ------------------------------------
-
 
 
 # 40.50
@@ -19492,7 +14090,7 @@ plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean <- ggplot(MRE.error.infer
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19518,7 +14116,7 @@ plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19544,7 +14142,7 @@ plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med <- ggplot(MRE.error.infer.
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19568,7 +14166,7 @@ plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19592,7 +14190,7 @@ plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19616,7 +14214,7 @@ plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd <- ggplot(MRE.error.infer.clu
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19643,7 +14241,7 @@ plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean <- ggplot(MRE.error.infer
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19669,7 +14267,7 @@ plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19695,7 +14293,7 @@ plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med <- ggplot(MRE.error.infer.
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19719,7 +14317,7 @@ plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19743,7 +14341,7 @@ plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19767,7 +14365,7 @@ plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd <- ggplot(MRE.error.infer.clu
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19794,7 +14392,7 @@ plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean <- ggplot(MRE.error.infer
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19820,7 +14418,7 @@ plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19846,7 +14444,7 @@ plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med <- ggplot(MRE.error.infer.
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19870,7 +14468,7 @@ plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19894,7 +14492,7 @@ plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
@@ -19918,7 +14516,7 @@ plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd <- ggplot(MRE.error.infer.clu
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd,
-       path = "~/age_mixing_AD_clusters",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/",
        width = 10, height = 8, units = "cm")
 
 
