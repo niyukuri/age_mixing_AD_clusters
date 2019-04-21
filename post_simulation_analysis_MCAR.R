@@ -164,7 +164,7 @@ dr.epi.rels.agemix_data <- dr.epi.rels.agemix %>%
             sum.R.inc.15.25.w = sum(R.inc.15.25.w, na.rm = TRUE),
             sum.R.inc.25.40.m = sum(R.inc.25.40.m, na.rm = TRUE),
             sum.R.inc.40.50.m = sum(R.inc.40.50.m, na.rm = TRUE),
-            sum.R.inc.40.50.w = sum(R.inc.40.50.w, na.rm = TRUE))
+            sum.R.inc.40.50.w = sum(R.inc.40.50.w, na.rm = TRUE)) # prevalence, incidence, and age mixing stats X times
 
 # nationwide
 # plot.sum.R.inc.40.50.w <- ggplot(data = dr.epi.rels.agemix_data, aes(x = x, y = sum.R.inc.40.50.w))+
@@ -504,6 +504,83 @@ rownames(age.mix.stats) <- c("AAD.male", "SDAD.male",  "slope.male",  "WSD.male"
 write.csv(age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/age.mixing.statistics_MCAR.csv")
 
 
+# Difference between true values and values at different sampling scenarios in MCAR
+
+d.AAD.male <- (age.mix.stats[1,14] - age.mix.stats[1,])/age.mix.stats[1,14]
+d.SDAD.male <- (age.mix.stats[2,14] - age.mix.stats[2,])/age.mix.stats[2,14]
+d.slope.male <- (age.mix.stats[3,14] - age.mix.stats[3,])/age.mix.stats[3,14]
+d.WSD.male <- (age.mix.stats[4,14] - age.mix.stats[4,])/age.mix.stats[4,14]
+d.BSD.male <- (age.mix.stats[5,14] - age.mix.stats[5,])/age.mix.stats[5,14]
+d.interc.male <- (age.mix.stats[6,14] - age.mix.stats[6,])/age.mix.stats[6,14]
+
+diff.cov.true.age.mix.stats <- matrix(c(d.AAD.male, d.SDAD.male, d.slope.male,
+                                        d.WSD.male, d.BSD.male, d.interc.male),
+                                      ncol = 14,
+                                      byrow = TRUE)
+
+colnames(diff.cov.true.age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
+                                           "cov.50", "cov.55", "cov.60",
+                                           "cov.65", "cov.70", "cov.75",
+                                           "cov.80", "cov.85", "cov.90",
+                                           "cov.95", "pop.lev")
+
+rownames(diff.cov.true.age.mix.stats) <- c("d.AAD.male", "d.SDAD.male",  "d.slope.male",  "d.WSD.male", "d.BSD.male" , "d.intercept.male") 
+
+
+
+error.age.mix.AAD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                            
+                            F = c(as.numeric(diff.cov.true.age.mix.stats[1,])))
+error.age.mix.AAD.male$parameter <- "AAD.male"
+
+error.age.mix.SDAD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                      
+                                      F = c(as.numeric(diff.cov.true.age.mix.stats[2,])))
+error.age.mix.SDAD.male$parameter <- "SDAD.male"
+
+
+error.age.mix.slope.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                       
+                                       F = c(as.numeric(diff.cov.true.age.mix.stats[3,])))
+error.age.mix.slope.male$parameter <- "slope.male"
+
+error.age.mix.WSD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                     
+                                     F = c(as.numeric(diff.cov.true.age.mix.stats[4,])))
+error.age.mix.WSD.male$parameter <- "WSD.male"
+
+
+error.age.mix.BSD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                     
+                                     F = c(as.numeric(diff.cov.true.age.mix.stats[5,])))
+error.age.mix.BSD.male$parameter <- "BSD.male"
+
+
+error.age.mix.intercept.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                           
+                                           F = c(as.numeric(diff.cov.true.age.mix.stats[6,])))
+error.age.mix.intercept.male$parameter <- "intercept.male"
+
+
+errors.age.mixing <- rbind(error.age.mix.AAD.male, error.age.mix.BSD.male,
+                          error.age.mix.intercept.male, error.age.mix.SDAD.male,
+                          error.age.mix.slope.male, error.age.mix.WSD.male)
+
+
+plots.errors.age.mix  <- ggplot(errors.age.mixing, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sequence coverage") + ylab("Value") 
+# +
+#   ggtitle("Relative error of age mixing statistics")
+
+# less than 10%: AAD.male, WSD.male, and SDAD.male
+# between 20 and 25%: BSD.male and slope.male
+# 38 and 47%: intervept.male
+
+
+
 CI.age.mix.stats <- matrix(c(paste(T.35.AAD.male[2], "[", T.35.AAD.male[1], "-", T.35.AAD.male[3], "]"), 
                              paste(T.40.AAD.male[2],  "[", T.40.AAD.male[1], "-", T.40.AAD.male[3], "]"), 
                              paste(T.45.AAD.male[2], "[", T.45.AAD.male[1], "-", T.45.AAD.male[3], "]"), 
@@ -830,7 +907,7 @@ ggsave(filename = "plot.age.mix.stats.df.MCAR.pdf",
 
 
 
-# Statistics of transmission clusters -------------------------------------
+# Statistics of size of transmission clusters -------------------------------------
 
 
 
@@ -1044,301 +1121,13 @@ ggsave(filename = "plot.clust.size.stats.pdf",
 
 
 
-# Age mixing measurements inferred in transmission clusters -----------------
 
 
+# True table of aggregated number of pairings --------------------------------------------
 
 
-# .cl.prop.men
-# .cl.prop.women
-# .cl.true.prop.men
-# .cl.true.prop.women
-# .tree.trans.true.prop.men
-# .tree.trans.true.prop.women
 
-
-
-
-# cov 35
-
-d.MCAR.cov.35.cl.prop.men <-  d.MCAR.cov.35 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.35.cl.prop.women <-  d.MCAR.cov.35 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.35.cl.true.prop.men <-  d.MCAR.cov.35 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.35.cl.true.prop.women <-  d.MCAR.cov.35 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.35.tree.trans.true.prop.men <-  d.MCAR.cov.35 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.35.tree.trans.true.prop.women <-  d.MCAR.cov.35 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# cov 40
-
-d.MCAR.cov.40.cl.prop.men <-  d.MCAR.cov.40 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.40.cl.prop.women <-  d.MCAR.cov.40 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.40.cl.true.prop.men <-  d.MCAR.cov.40 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.40.cl.true.prop.women <-  d.MCAR.cov.40 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.40.tree.trans.true.prop.men <-  d.MCAR.cov.40 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.40.tree.trans.true.prop.women <-  d.MCAR.cov.40 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# cov 45
-
-d.MCAR.cov.45.cl.prop.men <-  d.MCAR.cov.45 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.45.cl.prop.women <-  d.MCAR.cov.45 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.45.cl.true.prop.men <-  d.MCAR.cov.45 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.45.cl.true.prop.women <-  d.MCAR.cov.45 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.45.tree.trans.true.prop.men <-  d.MCAR.cov.45 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.45.tree.trans.true.prop.women <-  d.MCAR.cov.45 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-
-# cov 50
-
-d.MCAR.cov.50.cl.prop.men <-  d.MCAR.cov.50 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.50.cl.prop.women <-  d.MCAR.cov.50 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.50.cl.true.prop.men <-  d.MCAR.cov.50 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.50.cl.true.prop.women <-  d.MCAR.cov.50 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.50.tree.trans.true.prop.men <-  d.MCAR.cov.50 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.50.tree.trans.true.prop.women <-  d.MCAR.cov.50 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# cov 55
-
-d.MCAR.cov.55.cl.prop.men <-  d.MCAR.cov.55 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.55.cl.prop.women <-  d.MCAR.cov.55 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.55.cl.true.prop.men <-  d.MCAR.cov.55 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.55.cl.true.prop.women <-  d.MCAR.cov.55 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.55.tree.trans.true.prop.men <-  d.MCAR.cov.55 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.55.tree.trans.true.prop.women <-  d.MCAR.cov.55 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# cov 60
-
-d.MCAR.cov.60.cl.prop.men <-  d.MCAR.cov.60 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.60.cl.prop.women <-  d.MCAR.cov.60 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.60.cl.true.prop.men <-  d.MCAR.cov.60 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.60.cl.true.prop.women <-  d.MCAR.cov.60 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.60.tree.trans.true.prop.men <-  d.MCAR.cov.60 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.60.tree.trans.true.prop.women <-  d.MCAR.cov.60 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# 65
-
-d.MCAR.cov.65.cl.prop.men <-  d.MCAR.cov.65 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.65.cl.prop.women <-  d.MCAR.cov.65 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.65.cl.true.prop.men <-  d.MCAR.cov.65 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.65.cl.true.prop.women <-  d.MCAR.cov.65 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.65.tree.trans.true.prop.men <-  d.MCAR.cov.65 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.65.tree.trans.true.prop.women <-  d.MCAR.cov.65 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# 70
-
-d.MCAR.cov.70.cl.prop.men <-  d.MCAR.cov.70 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.70.cl.prop.women <-  d.MCAR.cov.70 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.70.cl.true.prop.men <-  d.MCAR.cov.70 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.70.cl.true.prop.women <-  d.MCAR.cov.70 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.70.tree.trans.true.prop.men <-  d.MCAR.cov.70 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.70.tree.trans.true.prop.women <-  d.MCAR.cov.70 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# 75
-
-d.MCAR.cov.75.cl.prop.men <-  d.MCAR.cov.75 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.75.cl.prop.women <-  d.MCAR.cov.75 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.75.cl.true.prop.men <-  d.MCAR.cov.75 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.75.cl.true.prop.women <-  d.MCAR.cov.75 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.75.tree.trans.true.prop.men <-  d.MCAR.cov.75 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.75.tree.trans.true.prop.women <-  d.MCAR.cov.75 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-
-# cov 80
-
-d.MCAR.cov.80.cl.prop.men <-  d.MCAR.cov.80 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.80.cl.prop.women <-  d.MCAR.cov.80 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.80.cl.true.prop.men <-  d.MCAR.cov.80 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.80.cl.true.prop.women <-  d.MCAR.cov.80 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.80.tree.trans.true.prop.men <-  d.MCAR.cov.80 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.80.tree.trans.true.prop.women <-  d.MCAR.cov.80 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# cov 85
-
-d.MCAR.cov.85.cl.prop.men <-  d.MCAR.cov.85 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.85.cl.prop.women <-  d.MCAR.cov.85 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.85.cl.true.prop.men <-  d.MCAR.cov.85 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.85.cl.true.prop.women <-  d.MCAR.cov.85 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.85.tree.trans.true.prop.men <-  d.MCAR.cov.85 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.85.tree.trans.true.prop.women <-  d.MCAR.cov.85 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-# cov 90
-
-d.MCAR.cov.90.cl.prop.men <-  d.MCAR.cov.90 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.90.cl.prop.women <-  d.MCAR.cov.90 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.90.cl.true.prop.men <-  d.MCAR.cov.90 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.90.cl.true.prop.women <-  d.MCAR.cov.90 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.90.tree.trans.true.prop.men <-  d.MCAR.cov.90 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.90.tree.trans.true.prop.women <-  d.MCAR.cov.90 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-
-# cov 95
-
-
-d.MCAR.cov.95.cl.prop.men <-  d.MCAR.cov.95 %>%
-  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
-
-d.MCAR.cov.95.cl.prop.women <-  d.MCAR.cov.95 %>%
-  select(contains(".cl.prop.women")) 
-
-d.MCAR.cov.95.cl.true.prop.men <-  d.MCAR.cov.95 %>%
-  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
-
-d.MCAR.cov.95.cl.true.prop.women <-  d.MCAR.cov.95 %>%
-  select(contains(".cl.true.prop.women")) 
-
-d.MCAR.cov.95.tree.trans.true.prop.men <-  d.MCAR.cov.95 %>%
-  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
-
-d.MCAR.cov.95.tree.trans.true.prop.women <-  d.MCAR.cov.95 %>%
-  select(contains(".tree.trans.true.prop.women")) 
-
-
-
-
-# cov 100 and true
-
-
-d.MCAR.cov.100.prop.men <-  dr.cov.100 %>%
-  select(contains("true.prop.men")) # true proportion of pairings inferred 
-
-d.MCAR.cov.100.prop.women <-  dr.cov.100 %>%
-  select(contains("true.prop.women")) 
-
-
-
-# Tables of aggregated number of pairings --------------------------------------------
-
+# At 100%
 
 M.15.25.F.15.25.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.tree.tra.M.15.25.F.15.25) # quant.med(dr.cov.100$cov.100.M.15.25.F.15.25)
 M.25.40.F.15.25.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.tree.tra.M.25.40.F.15.25) # quant.med(dr.cov.100$cov.100.M.25.40.F.15.25)
@@ -1388,7 +1177,7 @@ write.csv(CI.cov.100.age.groups.table, file = "/home/david/age_mixing_AD_cluster
 
 
 
-# True pairings in different sequence coverage scenarios
+# At different sequence coverage scenarios
 
 # Cov 35
 
@@ -1594,7 +1383,7 @@ M.40.50.F.40.50.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.tree.tra.M.40
 
 
 
-# Agregated table of pairings: true  ---------------------
+# Agregated table of pairings: true 
 
 
 agreggated.pairings.mat <- matrix(c(M.15.25.F.15.25.MCAR.cov.35[2], M.15.25.F.15.25.MCAR.cov.40[2], 
@@ -1841,7 +1630,8 @@ write.csv(CI.agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters
 
 
 
-# Pairings in transmission clusters
+
+# Table of aggregated number of pairings inferred from transmission clusters ------------
 
 
 
@@ -2180,7 +1970,7 @@ rownames(MCAR.cov.95.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male
 
 
 
-# Agregated table of pairings in transmission clusters  ---------------------
+# Agregated table of pairings in transmission clusters  
 
 agreggated.pairings.cl.mat <- matrix(c(M.15.25.F.15.25.MCAR.cov.cl.35[2], M.15.25.F.15.25.MCAR.cov.cl.40[2], 
                                        M.15.25.F.15.25.MCAR.cov.cl.45[2], M.15.25.F.15.25.MCAR.cov.cl.50[2], 
@@ -2428,27 +2218,314 @@ write.csv(CI.agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clus
 
 
 
+# I. PROPORTIONS ---------------------------
+
+
+# Proportions of pairings across age groups --------------
+
+
+
+
+d.MCAR.cov.100.prop.men <-  dr.cov.100 %>%
+  select(contains("true.prop.men")) # true proportion of pairings inferred 
+
+d.MCAR.cov.100.prop.women <-  dr.cov.100 %>%
+  select(contains("true.prop.women")) 
+
+
+
+
 # proportion of pairings inferred from transmission clusters
 
 
-# Output analysis ---------------------------------------------------------
+# Output analysis
 
 # Proportions of pairing of men/women across different age groups in three cases
 
 # (i) transmission network built from transmission clusters
-# (ii) true proportions in true transmission network of these individuals in transmission clusters
-# (iii) true proportions in true transmission network of individuals in full phylogeny
-
 # .cl.prop.men
 # .cl.prop.women
+
+# (ii) true proportions in true transmission network of these individuals in transmission clusters
 # .cl.true.prop.men
 # .cl.true.prop.women
+
+
+# (iii) true proportions in true transmission network of individuals in full phylogeny
 # .tree.trans.true.prop.men
 # .tree.trans.true.prop.women
 
 
 
-# True proprotions at 100 coverage ------------------------------
+# cov 35
+
+d.MCAR.cov.35.cl.prop.men <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.35.cl.prop.women <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.35.cl.true.prop.men <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.35.cl.true.prop.women <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.35.tree.trans.true.prop.men <-  d.MCAR.cov.35 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.35.tree.trans.true.prop.women <-  d.MCAR.cov.35 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# cov 40
+
+d.MCAR.cov.40.cl.prop.men <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.40.cl.prop.women <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.40.cl.true.prop.men <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.40.cl.true.prop.women <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.40.tree.trans.true.prop.men <-  d.MCAR.cov.40 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.40.tree.trans.true.prop.women <-  d.MCAR.cov.40 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# cov 45
+
+d.MCAR.cov.45.cl.prop.men <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.45.cl.prop.women <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.45.cl.true.prop.men <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.45.cl.true.prop.women <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.45.tree.trans.true.prop.men <-  d.MCAR.cov.45 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.45.tree.trans.true.prop.women <-  d.MCAR.cov.45 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+
+# cov 50
+
+d.MCAR.cov.50.cl.prop.men <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.50.cl.prop.women <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.50.cl.true.prop.men <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.50.cl.true.prop.women <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.50.tree.trans.true.prop.men <-  d.MCAR.cov.50 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.50.tree.trans.true.prop.women <-  d.MCAR.cov.50 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# cov 55
+
+d.MCAR.cov.55.cl.prop.men <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.55.cl.prop.women <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.55.cl.true.prop.men <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.55.cl.true.prop.women <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.55.tree.trans.true.prop.men <-  d.MCAR.cov.55 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.55.tree.trans.true.prop.women <-  d.MCAR.cov.55 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# cov 60
+
+d.MCAR.cov.60.cl.prop.men <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.60.cl.prop.women <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.60.cl.true.prop.men <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.60.cl.true.prop.women <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.60.tree.trans.true.prop.men <-  d.MCAR.cov.60 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.60.tree.trans.true.prop.women <-  d.MCAR.cov.60 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# 65
+
+d.MCAR.cov.65.cl.prop.men <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.65.cl.prop.women <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.65.cl.true.prop.men <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.65.cl.true.prop.women <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.65.tree.trans.true.prop.men <-  d.MCAR.cov.65 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.65.tree.trans.true.prop.women <-  d.MCAR.cov.65 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# 70
+
+d.MCAR.cov.70.cl.prop.men <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.70.cl.prop.women <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.70.cl.true.prop.men <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.70.cl.true.prop.women <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.70.tree.trans.true.prop.men <-  d.MCAR.cov.70 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.70.tree.trans.true.prop.women <-  d.MCAR.cov.70 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# 75
+
+d.MCAR.cov.75.cl.prop.men <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.75.cl.prop.women <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.75.cl.true.prop.men <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.75.cl.true.prop.women <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.75.tree.trans.true.prop.men <-  d.MCAR.cov.75 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.75.tree.trans.true.prop.women <-  d.MCAR.cov.75 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+
+# cov 80
+
+d.MCAR.cov.80.cl.prop.men <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.80.cl.prop.women <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.80.cl.true.prop.men <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.80.cl.true.prop.women <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.80.tree.trans.true.prop.men <-  d.MCAR.cov.80 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.80.tree.trans.true.prop.women <-  d.MCAR.cov.80 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# cov 85
+
+d.MCAR.cov.85.cl.prop.men <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.85.cl.prop.women <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.85.cl.true.prop.men <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.85.cl.true.prop.women <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.85.tree.trans.true.prop.men <-  d.MCAR.cov.85 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.85.tree.trans.true.prop.women <-  d.MCAR.cov.85 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+# cov 90
+
+d.MCAR.cov.90.cl.prop.men <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.90.cl.prop.women <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.90.cl.true.prop.men <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.90.cl.true.prop.women <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.90.tree.trans.true.prop.men <-  d.MCAR.cov.90 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.90.tree.trans.true.prop.women <-  d.MCAR.cov.90 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+
+# cov 95
+
+
+d.MCAR.cov.95.cl.prop.men <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.95.cl.prop.women <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.95.cl.true.prop.men <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.95.cl.true.prop.women <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.true.prop.women")) 
+
+d.MCAR.cov.95.tree.trans.true.prop.men <-  d.MCAR.cov.95 %>%
+  select(contains(".tree.trans.true.prop.men"))  # true proportion of pairings in the full phylogenetic tree
+
+d.MCAR.cov.95.tree.trans.true.prop.women <-  d.MCAR.cov.95 %>%
+  select(contains(".tree.trans.true.prop.women")) 
+
+
+
+
+
+# True proprotions of men/women in pairing at 100 coverage ------------------------------
 
 
 # Vectors
@@ -2516,7 +2593,9 @@ d.MCAR.true.cov.100.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.100.prop.wom
 
 
 
-# I. Inference made in transmission clusters: proportions of men/women in pairings ------------------------------
+
+
+# Proportions of men/women inferred from pairings in transmission clusters ------------------------------
 
 
 
@@ -3398,7 +3477,8 @@ d.MCAR.cov.95.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.men[,9
 d.MCAR.cov.95.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.women[,9])
 
 
-# Table of proportions in transmission clusters inference ------------------------
+
+# Table of proportions inferred from transmission clusters inference ------------------------
 
 
 props <- matrix(c(d.MCAR.cov.35.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.prop.men15.25.F.15.25[2], 
@@ -3866,6 +3946,8 @@ rownames(CI.props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                         "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
 write.csv(CI.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/inferred.proportions_CI.MCAR.csv")
+
+
 
 
 #  Figures --------------
@@ -4621,9 +4703,7 @@ ggsave(filename = "plotall.proportions.M.pdf",
 
 
 
-
-# II. True proportions in pairings ------------------------------
-
+# True proportions of men/women  from true pairings  ------------------------------
 
 
 # Cov 35
@@ -5504,7 +5584,7 @@ d.MCAR.cov.95.cl.true.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.95.cl.true.p
 d.MCAR.cov.95.cl.true.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.95.cl.true.prop.women[,9])
 
 
-# Table of proportions in transmission clusters inference ------------------------
+# Table of true proportions from transmission clusters ------------------------
 
 
 true.props <- matrix(c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.true.prop.men15.25.F.15.25[2], 
@@ -5656,7 +5736,7 @@ true.props <- matrix(c(d.MCAR.cov.35.cl.true.prop.men15.25.F.15.25[2], d.MCAR.co
 ncol = 14,
 byrow = TRUE)
 
-true.props <- round(true.props, digits = 2)
+true.props <- round(true.props, digits = 3)
 
 
 colnames(true.props) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
@@ -6728,7 +6808,7 @@ ggsave(filename = "plotall.proportions.M.pdf",
 
 
 
-# Statistics of age difference  of individuals in pairings ----------------
+# Outputs for statistics of age difference  of individuals in pairings ----------------
 
 
 AD.MCAR.cov.35 <- d.MCAR.cov.35 %>%
@@ -6757,6 +6837,7 @@ AD.MCAR.cov.90 <- d.MCAR.cov.90 %>%
   select(contains(".AD.")) 
 AD.MCAR.cov.95 <- d.MCAR.cov.95 %>%
   select(contains(".AD.")) 
+
 
 
 # Statistics of age difference  of individuals's true pairings at 100% coverage ----------------
@@ -6842,10 +6923,7 @@ sd.AD.num.men.true.cov.100.40.50 <- quant.med(AD.true.cov.100[,54])
 
 
 
-
-# Statistics of age difference  of individuals's in pairings  ----------------
-
-# From transmission clusters
+# Statistics of age difference  for individuals' in pairings from transmission clusters --------------------------------
 
 # Cov 35
 
@@ -8339,6 +8417,8 @@ rownames(CI.AD.stats) <- c("mean.AD.women.cl.15.25", "mean.AD.men.cl.15.25",
 write.csv(CI.AD.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MCAR/inferred.AD.stats.clust_CI.MCAR.csv")
 
 
+
+# Figures -------------------
 
 
 # mean.women.15.25-------------------- 
@@ -10623,7 +10703,9 @@ write.csv(CI.AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/l
 
 
 
-# Visualisation of true AD statistics --------------------------------------
+# Figures --------------------------------------
+
+
 
 # Mean
 
@@ -11417,12 +11499,10 @@ ggsave(filename = "plotall.true.sd.AD.pdf",
 
 
 
-# GoF and errors ----------------------------------------------------------
+# III. GoF and errors ---------------------------
 
 
-# For proportions
-################
-
+# For proportions -----------------------
 
 
 # Difference between clusters' inference and true values in 100% coverage
@@ -12043,6 +12123,9 @@ MRE.error.infer.clust.cov.100.women.40.50.cov.95 <- MRE(error.infer.clust.cov.10
 
 
 
+# Figures -----------------
+
+
 MRE.error.infer.clust.cov.100.prop.men.15.25 <- data.frame(x=c(seq(from=35, to=95, by=5)),
                                                            
                                                            F = c(MRE.error.infer.clust.cov.100.men.15.25.cov.35, MRE.error.infer.clust.cov.100.men.15.25.cov.40,
@@ -12191,8 +12274,8 @@ ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.women.40.50.png",
 
 
 
-# For age difference statistics
-###############################
+# For age difference statistics ------------------------------------
+
 
 
 # Cov 35
@@ -14066,7 +14149,7 @@ MRE.error.infer.clust.cov.100.women.40.50.cov.95.sd <- MRE(error.infer.clust.cov
 
 
 
-# Visualization AD statistics errors --------------------------------------
+# Figures --------------------------------------
 
 
 # 15 - 25
