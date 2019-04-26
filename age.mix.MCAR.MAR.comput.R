@@ -76,11 +76,9 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   library(Rsamtools)
   library(robustbase)
   library(intergraph)
-  
   library(lubridate)
-  
   library(tidyr)
-  
+  library(data.table)
   
   
   ###########################################
@@ -93,16 +91,16 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
-  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.4,
                                    population.simtime = 45, 
-                                   population.nummen = 15000, 
-                                   population.numwomen = 15000,
+                                   population.nummen = 20000, 
+                                   population.numwomen = 20000,
                                    hivseed.time = 10, 
                                    hivseed.type = "amount",
                                    hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
-                                   formation.hazard.agegapry.meanage = -0.025,
+                                   formation.hazard.agegapry.meanage = -0.04,
                                    debut.debutage = 15
   )
   
@@ -168,7 +166,6 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   # ## Add-ons
   #
   ### BEGIN Add-on
-  cfg.list["formation.hazard.agegapry.baseline"] <- 2
   cfg.list["mortality.aids.survtime.C"] <- 65
   cfg.list["mortality.aids.survtime.k"] <- -0.2
   cfg.list["monitoring.fraction.log_viralload"] <- 0 #0.3
@@ -468,12 +465,95 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
         ##################
         
         
+        # hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
+        #                                              agegroup = c(15, 25),
+        #                                              timepoint = 40) %>%
+        #   dplyr::select(pointprevalence) %>%
+        #   dplyr::slice(2) %>%
+        #   as.numeric()
+        # 
+        # hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
+        #                                            agegroup = c(15, 25),
+        #                                            timepoint = 40) %>%
+        #   dplyr::select(pointprevalence) %>%
+        #   dplyr::slice(1) %>%
+        #   as.numeric()
+        # 
+        # hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
+        #                                               agegroup = c(25, 40),
+        #                                               timepoint = 40) %>%
+        #   dplyr::select(pointprevalence) %>%
+        #   dplyr::slice(2) %>%
+        #   as.numeric()
+        # 
+        # hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
+        #                                             agegroup = c(25, 40),
+        #                                             timepoint = 40) %>%
+        #   dplyr::select(pointprevalence) %>%
+        #   dplyr::slice(1) %>%
+        #   as.numeric()
+        # 
+        # hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
+        #                                               agegroup = c(40, 50),
+        #                                               timepoint = 40) %>%
+        #   dplyr::select(pointprevalence) %>%
+        #   dplyr::slice(2) %>%
+        #   as.numeric()
+        # 
+        # hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
+        #                                             agegroup = c(40, 50),
+        #                                             timepoint = 40) %>%
+        #   dplyr::select(pointprevalence) %>%
+        #   dplyr::slice(1) %>%
+        #   as.numeric()
+        
+        # Women
+        
         hiv.prev.lt25.women <- prevalence.calculator(datalist = datalist.agemix,
                                                      agegroup = c(15, 25),
                                                      timepoint = 40) %>%
           dplyr::select(pointprevalence) %>%
           dplyr::slice(2) %>%
           as.numeric()
+        
+        hiv.prev.25.30.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                      agegroup = c(25, 30),
+                                                      timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
+        hiv.prev.30.35.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                      agegroup = c(30, 35),
+                                                      timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
+        hiv.prev.35.40.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                      agegroup = c(35, 40),
+                                                      timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
+        hiv.prev.40.45.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                      agegroup = c(40, 45),
+                                                      timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
+        hiv.prev.45.50.women <- prevalence.calculator(datalist = datalist.agemix,
+                                                      agegroup = c(45, 50),
+                                                      timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(2) %>%
+          as.numeric()
+        
+        
+        
+        # Men
         
         hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
                                                    agegroup = c(15, 25),
@@ -482,33 +562,53 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
           dplyr::slice(1) %>%
           as.numeric()
         
-        hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
-                                                      agegroup = c(25, 40),
-                                                      timepoint = 40) %>%
-          dplyr::select(pointprevalence) %>%
-          dplyr::slice(2) %>%
-          as.numeric()
-        
-        hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
-                                                    agegroup = c(25, 40),
+        hiv.prev.25.30.men <- prevalence.calculator(datalist = datalist.agemix,
+                                                    agegroup = c(25, 30),
                                                     timepoint = 40) %>%
           dplyr::select(pointprevalence) %>%
           dplyr::slice(1) %>%
           as.numeric()
         
-        hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
-                                                      agegroup = c(40, 50),
-                                                      timepoint = 40) %>%
-          dplyr::select(pointprevalence) %>%
-          dplyr::slice(2) %>%
-          as.numeric()
-        
-        hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
-                                                    agegroup = c(40, 50),
+        hiv.prev.30.35.men <- prevalence.calculator(datalist = datalist.agemix,
+                                                    agegroup = c(30, 35),
                                                     timepoint = 40) %>%
           dplyr::select(pointprevalence) %>%
           dplyr::slice(1) %>%
           as.numeric()
+        
+        hiv.prev.35.40.men <- prevalence.calculator(datalist = datalist.agemix,
+                                                    agegroup = c(35, 40),
+                                                    timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
+        
+        hiv.prev.40.45.men <- prevalence.calculator(datalist = datalist.agemix,
+                                                    agegroup = c(40, 45),
+                                                    timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
+        
+        hiv.prev.45.50.men <- prevalence.calculator(datalist = datalist.agemix,
+                                                    agegroup = c(45, 50),
+                                                    timepoint = 40) %>%
+          dplyr::select(pointprevalence) %>%
+          dplyr::slice(1) %>%
+          as.numeric()
+        
+        
+        
+        
+        
+        # agegroup <- c("15-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+        
+        men.prev <- c(hiv.prev.lt25.men, hiv.prev.25.30.men, hiv.prev.30.35.men, hiv.prev.35.40.men, hiv.prev.40.45.men, hiv.prev.45.50.men)
+        names(men.prev) <- c("prev.m.15.24", "prev.m.25.29", "prev.m.30.34", "prev.m.35.39", "prev.m.40.44", "prev.m.45.49")
+        women.prev <- c(hiv.prev.lt25.women, hiv.prev.25.30.women, hiv.prev.30.35.women, hiv.prev.35.40.women, hiv.prev.40.45.women, hiv.prev.45.50.women)
+        names(women.prev) <- c("prev.w.15.24", "prev.w.25.29", "prev.w.30.34", "prev.w.35.39", "prev.w.40.44", "prev.w.45.49")        
+        
+        
         
         
         # (iv) Incidence
@@ -570,20 +670,18 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
         
         
         
-        summary.epidemic.rels.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men, 
-                                      hiv.prev.25.40.women, hiv.prev.25.40.men,
-                                      hiv.prev.40.50.women, hiv.prev.40.50.men, 
-                                      mix.rels.dat,
-                                      pp.cp.6months.male.rels, # pp.cp.6months.female.rels, 
-                                      
+        summary.epidemic.rels.df <- c(men.prev, women.prev,
                                       epi.rels.incidence.df.15.24.men, epi.rels.incidence.df.15.24.women, 
                                       epi.rels.incidence.df.25.39.men, epi.rels.incidence.df.25.39.women,
-                                      epi.rels.incidence.df.40.49.men, epi.rels.incidence.df.40.49.women)
+                                      epi.rels.incidence.df.40.49.men, epi.rels.incidence.df.40.49.women,
+                                      pp.cp.6months.male.rels, # , # pp.cp.6months.female.rels, 
+                                      mix.rels.dat) 
         
-        names(summary.epidemic.rels.df) <- c("R.prev.15.25.w", "R.prev.15.25.m", "R.prev.25.40.w", "R.prev.25.40.m", "R.prev.40.50.w", "R.prev.40.50.m",
-                                             names(mix.rels.dat), 
-                                             "R.p.prev.6months.m", # "R.p.prev.6months.f",
-                                             "R.inc.15.25.m", "R.inc.15.25.w", "R.inc.25.40.m", "R.inc.25.40.w", "R.inc.40.50.m", "R.inc.40.50.w")
+        names(summary.epidemic.rels.df) <- c(names(men.prev), names(women.prev),
+                                             "R.inc.15.25.m", "R.inc.15.25.w", "R.inc.25.40.m", 
+                                             "R.inc.25.40.w", "R.inc.40.50.m", "R.inc.40.50.w",
+                                             "R.p.prev.6months.m",
+                                             names(mix.rels.dat)) 
         
         
         
@@ -1366,7 +1464,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         res.clust.MCAR.cov.40 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1380,7 +1478,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         res.clust.MCAR.cov.45 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1394,7 +1492,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         res.clust.MCAR.cov.50 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1408,7 +1506,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         res.clust.MCAR.cov.55 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1422,7 +1520,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MCAR.cov.60 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -1437,7 +1535,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MCAR.cov.65 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -1452,7 +1550,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1469,7 +1567,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1485,7 +1583,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1502,7 +1600,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         res.clust.MCAR.cov.85 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1516,7 +1614,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1533,7 +1631,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         res.clust.MCAR.cov.95 <- tryCatch(age.mixing.MCAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1547,7 +1645,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                          error=function(e) return(rep(NA, 198)))
+                                          error=function(e) return(rep(NA, 111)))
         
         # 100 Coverage
         
@@ -1563,7 +1661,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                                age.group.25.40 = c(25,40),
                                                                age.group.40.50 = c(40,50),
                                                                cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         names.columns <- names(res.clust.MCAR.cov.100)
@@ -1605,7 +1703,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.a.cov.40 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1620,7 +1718,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.a.cov.45 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1635,7 +1733,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.a.cov.50 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1650,7 +1748,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.a.cov.55 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1665,7 +1763,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MAR.a.cov.60 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -1681,7 +1779,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MAR.a.cov.65 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -1697,7 +1795,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1715,7 +1813,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1732,7 +1830,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1750,7 +1848,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.a.cov.85 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1765,7 +1863,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1783,7 +1881,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.a.cov.95 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1798,7 +1896,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1838,7 +1936,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.b.cov.40 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1853,7 +1951,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.b.cov.45 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1868,7 +1966,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.b.cov.50 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1883,7 +1981,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.b.cov.55 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1898,7 +1996,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MAR.b.cov.60 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -1914,7 +2012,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MAR.b.cov.65 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -1930,7 +2028,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1948,7 +2046,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1965,7 +2063,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -1983,7 +2081,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.b.cov.85 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -1998,7 +2096,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -2016,7 +2114,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.b.cov.95 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -2031,7 +2129,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -2069,7 +2167,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.c.cov.40 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -2084,7 +2182,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.c.cov.45 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -2099,7 +2197,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.c.cov.50 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -2114,7 +2212,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.c.cov.55 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -2129,7 +2227,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MAR.c.cov.60 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -2145,7 +2243,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         res.clust.MAR.c.cov.65 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
@@ -2161,7 +2259,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -2179,7 +2277,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -2196,7 +2294,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -2214,7 +2312,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.c.cov.85 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -2229,7 +2327,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -2247,7 +2345,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         res.clust.MAR.c.cov.95 <- tryCatch(age.mixing.MAR.fun(simpact.trans.net = simpact.trans.net.adv,  
                                                               datalist.agemix = datalist.agemix, 
@@ -2262,7 +2360,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                                               age.group.25.40 = c(25,40),
                                                               age.group.40.50 = c(40,50),
                                                               cut.off = 7),
-                                           error=function(e) return(rep(NA, 198)))
+                                           error=function(e) return(rep(NA, 111)))
         
         
         
@@ -2305,7 +2403,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
         
       }else{
         
-        results.outputvector <- rep(NA, 10513) # 19 + 198 + 198*13*4
+        results.outputvector <- rep(NA, 5908) # 25 + 111 + 111*13*4
         
       }
       
