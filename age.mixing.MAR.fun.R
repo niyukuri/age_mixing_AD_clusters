@@ -72,6 +72,7 @@
 # - mean, median, and standard devation of transmission cluster sizes
 
 
+
 age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv, 
                                datalist.agemix = datalist.agemix,
                                work.dir = work.dir,  
@@ -99,10 +100,10 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
   
   
   
-  
   # Data list of infected individuals
   
-  # Select IDs in MCAR scenario
+  # Select IDs in MAR scenario
+  
   
   simpact.trans.net <- simpact.trans.net
   limitTransmEvents <- limitTransmEvents
@@ -121,9 +122,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
                                 age.group.40.50 = age.group.40.50)
   
   
-
   if(length(mAr.IDs) >= 20){
-    
     
     
     simpact.trans.net.adv <- simpact.trans.net
@@ -265,121 +264,236 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     # (iii) Prevalence
     
-    
-    hiv.prev.lt25.women <-prevalence.calculator(datalist = datalist.agemix,
-                                                agegroup = c(15, 25),
-                                                timepoint = 40) %>%
-      dplyr::select(pointprevalence) %>%
-      dplyr::slice(2) %>%
-      as.numeric()
-    
-    hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
-                                               agegroup = c(15, 25),
-                                               timepoint = 40) %>%
-      dplyr::select(pointprevalence) %>%
-      dplyr::slice(1) %>%
-      as.numeric()
-    
-    hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
-                                                  agegroup = c(25, 40),
-                                                  timepoint = 40) %>%
-      dplyr::select(pointprevalence) %>%
-      dplyr::slice(2) %>%
-      as.numeric()
-    
-    hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
-                                                agegroup = c(25, 40),
-                                                timepoint = 40) %>%
-      dplyr::select(pointprevalence) %>%
-      dplyr::slice(1) %>%
-      as.numeric()
-    
-    hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
-                                                  agegroup = c(40, 50),
-                                                  timepoint = 40) %>%
-      dplyr::select(pointprevalence) %>%
-      dplyr::slice(2) %>%
-      as.numeric()
-    
-    hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
-                                                agegroup = c(40, 50),
-                                                timepoint = 40) %>%
-      dplyr::select(pointprevalence) %>%
-      dplyr::slice(1) %>%
-      as.numeric()
-    
-    
-    # (iv) Incidence
+    # 
+    # hiv.prev.lt25.women <-prevalence.calculator(datalist = datalist.agemix,
+    #                                             agegroup = c(15, 25),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.lt25.men <- prevalence.calculator(datalist = datalist.agemix,
+    #                                            agegroup = c(15, 25),
+    #                                            timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.25.40.women <- prevalence.calculator(datalist = datalist.agemix,
+    #                                               agegroup = c(25, 40),
+    #                                               timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.25.40.men <- prevalence.calculator(datalist = datalist.agemix,
+    #                                             agegroup = c(25, 40),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.40.50.women <- prevalence.calculator(datalist = datalist.agemix,
+    #                                               agegroup = c(40, 50),
+    #                                               timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.40.50.men <- prevalence.calculator(datalist = datalist.agemix,
+    #                                             agegroup = c(40, 50),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
     
     
-    epi.transm.incidence.df.15.24.men <- incidence.calculator(datalist = datalist.agemix,
-                                                              agegroup = c(15, 25),
-                                                              timewindow = timewindow,
-                                                              only.active = "No") %>%
-      dplyr::select(incidence) %>%
-      dplyr::slice(1) %>%
-      as.numeric()
+    # Prevalence and incidence don't have any sense since the selected individuals are HIV+ ------------------------------
     
-    epi.transm.incidence.df.15.24.women <- incidence.calculator(datalist = datalist.agemix,
-                                                                agegroup = c(15, 25),
-                                                                timewindow = timewindow,
-                                                                only.active = "No") %>%
-      dplyr::select(incidence) %>%
-      dplyr::slice(2) %>%
-      as.numeric()
+    # # Women
+    # 
+    # hiv.prev.lt25.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                              agegroup = c(15, 25),
+    #                                              timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.25.30.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                               agegroup = c(25, 30),
+    #                                               timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.30.35.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                               agegroup = c(30, 35),
+    #                                               timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.35.40.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                               agegroup = c(35, 40),
+    #                                               timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.40.45.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                               agegroup = c(40, 45),
+    #                                               timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.45.50.women <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                               agegroup = c(45, 50),
+    #                                               timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # 
+    # 
+    # # Men
+    # 
+    # hiv.prev.lt25.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                            agegroup = c(15, 25),
+    #                                            timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.25.30.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                             agegroup = c(25, 30),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.30.35.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                             agegroup = c(30, 35),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.35.40.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                             agegroup = c(35, 40),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.40.45.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                             agegroup = c(40, 45),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # hiv.prev.45.50.men <- prevalence.calculator(datalist = transm.datalist.agemix,
+    #                                             agegroup = c(45, 50),
+    #                                             timepoint = 40) %>%
+    #   dplyr::select(pointprevalence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # 
+    # 
+    # 
+    # 
+    # # agegroup <- c("15-24", "25-29", "30-34", "35-39", "40-44", "45-49")
+    # 
+    # men.prev <- c(hiv.prev.lt25.men, hiv.prev.25.30.men, hiv.prev.30.35.men, hiv.prev.35.40.men, hiv.prev.40.45.men, hiv.prev.45.50.men)
+    # names(men.prev) <- c("prev.m.15.24", "prev.m.25.29", "prev.m.30.34", "prev.m.35.39", "prev.m.40.44", "prev.m.45.49")
+    # women.prev <- c(hiv.prev.lt25.women, hiv.prev.25.30.women, hiv.prev.30.35.women, hiv.prev.35.40.women, hiv.prev.40.45.women, hiv.prev.45.50.women)
+    # names(women.prev) <- c("prev.w.15.24", "prev.w.25.29", "prev.w.30.34", "prev.w.35.39", "prev.w.40.44", "prev.w.45.49")        
+    # 
+    # # (iv) Incidence
+    # 
+    # 
+    # epi.transm.incidence.df.15.24.men <- incidence.calculator(datalist = datalist.agemix,
+    #                                                           agegroup = c(15, 25),
+    #                                                           timewindow = timewindow,
+    #                                                           only.active = "No") %>%
+    #   dplyr::select(incidence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # epi.transm.incidence.df.15.24.women <- incidence.calculator(datalist = datalist.agemix,
+    #                                                             agegroup = c(15, 25),
+    #                                                             timewindow = timewindow,
+    #                                                             only.active = "No") %>%
+    #   dplyr::select(incidence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # 
+    # 
+    # epi.transm.incidence.df.25.39.men <- incidence.calculator(datalist = datalist.agemix,
+    #                                                           agegroup = c(25, 40),
+    #                                                           timewindow = timewindow,
+    #                                                           only.active = "No") %>%
+    #   dplyr::select(incidence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # epi.transm.incidence.df.25.39.women <- incidence.calculator(datalist = datalist.agemix,
+    #                                                             agegroup = c(25, 40),
+    #                                                             timewindow = timewindow,
+    #                                                             only.active = "No") %>%
+    #   dplyr::select(incidence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
+    # 
+    # epi.transm.incidence.df.40.49.men <- incidence.calculator(datalist = datalist.agemix,
+    #                                                           agegroup = c(40, 50),
+    #                                                           timewindow = timewindow,
+    #                                                           only.active = "No") %>%
+    #   dplyr::select(incidence) %>%
+    #   dplyr::slice(1) %>%
+    #   as.numeric()
+    # 
+    # epi.transm.incidence.df.40.49.women <- incidence.calculator(datalist = datalist.agemix,
+    #                                                             agegroup = c(40, 50),
+    #                                                             timewindow = timewindow,
+    #                                                             only.active = "No") %>%
+    #   dplyr::select(incidence) %>%
+    #   dplyr::slice(2) %>%
+    #   as.numeric()
+    # 
     
     
-    
-    epi.transm.incidence.df.25.39.men <- incidence.calculator(datalist = datalist.agemix,
-                                                              agegroup = c(25, 40),
-                                                              timewindow = timewindow,
-                                                              only.active = "No") %>%
-      dplyr::select(incidence) %>%
-      dplyr::slice(1) %>%
-      as.numeric()
-    
-    epi.transm.incidence.df.25.39.women <- incidence.calculator(datalist = datalist.agemix,
-                                                                agegroup = c(25, 40),
-                                                                timewindow = timewindow,
-                                                                only.active = "No") %>%
-      dplyr::select(incidence) %>%
-      dplyr::slice(2) %>%
-      as.numeric()
-    
-    
-    epi.transm.incidence.df.40.49.men <- incidence.calculator(datalist = datalist.agemix,
-                                                              agegroup = c(40, 50),
-                                                              timewindow = timewindow,
-                                                              only.active = "No") %>%
-      dplyr::select(incidence) %>%
-      dplyr::slice(1) %>%
-      as.numeric()
-    
-    epi.transm.incidence.df.40.49.women <- incidence.calculator(datalist = datalist.agemix,
-                                                                agegroup = c(40, 50),
-                                                                timewindow = timewindow,
-                                                                only.active = "No") %>%
-      dplyr::select(incidence) %>%
-      dplyr::slice(2) %>%
-      as.numeric()
+    # summary.epidemic.transm.df <- c(men.prev, women.prev,
+    #                                 mix.rels.transm.dat,
+    #                                 pp.cp.6months.male.transm, # pp.cp.6months.female.transm, 
+    #                                 
+    #                                 epi.transm.incidence.df.15.24.men, epi.transm.incidence.df.15.24.women, 
+    #                                 epi.transm.incidence.df.25.39.men, epi.transm.incidence.df.25.39.women,
+    #                                 epi.transm.incidence.df.40.49.men, epi.transm.incidence.df.40.49.women)
+    # 
+    # 
+    # names(summary.epidemic.transm.df) <- c(names(men.prev), names(women.prev),
+    #                                        names(mix.rels.transm.dat), 
+    #                                        "T.p.prev.6months.m", # "T.p.prev.6months.f",
+    #                                        "T.inc.15.25.m", "T.inc.15.25.w", "T.inc.25.40.m", "T.inc.25.40.w", "T.inc.40.50.m", "T.inc.40.50.w")
+    # 
+    # 
+    # 
     
     
+    # Sexual behaviour stats
     
-    summary.epidemic.transm.df <- c(hiv.prev.lt25.women, hiv.prev.lt25.men, 
-                                    hiv.prev.25.40.women, hiv.prev.25.40.men,
-                                    hiv.prev.40.50.women, hiv.prev.40.50.men, 
-                                    mix.rels.transm.dat,
-                                    pp.cp.6months.male.transm, # pp.cp.6months.female.transm, 
-                                    
-                                    epi.transm.incidence.df.15.24.men, epi.transm.incidence.df.15.24.women, 
-                                    epi.transm.incidence.df.25.39.men, epi.transm.incidence.df.25.39.women,
-                                    epi.transm.incidence.df.40.49.men, epi.transm.incidence.df.40.49.women)
+    summary.sex.behav.transm.df <- c(mix.rels.transm.dat,
+                                     pp.cp.6months.male.transm) # pp.cp.6months.female.transm,)
     
     
-    names(summary.epidemic.transm.df) <- c("T.prev.15.25.w", "T.prev.15.25.m", "T.prev.25.40.w", "T.prev.25.40.m", "T.prev.40.50.w", "T.prev.40.50.m",
-                                           names(mix.rels.transm.dat), 
-                                           "T.p.prev.6months.m", # "T.p.prev.6months.f",
-                                           "T.inc.15.25.m", "T.inc.15.25.w", "T.inc.25.40.m", "T.inc.25.40.w", "T.inc.40.50.m", "T.inc.40.50.w")
+    names(summary.sex.behav.transm.df) <- c(names(mix.rels.transm.dat), 
+                                            "T.p.prev.6months.m")
+    
     
     
     
@@ -1133,10 +1247,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     
     
-    # 1.
-    
-    # Age structure in transmission clusters as observed from phylogenetic tree #
-    ##################################################################################
+    # 1. Age structure in transmission clusters as observed from phylogenetic tree  ----------------------------
     
     
     age.groups.filtered.trans.clust.network.fun <- function(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
@@ -1306,7 +1417,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       men.15.25.women.25.40.1 <- vector()
       men.15.25.women.40.50.1 <- vector()
       
-      if(nrow(men.age.table.1)>1){
+      if(nrow(men.age.table.1)>=1){
         
         for (j in 1:nrow(men.age.table.1)) {
           
@@ -1341,7 +1452,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       women.15.25.men.25.40.2 <- vector()
       women.15.25.men.40.50.2 <- vector()
       
-      if(nrow(women.age.table.1)>1){
+      if(nrow(women.age.table.1)>=1){
         
         for (j in 1:nrow(women.age.table.1)) {
           
@@ -1379,7 +1490,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       men.25.40.women.40.50.1 <- vector()
       
       
-      if(nrow(men.age.table.1) >1 ){
+      if(nrow(men.age.table.1) >=1 ){
         for (j in 1:nrow(men.age.table.1)) {
           
           
@@ -1415,7 +1526,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       women.25.40.men.25.40.2 <- vector()
       women.25.40.men.40.50.2 <- vector()
       
-      if(nrow(women.age.table.1) >1){
+      if(nrow(women.age.table.1) >=1){
         
         for (j in 1:nrow(women.age.table.1)) {
           
@@ -1451,7 +1562,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       men.40.50.women.25.40.1 <- vector()
       men.40.50.women.40.50.1 <- vector()
       
-      if(nrow(men.age.table.1) >1 ){
+      if(nrow(men.age.table.1) >=1 ){
         
         for (j in 1:nrow(men.age.table.1)) {
           
@@ -1488,7 +1599,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       women.40.50.men.25.40.2 <- vector()
       women.40.50.men.40.50.2 <- vector()
       
-      if(nrow(women.age.table.1) >1){
+      if(nrow(women.age.table.1) >=1){
         
         for (j in 1:nrow(women.age.table.1)) {
           
@@ -1551,6 +1662,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       men.25.40.T <- sum(length(men.25.40.women.15.25), length(men.25.40.women.25.40), length(men.25.40.women.40.50)) # number of pairings of men between 25 and 39 
       men.40.50.T <- sum(length(men.40.50.women.15.25), length(men.40.50.women.25.40), length(men.40.50.women.40.50)) # number of pairings of men between 40 and 49 
       
+      
       # proportion of men in different age groups
       prop.men.age.groups.table <- matrix(c(length(men.15.25.women.15.25)/men.15.25.T, length(men.15.25.women.25.40)/men.15.25.T, length(men.15.25.women.40.50)/men.15.25.T,
                                             length(men.25.40.women.15.25)/men.25.40.T, length(men.25.40.women.25.40)/men.25.40.T, length(men.25.40.women.40.50)/men.25.40.T,
@@ -1594,7 +1706,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     
     
-    # 1. Results: age structure table obtained from transmission network built from transmission clusters
+    # Results_1: age structure table obtained from transmission network built from transmission clusters -----------
     
     age.structure.transm.clust.List <- age.groups.filtered.trans.clust.network.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
                                                                                    transm.matrix = transm.matrix,
@@ -1684,6 +1796,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     med.AD.age.groups.cl <- age.structure.transm.clust.List$med.AD.age.groups 
     sd.AD.age.groups.cl <- age.structure.transm.clust.List$sd.AD.age.groups 
     
+    
     res1 <- c(table.cl.age.str, table.cl.age.str.prop.men, table.cl.age.str.prop.women, 
               numbers.individuals.age.groups.cl,
               mean.AD.age.groups.cl, med.AD.age.groups.cl,
@@ -1692,15 +1805,13 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     
     
-    # 2.
-    
-    # True age structure in transmission clusters as observed from transmission network #
-    #####################################################################################
+    # 2. True age structure in transmission clusters as observed from transmission network -------------------------
     
     age.groups.filtered.transmission.clust.fun <- function(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
                                                            age.group.15.25 = c(15,25),
                                                            age.group.25.40 = c(25,40),
                                                            age.group.40.50 = c(40,50)){
+      
       num.women.15.25 <- dplyr::filter(table.transm.clust.net.igraph, 
                                        table.transm.clust.net.igraph$GenderRec=="1" & table.transm.clust.net.igraph$ageSampTimeRec >= age.group.15.25[1] & table.transm.clust.net.igraph$ageSampTimeRec < age.group.15.25[2])
       
@@ -1870,7 +1981,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       men.15.25.women.25.40.1 <- vector()
       men.15.25.women.40.50.1 <- vector()
       
-      if(nrow(men.age.table.1) >1 ){
+      if(nrow(men.age.table.1) >=1 ){
         
         for (j in 1:nrow(men.age.table.1)) {
           
@@ -1904,7 +2015,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       women.15.25.men.25.40.2 <- vector()
       women.15.25.men.40.50.2 <- vector()
       
-      if(nrow(women.age.table.1) >1 ){
+      if(nrow(women.age.table.1) >=1 ){
         for (j in 1:nrow(women.age.table.1)) {
           
           
@@ -1937,7 +2048,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       men.25.40.women.25.40.1 <- vector()
       men.25.40.women.40.50.1 <- vector()
       
-      if(nrow(men.age.table.1) >1 ){
+      if(nrow(men.age.table.1) >=1 ){
         
         for (j in 1:nrow(men.age.table.1)) {
           
@@ -1973,7 +2084,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       women.25.40.men.25.40.2 <- vector()
       women.25.40.men.40.50.2 <- vector()
       
-      if(nrow(women.age.table.1) >1 ){
+      if(nrow(women.age.table.1) >=1 ){
         
         for (j in 1:nrow(women.age.table.1)) {
           
@@ -2007,7 +2118,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       men.40.50.women.25.40.1 <- vector()
       men.40.50.women.40.50.1 <- vector()
       
-      if(nrow(men.age.table.1) > 1 ){
+      if(nrow(men.age.table.1) >=1 ){
         
         for (j in 1:nrow(men.age.table.1)) {
           
@@ -2044,7 +2155,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
       women.40.50.men.25.40.2 <- vector()
       women.40.50.men.40.50.2 <- vector()
       
-      if(nrow(women.age.table.1) >1 ){
+      if(nrow(women.age.table.1) >=1 ){
         
         for (j in 1:nrow(women.age.table.1)) {
           
@@ -2154,7 +2265,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     
     
-    # 2. Results: true age structure table from transmission network of these individuals in transmission clusters
+    # Results_2: true age structure table from transmission network of these individuals in transmission clusters ---------------------
     
     age.structure.transm.clus.true.List <- age.groups.filtered.transmission.clust.fun(table.transm.clust.net.igraph = table.transm.clust.net.igraph,
                                                                                       age.group.15.25 = c(15,25),
@@ -2257,808 +2368,804 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     
     
-    # 3.
-    
-    # True age structure in transmission transmission network for selected individuals #
-    #####################################################################################
-    
-    age.groups.filtered.transmission.net.fun <- function(table.transmission.net.cov = table.simpact.trans.net.cov,
-                                                         age.group.15.25 = c(15,25),
-                                                         age.group.25.40 = c(25,40),
-                                                         age.group.40.50 = c(40,50)){
-      
-      num.women.15.25 <- dplyr::filter(table.transmission.net.cov, 
-                                       table.transmission.net.cov$GenderRec=="1" & table.transmission.net.cov$ageSampTimeRec >= age.group.15.25[1] & table.transmission.net.cov$ageSampTimeRec < age.group.15.25[2])
-      
-      num.men.15.25 <- dplyr::filter(table.transmission.net.cov, 
-                                     table.transmission.net.cov$GenderRec=="0" & table.transmission.net.cov$ageSampTimeRec >= age.group.15.25[1] & table.transmission.net.cov$ageSampTimeRec < age.group.15.25[2])
-      
-      
-      num.women.25.40 <- dplyr::filter(table.transmission.net.cov, 
-                                       table.transmission.net.cov$GenderRec=="1" & table.transmission.net.cov$ageSampTimeRec >= age.group.25.40[1] & table.transmission.net.cov$ageSampTimeRec < age.group.25.40[2])
-      
-      
-      num.men.25.40 <- dplyr::filter(table.transmission.net.cov, 
-                                     table.transmission.net.cov$GenderRec=="0" & table.transmission.net.cov$ageSampTimeRec >= age.group.25.40[1] & table.transmission.net.cov$ageSampTimeRec < age.group.25.40[2])
-      
-      
-      
-      num.women.40.50 <- dplyr::filter(table.transmission.net.cov, 
-                                       table.transmission.net.cov$GenderRec=="1" & table.transmission.net.cov$ageSampTimeRec >= age.group.40.50[1] & table.transmission.net.cov$ageSampTimeRec < age.group.40.50[2])
-      
-      
-      
-      num.men.40.50 <- dplyr::filter(table.transmission.net.cov, 
-                                     table.transmission.net.cov$GenderRec=="0" & table.transmission.net.cov$ageSampTimeRec >= age.group.40.50[1] & table.transmission.net.cov$ageSampTimeRec < age.group.40.50[2])
-      
-      
-      numbers.indiv.women.15.25 <- nrow(num.women.15.25)
-      numbers.indiv.men.15.25 <- nrow(num.men.15.25)
-      numbers.indiv.women.25.40 <- nrow(num.women.25.40)
-      numbers.indiv.men.25.40 <- nrow(num.men.25.40)
-      numbers.indiv.women.40.50 <- nrow(num.women.40.50)
-      numbers.indiv.men.40.50 <- nrow(num.men.40.50)
-      
-      numbers.individuals.age.groups <- c(numbers.indiv.women.15.25, numbers.indiv.men.15.25, 
-                                          numbers.indiv.women.25.40, numbers.indiv.men.25.40,
-                                          numbers.indiv.women.40.50, numbers.indiv.men.40.50)
-      
-      names(numbers.individuals.age.groups) <- c("num.women.true.net.15.25", "num.men.true.net.15.25", 
-                                                 "num.women.true.net.25.40", "num.men.true.net.25.40",
-                                                 "num.women.true.net.40.50", "num.men.true.net.40.50")
-      
-      
-      
-      num.women.15.25$ageSampTimeDon <- num.women.15.25$SampTime - num.women.15.25$TOBDon
-      num.men.15.25$ageSampTimeDon <- num.men.15.25$SampTime - num.men.15.25$TOBDon
-      
-      num.women.25.40$ageSampTimeDon <- num.women.25.40$SampTime - num.women.25.40$TOBDon
-      num.men.25.40$ageSampTimeDon <- num.men.25.40$SampTime - num.men.25.40$TOBDon
-      
-      num.women.40.50$ageSampTimeDon <- num.women.40.50$SampTime - num.women.40.50$TOBDon
-      num.men.40.50$ageSampTimeDon <- num.men.40.50$SampTime - num.men.40.50$TOBDon
-      
-      
-      # Age differences
-      
-      AD.num.women.15.25 <- abs(num.women.15.25$ageSampTimeDon - num.women.15.25$ageSampTimeRec)
-      AD.num.men.15.25 <- abs(num.men.15.25$ageSampTimeDon - num.men.15.25$ageSampTimeRec)
-      
-      AD.num.women.25.40 <- abs(num.women.25.40$ageSampTimeDon - num.women.25.40$ageSampTimeRec)
-      AD.num.men.25.40 <- abs(num.men.25.40$ageSampTimeDon - num.men.25.40$ageSampTimeRec)
-      
-      AD.num.women.40.50 <- abs(num.women.40.50$ageSampTimeDon - num.women.40.50$ageSampTimeRec)
-      AD.num.men.40.50 <- abs(num.men.40.50$ageSampTimeDon - num.men.40.50$ageSampTimeRec)
-      
-      
-      mean.AD.num.women.15.25 <- mean(AD.num.women.15.25)
-      med.AD.num.women.15.25 <- median(AD.num.women.15.25)
-      sd.AD.num.women.15.25 <- sd(AD.num.women.15.25)
-      
-      mean.AD.num.men.15.25 <- mean(AD.num.men.15.25)
-      med.AD.num.men.15.25 <- median(AD.num.men.15.25)
-      sd.AD.num.men.15.25 <- sd(AD.num.men.15.25)
-      
-      
-      mean.AD.num.women.25.40 <- mean(AD.num.women.25.40)
-      med.AD.num.women.25.40 <- median(AD.num.women.25.40)
-      sd.AD.num.women.25.40 <- sd(AD.num.women.25.40)
-      
-      mean.AD.num.men.25.40 <- mean(AD.num.men.25.40)
-      med.AD.num.men.25.40 <- median(AD.num.men.25.40)
-      sd.AD.num.men.25.40 <- sd(AD.num.men.25.40)
-      
-      
-      mean.AD.num.women.40.50 <- mean(AD.num.women.40.50)
-      med.AD.num.women.40.50 <- median(AD.num.women.40.50)
-      sd.AD.num.women.40.50 <- sd(AD.num.women.40.50)
-      
-      mean.AD.num.men.40.50 <- mean(AD.num.men.40.50)
-      med.AD.num.men.40.50 <- median(AD.num.men.40.50)
-      sd.AD.num.men.40.50 <- sd(AD.num.men.40.50)
-      
-      
-      mean.AD.age.groups <- c(mean.AD.num.women.15.25, mean.AD.num.men.15.25,
-                              mean.AD.num.women.25.40, mean.AD.num.men.25.40,
-                              mean.AD.num.women.40.50, mean.AD.num.men.40.50)
-      
-      names(mean.AD.age.groups) <- c("mean.AD.num.women.true.net.15.25", "mean.AD.num.men.true.net.15.25",
-                                     "mean.AD.num.women.true.net.25.40", "mean.AD.num.men.true.net.25.40",
-                                     "mean.AD.num.women.true.net.40.50", "mean.AD.num.men.true.net.40.50")
-      
-      
-      
-      med.AD.age.groups <- c(med.AD.num.women.15.25, med.AD.num.men.15.25,
-                             med.AD.num.women.25.40, med.AD.num.men.25.40,
-                             med.AD.num.women.40.50, med.AD.num.men.40.50)
-      
-      names(med.AD.age.groups) <- c("med.AD.num.women.true.net.15.25", "med.AD.num.men.true.net.15.25",
-                                    "med.AD.num.women.true.net.25.40", "med.AD.num.men.true.net.25.40",
-                                    "med.AD.num.women.true.net.40.50", "med.AD.num.men.true.net.40.50")
-      
-      
-      
-      sd.AD.age.groups <- c(sd.AD.num.women.15.25, sd.AD.num.men.15.25,
-                            sd.AD.num.women.25.40, sd.AD.num.men.25.40,
-                            sd.AD.num.women.40.50, sd.AD.num.men.40.50)
-      
-      names(sd.AD.age.groups) <- c("sd.AD.num.women.true.net.15.25", "sd.AD.num.men.true.net.15.25",
-                                   "sd.AD.num.women.true.net.25.40", "sd.AD.num.men.true.net.25.40",
-                                   "sd.AD.num.women.true.net.40.50", "sd.AD.num.men.true.net.40.50")
-      
-      
-      table.transmission.net.cov$ageSampTimeDon <- table.transmission.net.cov$SampTime - table.transmission.net.cov$TOBDon
-      
-      men.df <- dplyr::filter(table.transmission.net.cov, table.transmission.net.cov$GenderDon=="0")
-      women.df <- dplyr::filter(table.transmission.net.cov, table.transmission.net.cov$GenderDon=="1")
-      
-      Age.groups.table <- NULL
-      
-      filter.dat <- function(table.dat.fr = table.dat.fr){
-        v1.dat <- vector()
-        v2.dat <- vector()
-        age1.dat <- vector()
-        age2.dat <- vector()
-        gender1.dat <- vector()
-        gender2.dat <- vector()
-        
-        for(i in 1:nrow(table.dat.fr)){
-          
-          v1 <- table.dat.fr$RecId[i]
-          v2 <- table.dat.fr$DonId[i]
-          
-          index.v1 <- which(table.dat.fr$RecId == v1)
-          
-          age1 <- table.dat.fr$ageSampTimeRec[index.v1]
-          age2 <- table.dat.fr$ageSampTimeDon[index.v1]
-          
-          gender1 <- table.dat.fr$GenderRec[index.v1]
-          gender2 <- table.dat.fr$GenderDon[index.v1]
-          
-          v1.dat <- c(v1.dat, v1)
-          v2.dat <- c(v2.dat, v2)
-          age1.dat <- c(age1.dat, age1)
-          age2.dat <- c(age2.dat, age2)
-          gender1.dat <- c(gender1.dat, gender1)
-          gender2.dat <- c(gender2.dat, gender2)
-          
-        }
-        
-        age.table <- data.frame(v1.dat, gender1.dat, age1.dat, v2.dat, gender2.dat, age2.dat)
-        
-        return(age.table)
-        
-      }
-      
-      age.table <-   filter.dat(table.dat.fr = table.transmission.net.cov)
-      
-      # men as donors
-      men.age.table.1 <-  filter.dat(table.dat.fr = men.df) # dplyr::filter(age.table, age.table$gender1.dat==0)
-      
-      # women as donors
-      women.age.table.1 <-   filter.dat(table.dat.fr = women.df) # dplyr::filter(age.table, age.table$gender1.dat==1)
-      
-      
-      # men 15.25 and women
-      
-      men.15.25.women.15.25.1 <- vector()
-      men.15.25.women.25.40.1 <- vector()
-      men.15.25.women.40.50.1 <- vector()
-      
-      if(nrow(men.age.table.1) >1 ){
-        
-        for (j in 1:nrow(men.age.table.1)) {
-          
-          
-          if(men.age.table.1$age1.dat[j] >= age.group.15.25[1] & men.age.table.1$age1.dat[j] < age.group.15.25[2]){
-            
-            if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
-              
-              men.15.25.women.15.25.1 <- c(men.15.25.women.15.25.1, men.age.table.1$age2.dat[j])
-              
-            }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
-              
-              men.15.25.women.25.40.1 <- c(men.15.25.women.25.40.1, men.age.table.1$age2.dat[j])
-              
-            }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
-              
-              men.15.25.women.40.50.1 <- c(men.15.25.women.40.50.1, men.age.table.1$age2.dat[j])
-            }
-            
-          }
-          
-          
-        }
-        
-      }
-      
-      
-      # women 15.25 and men
-      
-      women.15.25.men.15.25.2 <- vector()
-      women.15.25.men.25.40.2 <- vector()
-      women.15.25.men.40.50.2 <- vector()
-      
-      if(nrow(women.age.table.1) >1 ){
-        
-        for (j in 1:nrow(women.age.table.1)) {
-          
-          
-          if(women.age.table.1$age1.dat[j] >= age.group.15.25[1] & women.age.table.1$age1.dat[j] < age.group.15.25[2]){
-            
-            if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
-              
-              women.15.25.men.15.25.2 <- c(women.15.25.men.15.25.2, women.age.table.1$age2.dat[j])
-              
-            }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
-              
-              women.15.25.men.25.40.2 <- c(women.15.25.men.25.40.2, women.age.table.1$age2.dat[j])
-              
-            }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
-              
-              women.15.25.men.40.50.2 <- c(women.15.25.men.40.50.2, women.age.table.1$age2.dat[j])
-            }
-            
-          }
-          
-          
-        }
-        
-      }
-      
-      
-      
-      # men 25.40 and women
-      
-      men.25.40.women.15.25.1 <- vector()
-      men.25.40.women.25.40.1 <- vector()
-      men.25.40.women.40.50.1 <- vector()
-      
-      if(nrow(men.age.table.1) > 1 ){
-        
-        for (j in 1:nrow(men.age.table.1)) {
-          
-          
-          if(men.age.table.1$age1.dat[j] >= age.group.25.40[1] & men.age.table.1$age1.dat[j] < age.group.25.40[2]){
-            
-            if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
-              
-              men.25.40.women.15.25.1 <- c(men.25.40.women.15.25.1, men.age.table.1$age2.dat[j])
-              
-            }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
-              
-              men.25.40.women.25.40.1 <- c(men.25.40.women.25.40.1, men.age.table.1$age2.dat[j])
-              
-            }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
-              
-              men.25.40.women.40.50.1 <- c(men.25.40.women.40.50.1, men.age.table.1$age2.dat[j])
-            }
-            
-          }
-          
-        }
-        
-      }
-      
-      
-      
-      
-      
-      # women 25.40 and men
-      
-      women.25.40.men.15.25.2 <- vector()
-      women.25.40.men.25.40.2 <- vector()
-      women.25.40.men.40.50.2 <- vector()
-      
-      if(nrow(women.age.table.1) >1 ){
-        
-        for (j in 1:nrow(women.age.table.1)) {
-          
-          
-          if(women.age.table.1$age1.dat[j] >= age.group.25.40[1] & women.age.table.1$age1.dat[j] < age.group.25.40[2]){
-            
-            if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
-              
-              women.25.40.men.15.25.2 <- c(women.25.40.men.15.25.2, women.age.table.1$age2.dat[j])
-              
-            }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
-              
-              women.25.40.men.25.40.2 <- c(women.25.40.men.25.40.2, women.age.table.1$age2.dat[j])
-              
-            }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
-              
-              women.25.40.men.40.50.2 <- c(women.25.40.men.40.50.2, women.age.table.1$age2.dat[j])
-            }
-            
-          }
-          
-          
-        }
-        
-      }
-      
-      
-      
-      
-      # men 40.50 and women
-      
-      men.40.50.women.15.25.1 <- vector()
-      men.40.50.women.25.40.1 <- vector()
-      men.40.50.women.40.50.1 <- vector()
-      
-      
-      if(nrow(men.age.table.1) >1 ){
-        
-        for (j in 1:nrow(men.age.table.1)) {
-          
-          
-          if(men.age.table.1$age1.dat[j] >= age.group.40.50[1] & men.age.table.1$age1.dat[j] < age.group.40.50[2]){
-            
-            if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
-              
-              men.40.50.women.15.25.1 <- c(men.40.50.women.15.25.1, men.age.table.1$age2.dat[j])
-              
-            }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
-              
-              men.40.50.women.25.40.1 <- c(men.40.50.women.25.40.1, men.age.table.1$age2.dat[j])
-              
-            }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
-              
-              men.40.50.women.40.50.1 <- c(men.40.50.women.40.50.1, men.age.table.1$age2.dat[j])
-            }
-            
-          }
-          
-          
-        }
-      }
-      
-      
-      
-      
-      
-      # women 40.50 and men
-      
-      women.40.50.men.15.25.2 <- vector()
-      women.40.50.men.25.40.2 <- vector()
-      women.40.50.men.40.50.2 <- vector()
-      
-      
-      if(nrow(women.age.table.1) > 1 ){
-        
-        for (j in 1:nrow(women.age.table.1)) {
-          
-          
-          if(women.age.table.1$age1.dat[j] >= age.group.40.50[1] & women.age.table.1$age1.dat[j] < age.group.40.50[2]){
-            
-            if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
-              
-              women.40.50.men.15.25.2 <- c(women.40.50.men.15.25.2, women.age.table.1$age2.dat[j])
-              
-            }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
-              
-              women.40.50.men.25.40.2 <- c(women.40.50.men.25.40.2, women.age.table.1$age2.dat[j])
-              
-            }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
-              
-              women.40.50.men.40.50.2 <- c(women.40.50.men.40.50.2, women.age.table.1$age2.dat[j])
-            }
-            
-          }
-          
-          
-        }
-        
-      }
-      
-      
-      
-      
-      
-      men.15.25.women.15.25 <- c(men.15.25.women.15.25.1, women.15.25.men.15.25.2)
-      
-      men.15.25.women.25.40 <- c(men.15.25.women.25.40.1, women.25.40.men.15.25.2)
-      
-      men.15.25.women.40.50 <- c(men.15.25.women.40.50.1, women.40.50.men.15.25.2)
-      
-      men.25.40.women.15.25 <- c(men.25.40.women.15.25.1, women.15.25.men.25.40.2)
-      
-      men.25.40.women.25.40 <- c(men.25.40.women.25.40.1, women.25.40.men.25.40.2)
-      
-      men.25.40.women.40.50 <- c(men.25.40.women.40.50.1, women.40.50.men.25.40.2)
-      
-      men.40.50.women.15.25 <- c(men.40.50.women.15.25.1, women.15.25.men.40.50.2)
-      
-      men.40.50.women.25.40 <- c(men.40.50.women.25.40.1, women.25.40.men.40.50.2)
-      
-      men.40.50.women.40.50 <- c(men.40.50.women.40.50.1, women.40.50.men.40.50.2)
-      
-      
-      Age.groups.table <- matrix(c(length(men.15.25.women.15.25), length(men.15.25.women.25.40), length(men.15.25.women.40.50),
-                                   length(men.25.40.women.15.25), length(men.25.40.women.25.40), length(men.25.40.women.40.50),
-                                   length(men.40.50.women.15.25), length(men.40.50.women.25.40), length(men.40.50.women.40.50)),
-                                 ncol = 3,
-                                 byrow = TRUE)
-      
-      colnames(Age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
-      rownames(Age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
-      
-      Age.groups.table <- as.table(Age.groups.table)
-      
-      
-      men.15.25.T <- sum(length(men.15.25.women.15.25), length(men.15.25.women.25.40), length(men.15.25.women.40.50))
-      men.25.40.T <- sum(length(men.25.40.women.15.25), length(men.25.40.women.25.40), length(men.25.40.women.40.50))
-      men.40.50.T <- sum(length(men.40.50.women.15.25), length(men.40.50.women.25.40), length(men.40.50.women.40.50))
-      
-      prop.men.age.groups.table <- matrix(c(length(men.15.25.women.15.25)/men.15.25.T, length(men.15.25.women.25.40)/men.15.25.T, length(men.15.25.women.40.50)/men.15.25.T,
-                                            length(men.25.40.women.15.25)/men.25.40.T, length(men.25.40.women.25.40)/men.25.40.T, length(men.25.40.women.40.50)/men.25.40.T,
-                                            length(men.40.50.women.15.25)/men.40.50.T, length(men.40.50.women.25.40)/men.40.50.T, length(men.40.50.women.40.50)/men.40.50.T),
-                                          ncol = 3,
-                                          byrow = TRUE)
-      
-      colnames(prop.men.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
-      rownames(prop.men.age.groups.table) <- c("prop.Male.15.25", "prop.Male.25.40", "prop.Male.40.50")
-      
-      
-      
-      
-      women.15.25.T <- sum(length(men.15.25.women.15.25), length(men.25.40.women.15.25), length(men.40.50.women.15.25))
-      women.25.40.T <- sum(length(men.15.25.women.25.40), length(men.25.40.women.25.40), length(men.40.50.women.25.40))
-      women.40.50.T <- sum(length(men.15.25.women.40.50), length(men.25.40.women.40.50), length(men.40.50.women.40.50))
-      
-      prop.women.age.groups.table <- matrix(c(length(men.15.25.women.15.25)/women.15.25.T, length(men.25.40.women.15.25)/women.15.25.T, length(men.40.50.women.15.25)/women.15.25.T,
-                                              length(men.15.25.women.25.40)/women.25.40.T, length(men.25.40.women.25.40)/women.25.40.T, length(men.40.50.women.25.40)/women.25.40.T,
-                                              length(men.15.25.women.40.50)/women.40.50.T, length(men.25.40.women.40.50)/women.40.50.T, length(men.40.50.women.40.50)/women.40.50.T),
-                                            ncol = 3,
-                                            byrow = TRUE)
-      
-      colnames(prop.women.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
-      rownames(prop.women.age.groups.table) <- c("prop.Female.15.25", "prop.Female.25.40", "prop.Female.40.50")
-      
-      
-      # Directionality
-      
-      men.15.25.women.15.25.MtoW <- c(men.15.25.women.15.25.1)
-      
-      men.15.25.women.25.40.MtoW <- c(men.15.25.women.25.40.1)
-      
-      men.15.25.women.40.50.MtoW <- c(men.15.25.women.40.50.1)
-      
-      men.25.40.women.15.25.MtoW <- c(men.25.40.women.15.25.1)
-      
-      men.25.40.women.25.40.MtoW <- c(men.25.40.women.25.40.1)
-      
-      men.25.40.women.40.50.MtoW <- c(men.25.40.women.40.50.1)
-      
-      men.40.50.women.15.25.MtoW <- c(men.40.50.women.15.25.1)
-      
-      men.40.50.women.25.40.MtoW <- c(men.40.50.women.25.40.1)
-      
-      men.40.50.women.40.50.MtoW <- c(men.40.50.women.40.50.1)
-      
-      
-      Age.groups.table.MtoW <- matrix(c(length(men.15.25.women.15.25.MtoW), length(men.15.25.women.25.40.MtoW), length(men.15.25.women.40.50.MtoW),
-                                        length(men.25.40.women.15.25.MtoW), length(men.25.40.women.25.40.MtoW), length(men.25.40.women.40.50.MtoW),
-                                        length(men.40.50.women.15.25.MtoW), length(men.40.50.women.25.40.MtoW), length(men.40.50.women.40.50.MtoW)),
-                                      ncol = 3,
-                                      byrow = TRUE)
-      
-      colnames(Age.groups.table.MtoW) <- c("Female.15.25.MtoW", "Female.25.40.MtoW", "Female.40.50.MtoW")
-      rownames(Age.groups.table.MtoW) <- c("Male.15.25.MtoW", "Male.25.40.MtoW", "Male.40.50.MtoW")
-      
-      Age.groups.table.MtoW <- as.table(Age.groups.table.MtoW)
-      
-      
-      men.15.25.T.MtoW <- sum(length(men.15.25.women.15.25.MtoW), length(men.15.25.women.25.40.MtoW), length(men.15.25.women.40.50.MtoW))
-      men.25.40.T.MtoW <- sum(length(men.25.40.women.15.25.MtoW), length(men.25.40.women.25.40.MtoW), length(men.25.40.women.40.50.MtoW))
-      men.40.50.T.MtoW <- sum(length(men.40.50.women.15.25.MtoW), length(men.40.50.women.25.40.MtoW), length(men.40.50.women.40.50.MtoW))
-      
-      prop.men.age.groups.table.MtoW <- matrix(c(length(men.15.25.women.15.25.MtoW)/men.15.25.T.MtoW, length(men.15.25.women.25.40.MtoW)/men.15.25.T.MtoW, length(men.15.25.women.40.50.MtoW)/men.15.25.T.MtoW,
-                                                 length(men.25.40.women.15.25.MtoW)/men.25.40.T.MtoW, length(men.25.40.women.25.40.MtoW)/men.25.40.T.MtoW, length(men.25.40.women.40.50.MtoW)/men.25.40.T.MtoW,
-                                                 length(men.40.50.women.15.25.MtoW)/men.40.50.T.MtoW, length(men.40.50.women.25.40.MtoW)/men.40.50.T.MtoW, length(men.40.50.women.40.50.MtoW)/men.40.50.T.MtoW),
-                                               ncol = 3,
-                                               byrow = TRUE)
-      
-      colnames(prop.men.age.groups.table.MtoW) <- c("Female.15.25.MtoW", "Female.25.40.MtoW", "Female.40.50.MtoW")
-      rownames(prop.men.age.groups.table.MtoW) <- c("prop.Male.15.25.MtoW", "prop.Male.25.40.MtoW", "prop.Male.40.50.MtoW")
-      
-      
-      
-      men.15.25.women.15.25.WtoM <- c(women.15.25.men.15.25.2)
-      
-      men.15.25.women.25.40.WtoM <- c(women.25.40.men.15.25.2)
-      
-      men.15.25.women.40.50.WtoM <- c(women.40.50.men.15.25.2)
-      
-      men.25.40.women.15.25.WtoM <- c( women.15.25.men.25.40.2)
-      
-      men.25.40.women.25.40.WtoM <- c(women.25.40.men.25.40.2)
-      
-      men.25.40.women.40.50.WtoM <- c(women.40.50.men.25.40.2)
-      
-      men.40.50.women.15.25.WtoM <- c(women.15.25.men.40.50.2)
-      
-      men.40.50.women.25.40.WtoM <- c(women.25.40.men.40.50.2)
-      
-      men.40.50.women.40.50.WtoM <- c(women.40.50.men.40.50.2)
-      
-      Age.groups.table.WtoM <- matrix(c(length(men.15.25.women.15.25.WtoM), length(men.15.25.women.25.40.WtoM), length(men.15.25.women.40.50.WtoM),
-                                        length(men.25.40.women.15.25.WtoM), length(men.25.40.women.25.40.WtoM), length(men.25.40.women.40.50.WtoM),
-                                        length(men.40.50.women.15.25.WtoM), length(men.40.50.women.25.40.WtoM), length(men.40.50.women.40.50.WtoM)),
-                                      ncol = 3,
-                                      byrow = TRUE)
-      
-      colnames(Age.groups.table.WtoM) <- c("Female.15.25.WtoM", "Female.25.40.WtoM", "Female.40.50.WtoM")
-      rownames(Age.groups.table.WtoM) <- c("Male.15.25.WtoM", "Male.25.40.WtoM", "Male.40.50.WtoM")
-      
-      Age.groups.table.WtoM <- as.table(Age.groups.table.WtoM)
-      
-      
-      men.15.25.T.WtoM <- sum(length(men.15.25.women.15.25.WtoM), length(men.15.25.women.25.40.WtoM), length(men.15.25.women.40.50.WtoM))
-      men.25.40.T.WtoM <- sum(length(men.25.40.women.15.25.WtoM), length(men.25.40.women.25.40.WtoM), length(men.25.40.women.40.50.WtoM))
-      men.40.50.T.WtoM <- sum(length(men.40.50.women.15.25.WtoM), length(men.40.50.women.25.40.WtoM), length(men.40.50.women.40.50.WtoM))
-      
-      prop.men.age.groups.table.WtoM <- matrix(c(length(men.15.25.women.15.25.WtoM)/men.15.25.T.WtoM, length(men.15.25.women.25.40.WtoM)/men.15.25.T.WtoM, length(men.15.25.women.40.50.WtoM)/men.15.25.T.WtoM,
-                                                 length(men.25.40.women.15.25.WtoM)/men.25.40.T.WtoM, length(men.25.40.women.25.40.WtoM)/men.25.40.T.WtoM, length(men.25.40.women.40.50.WtoM)/men.25.40.T.WtoM,
-                                                 length(men.40.50.women.15.25.WtoM)/men.40.50.T.WtoM, length(men.40.50.women.25.40.WtoM)/men.40.50.T.WtoM, length(men.40.50.women.40.50.WtoM)/men.40.50.T.WtoM),
-                                               ncol = 3,
-                                               byrow = TRUE)
-      
-      colnames(prop.men.age.groups.table.WtoM) <- c("Female.15.25.WtoM", "Female.25.40.WtoM", "Female.40.50.WtoM")
-      rownames(prop.men.age.groups.table.WtoM) <- c("prop.Male.15.25.WtoM", "prop.Male.25.40.WtoM", "prop.Male.40.50.WtoM")
-      
-      
-      
-      outputlist <- NULL
-      outputlist$Age.groups.table <- Age.groups.table
-      outputlist$prop.men.age.groups.table <- prop.men.age.groups.table
-      outputlist$prop.women.age.groups.table <- prop.women.age.groups.table
-      
-      outputlist$Age.groups.table.MtoW <- Age.groups.table.MtoW
-      outputlist$prop.men.age.groups.table.MtoW <- prop.men.age.groups.table.MtoW
-      outputlist$Age.groups.table.WtoM <- Age.groups.table.WtoM
-      outputlist$prop.men.age.groups.table.WtoM <- prop.men.age.groups.table.WtoM
-      
-      
-      outputlist$numbers.individuals.age.groups <- numbers.individuals.age.groups
-      outputlist$mean.AD.age.groups <- mean.AD.age.groups
-      outputlist$med.AD.age.groups <- med.AD.age.groups
-      outputlist$sd.AD.age.groups <- sd.AD.age.groups
-      
-      
-      return(outputlist)
-      
-    }
-    
-    
-    
-    
-    # 3. Results: true age structure table from transmission network of all selected individuals (people in the phylogenetic tree)
-    
-    age.structure.transm.net.true.List <- age.groups.filtered.transmission.net.fun(table.transmission.net.cov = table.simpact.trans.net.cov,
-                                                                                   age.group.15.25 = c(15,25),
-                                                                                   age.group.25.40 = c(25,40),
-                                                                                   age.group.40.50 = c(40,50))
-    # (i) Aggregated tables of pairings
-    
-    age.structure.transm.net.true <- age.structure.transm.net.true.List$Age.groups.table
-    
-    tree.tra.age.str.M.15.25.F.15.25 <- age.structure.transm.net.true[1,][1]
-    tree.tra.age.str.M.25.40.F.15.25 <- age.structure.transm.net.true[2,][1]
-    tree.tra.age.str.M.40.50.F.15.25 <- age.structure.transm.net.true[3,][1]
-    
-    tree.tra.age.str.M.15.25.F.25.40 <- age.structure.transm.net.true[1,][2]
-    tree.tra.age.str.M.25.40.F.25.40 <- age.structure.transm.net.true[2,][2]
-    tree.tra.age.str.M.40.50.F.25.40 <- age.structure.transm.net.true[3,][2]
-    
-    tree.tra.age.str.M.15.25.F.40.50 <- age.structure.transm.net.true[1,][3]
-    tree.tra.age.str.M.25.40.F.40.50 <- age.structure.transm.net.true[2,][3]
-    tree.tra.age.str.M.40.50.F.40.50 <- age.structure.transm.net.true[3,][3]
-    
-    table.tree.tra.age.str <- c(tree.tra.age.str.M.15.25.F.15.25, tree.tra.age.str.M.25.40.F.15.25, tree.tra.age.str.M.40.50.F.15.25,
-                                tree.tra.age.str.M.15.25.F.25.40, tree.tra.age.str.M.25.40.F.25.40, tree.tra.age.str.M.40.50.F.25.40,
-                                tree.tra.age.str.M.15.25.F.40.50, tree.tra.age.str.M.25.40.F.40.50, tree.tra.age.str.M.40.50.F.40.50)
-    
-    
-    names(table.tree.tra.age.str) <- c("tree.tra.M.15.25.F.15.25", "tree.tra.M.25.40.F.15.25", "tree.tra.M.40.50.F.15.25",
-                                       "tree.tra.M.15.25.F.25.40", "tree.tra.M.25.40.F.25.40", "tree.tra.M.40.50.F.25.40",
-                                       "tree.tra.M.15.25.F.40.50", "tree.tra.M.25.40.F.40.50", "tree.tra.M.40.50.F.40.50")
-    
-    
-    
-    # (ii) Pairings table with men to women infection: directionality
-    
-    age.structure.transm.net.true.MtoW <- age.structure.transm.net.true.List$Age.groups.table.MtoW
-    
-    tree.tra.age.str.MtoW.M.15.25.F.15.25 <- age.structure.transm.net.true.MtoW[1,][1]
-    tree.tra.age.str.MtoW.M.25.40.F.15.25 <- age.structure.transm.net.true.MtoW[2,][1]
-    tree.tra.age.str.MtoW.M.40.50.F.15.25 <- age.structure.transm.net.true.MtoW[3,][1]
-    
-    tree.tra.age.str.MtoW.M.15.25.F.25.40 <- age.structure.transm.net.true.MtoW[1,][2]
-    tree.tra.age.str.MtoW.M.25.40.F.25.40 <- age.structure.transm.net.true.MtoW[2,][2]
-    tree.tra.age.str.MtoW.M.40.50.F.25.40 <- age.structure.transm.net.true.MtoW[3,][2]
-    
-    tree.tra.age.str.MtoW.M.15.25.F.40.50 <- age.structure.transm.net.true.MtoW[1,][3]
-    tree.tra.age.str.MtoW.M.25.40.F.40.50 <- age.structure.transm.net.true.MtoW[2,][3]
-    tree.tra.age.str.MtoW.M.40.50.F.40.50 <- age.structure.transm.net.true.MtoW[3,][3]
-    
-    table.tree.tra.age.str.MtoW <- c(tree.tra.age.str.MtoW.M.15.25.F.15.25, tree.tra.age.str.MtoW.M.25.40.F.15.25, tree.tra.age.str.MtoW.M.40.50.F.15.25,
-                                     tree.tra.age.str.MtoW.M.15.25.F.25.40, tree.tra.age.str.MtoW.M.25.40.F.25.40, tree.tra.age.str.MtoW.M.40.50.F.25.40,
-                                     tree.tra.age.str.MtoW.M.15.25.F.40.50, tree.tra.age.str.MtoW.M.25.40.F.40.50, tree.tra.age.str.MtoW.M.40.50.F.40.50)
-    
-    
-    names(table.tree.tra.age.str.MtoW) <- c("tree.tra.MtoW.M.15.25.F.15.25", "tree.tra.MtoW.M.25.40.F.15.25", "tree.tra.MtoW.M.40.50.F.15.25",
-                                            "tree.tra.MtoW.M.15.25.F.25.40", "tree.tra.MtoW.M.25.40.F.25.40", "tree.tra.MtoW.M.40.50.F.25.40",
-                                            "tree.tra.MtoW.M.15.25.F.40.50", "tree.tra.MtoW.M.25.40.F.40.50", "tree.tra.MtoW.M.40.50.F.40.50")
-    
-    
-    
-    # (iii) Pairings table with women to men infection: directionality
-    
-    age.structure.transm.net.true.WtoM <- age.structure.transm.net.true.List$Age.groups.table.WtoM
-    
-    tree.tra.age.str.WtoM.M.15.25.F.15.25 <- age.structure.transm.net.true.WtoM[1,][1]
-    tree.tra.age.str.WtoM.M.25.40.F.15.25 <- age.structure.transm.net.true.WtoM[2,][1]
-    tree.tra.age.str.WtoM.M.40.50.F.15.25 <- age.structure.transm.net.true.WtoM[3,][1]
-    
-    tree.tra.age.str.WtoM.M.15.25.F.25.40 <- age.structure.transm.net.true.WtoM[1,][2]
-    tree.tra.age.str.WtoM.M.25.40.F.25.40 <- age.structure.transm.net.true.WtoM[2,][2]
-    tree.tra.age.str.WtoM.M.40.50.F.25.40 <- age.structure.transm.net.true.WtoM[3,][2]
-    
-    tree.tra.age.str.WtoM.M.15.25.F.40.50 <- age.structure.transm.net.true.WtoM[1,][3]
-    tree.tra.age.str.WtoM.M.25.40.F.40.50 <- age.structure.transm.net.true.WtoM[2,][3]
-    tree.tra.age.str.WtoM.M.40.50.F.40.50 <- age.structure.transm.net.true.WtoM[3,][3]
-    
-    table.tree.tra.age.str.WtoM <- c(tree.tra.age.str.WtoM.M.15.25.F.15.25, tree.tra.age.str.WtoM.M.25.40.F.15.25, tree.tra.age.str.WtoM.M.40.50.F.15.25,
-                                     tree.tra.age.str.WtoM.M.15.25.F.25.40, tree.tra.age.str.WtoM.M.25.40.F.25.40, tree.tra.age.str.WtoM.M.40.50.F.25.40,
-                                     tree.tra.age.str.WtoM.M.15.25.F.40.50, tree.tra.age.str.WtoM.M.25.40.F.40.50, tree.tra.age.str.WtoM.M.40.50.F.40.50)
-    
-    
-    names(table.tree.tra.age.str.WtoM) <- c("tree.tra.WtoM.M.15.25.F.15.25", "tree.tra.WtoM.M.25.40.F.15.25", "tree.tra.WtoM.M.40.50.F.15.25",
-                                            "tree.tra.WtoM.M.15.25.F.25.40", "tree.tra.WtoM.M.25.40.F.25.40", "tree.tra.WtoM.M.40.50.F.25.40",
-                                            "tree.tra.WtoM.M.15.25.F.40.50", "tree.tra.WtoM.M.25.40.F.40.50", "tree.tra.WtoM.M.40.50.F.40.50")
-    
-    
-    
-    # (iv) Men's pairings proportions in aggregated table
-    
-    
-    age.structure.transm.net.true.prop.men <- age.structure.transm.net.true.List$prop.men.age.groups.table
-    
-    tree.trans.true.age.str.prop.men.15.25.F.15.25 <- age.structure.transm.net.true.prop.men[1,][1]
-    tree.trans.true.age.str.prop.men.25.40.F.15.25 <- age.structure.transm.net.true.prop.men[2,][1]
-    tree.trans.true.age.str.prop.men.40.50.F.15.25 <- age.structure.transm.net.true.prop.men[3,][1]
-    
-    tree.trans.true.age.str.prop.men.15.25.F.25.40 <- age.structure.transm.net.true.prop.men[1,][2]
-    tree.trans.true.age.str.prop.men.25.40.F.25.40 <- age.structure.transm.net.true.prop.men[2,][2]
-    tree.trans.true.age.str.prop.men.40.50.F.25.40 <- age.structure.transm.net.true.prop.men[3,][2]
-    
-    tree.trans.true.age.str.prop.men.15.25.F.40.50 <- age.structure.transm.net.true.prop.men[1,][3]
-    tree.trans.true.age.str.prop.men.25.40.F.40.50 <- age.structure.transm.net.true.prop.men[2,][3]
-    tree.trans.true.age.str.prop.men.40.50.F.40.50 <- age.structure.transm.net.true.prop.men[3,][3]
-    
-    table.tree.trans.true.age.str.prop.men <- c(tree.trans.true.age.str.prop.men.15.25.F.15.25, tree.trans.true.age.str.prop.men.25.40.F.15.25, tree.trans.true.age.str.prop.men.40.50.F.15.25,
-                                                tree.trans.true.age.str.prop.men.15.25.F.25.40, tree.trans.true.age.str.prop.men.25.40.F.25.40, tree.trans.true.age.str.prop.men.40.50.F.25.40,
-                                                tree.trans.true.age.str.prop.men.15.25.F.40.50, tree.trans.true.age.str.prop.men.25.40.F.40.50, tree.trans.true.age.str.prop.men.40.50.F.40.50)
-    
-    names(table.tree.trans.true.age.str.prop.men) <- c("tree.trans.true.prop.men15.25.F.15.25", "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25",
-                                                       "tree.trans.true.prop.men15.25.F.25.40", "tree.trans.true.prop.men25.40.F.25.40", "tree.trans.true.prop.men40.50.F.25.40",
-                                                       "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50", "tree.trans.true.prop.men40.50.F.40.50")
-    
-    
-    table.tree.trans.true.age.str.prop.men <- NA.handle.fun(input = table.tree.trans.true.age.str.prop.men)
-    
-    
-    # (v) Men's pairings proportions in men to women infection: directionality
-    
-    age.structure.transm.net.true.prop.men.MtoW <- age.structure.transm.net.true.List$prop.men.age.groups.table.MtoW
-    
-    tree.trans.true.age.str.MtoW.prop.men.15.25.F.15.25 <- age.structure.transm.net.true.prop.men.MtoW[1,][1]
-    tree.trans.true.age.str.MtoW.prop.men.25.40.F.15.25 <- age.structure.transm.net.true.prop.men.MtoW[2,][1]
-    tree.trans.true.age.str.MtoW.prop.men.40.50.F.15.25 <- age.structure.transm.net.true.prop.men.MtoW[3,][1]
-    
-    tree.trans.true.age.str.MtoW.prop.men.15.25.F.25.40 <- age.structure.transm.net.true.prop.men.MtoW[1,][2]
-    tree.trans.true.age.str.MtoW.prop.men.25.40.F.25.40 <- age.structure.transm.net.true.prop.men.MtoW[2,][2]
-    tree.trans.true.age.str.MtoW.prop.men.40.50.F.25.40 <- age.structure.transm.net.true.prop.men.MtoW[3,][2]
-    
-    tree.trans.true.age.str.MtoW.prop.men.15.25.F.40.50 <- age.structure.transm.net.true.prop.men.MtoW[1,][3]
-    tree.trans.true.age.str.MtoW.prop.men.25.40.F.40.50 <- age.structure.transm.net.true.prop.men.MtoW[2,][3]
-    tree.trans.true.age.str.MtoW.prop.men.40.50.F.40.50 <- age.structure.transm.net.true.prop.men.MtoW[3,][3]
-    
-    table.tree.trans.true.age.str.MtoW.prop.men <- c(tree.trans.true.age.str.MtoW.prop.men.15.25.F.15.25, tree.trans.true.age.str.MtoW.prop.men.25.40.F.15.25, tree.trans.true.age.str.MtoW.prop.men.40.50.F.15.25,
-                                                     tree.trans.true.age.str.MtoW.prop.men.15.25.F.25.40, tree.trans.true.age.str.MtoW.prop.men.25.40.F.25.40, tree.trans.true.age.str.MtoW.prop.men.40.50.F.25.40,
-                                                     tree.trans.true.age.str.MtoW.prop.men.15.25.F.40.50, tree.trans.true.age.str.MtoW.prop.men.25.40.F.40.50, tree.trans.true.age.str.MtoW.prop.men.40.50.F.40.50)
-    
-    names(table.tree.trans.true.age.str.MtoW.prop.men) <- paste0("MtoW.", c("tree.trans.true.prop.men15.25.F.15.25", "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25",
-                                                                            "tree.trans.true.prop.men15.25.F.25.40", "tree.trans.true.prop.men25.40.F.25.40", "tree.trans.true.prop.men40.50.F.25.40",
-                                                                            "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50", "tree.trans.true.prop.men40.50.F.40.50"))
-    
-    table.tree.trans.true.age.str.MtoW.prop.men <- NA.handle.fun(input = table.tree.trans.true.age.str.MtoW.prop.men)
-    
-    
-    
-    # (vi) Men's pairings proportions in women to men infection: directionality
-    
-    age.structure.transm.net.true.prop.men.WtoM <- age.structure.transm.net.true.List$prop.men.age.groups.table.WtoM
-    
-    tree.trans.true.age.str.WtoM.prop.men.15.25.F.15.25 <- age.structure.transm.net.true.prop.men.WtoM[1,][1]
-    tree.trans.true.age.str.WtoM.prop.men.25.40.F.15.25 <- age.structure.transm.net.true.prop.men.WtoM[2,][1]
-    tree.trans.true.age.str.WtoM.prop.men.40.50.F.15.25 <- age.structure.transm.net.true.prop.men.WtoM[3,][1]
-    
-    tree.trans.true.age.str.WtoM.prop.men.15.25.F.25.40 <- age.structure.transm.net.true.prop.men.WtoM[1,][2]
-    tree.trans.true.age.str.WtoM.prop.men.25.40.F.25.40 <- age.structure.transm.net.true.prop.men.WtoM[2,][2]
-    tree.trans.true.age.str.WtoM.prop.men.40.50.F.25.40 <- age.structure.transm.net.true.prop.men.WtoM[3,][2]
-    
-    tree.trans.true.age.str.WtoM.prop.men.15.25.F.40.50 <- age.structure.transm.net.true.prop.men.WtoM[1,][3]
-    tree.trans.true.age.str.WtoM.prop.men.25.40.F.40.50 <- age.structure.transm.net.true.prop.men.WtoM[2,][3]
-    tree.trans.true.age.str.WtoM.prop.men.40.50.F.40.50 <- age.structure.transm.net.true.prop.men.WtoM[3,][3]
-    
-    table.tree.trans.true.age.str.WtoM.prop.men <- c(tree.trans.true.age.str.WtoM.prop.men.15.25.F.15.25, tree.trans.true.age.str.WtoM.prop.men.25.40.F.15.25, tree.trans.true.age.str.WtoM.prop.men.40.50.F.15.25,
-                                                     tree.trans.true.age.str.WtoM.prop.men.15.25.F.25.40, tree.trans.true.age.str.WtoM.prop.men.25.40.F.25.40, tree.trans.true.age.str.WtoM.prop.men.40.50.F.25.40,
-                                                     tree.trans.true.age.str.WtoM.prop.men.15.25.F.40.50, tree.trans.true.age.str.WtoM.prop.men.25.40.F.40.50, tree.trans.true.age.str.WtoM.prop.men.40.50.F.40.50)
-    
-    names(table.tree.trans.true.age.str.WtoM.prop.men) <- paste0("WtoM.", c("tree.trans.true.prop.men15.25.F.15.25", "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25",
-                                                                            "tree.trans.true.prop.men15.25.F.25.40", "tree.trans.true.prop.men25.40.F.25.40", "tree.trans.true.prop.men40.50.F.25.40",
-                                                                            "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50", "tree.trans.true.prop.men40.50.F.40.50"))
-    
-    
-    table.tree.trans.true.age.str.WtoM.prop.men <- NA.handle.fun(input = table.tree.trans.true.age.str.WtoM.prop.men)
-    
-    
-    
-    # (vii) Womens'  pairings proportions in aggregated table
-    
-    
-    age.structure.transm.clust.true.prop.women <- age.structure.transm.net.true.List$prop.women.age.groups.table
-    
-    tree.trans.true.age.str.prop.women.15.25.M.15.25 <- age.structure.transm.clust.true.prop.women[1,][1]
-    tree.trans.true.age.str.prop.women.25.40.M.15.25 <- age.structure.transm.clust.true.prop.women[2,][1]
-    tree.trans.true.age.str.prop.women.40.50.M.15.25 <- age.structure.transm.clust.true.prop.women[3,][1]
-    
-    tree.trans.true.age.str.prop.women.15.25.M.25.40 <- age.structure.transm.clust.true.prop.women[1,][2]
-    tree.trans.true.age.str.prop.women.25.40.M.25.40 <- age.structure.transm.clust.true.prop.women[2,][2]
-    tree.trans.true.age.str.prop.women.40.50.M.25.40 <- age.structure.transm.clust.true.prop.women[3,][2]
-    
-    tree.trans.true.age.str.prop.women.15.25.M.40.50 <- age.structure.transm.clust.true.prop.women[1,][3]
-    tree.trans.true.age.str.prop.women.25.40.M.40.50 <- age.structure.transm.clust.true.prop.women[2,][3]
-    tree.trans.true.age.str.prop.women.40.50.M.40.50 <- age.structure.transm.clust.true.prop.women[3,][3]
-    
-    table.tree.trans.true.age.str.prop.women <- c(tree.trans.true.age.str.prop.women.15.25.M.15.25, tree.trans.true.age.str.prop.women.25.40.M.15.25, tree.trans.true.age.str.prop.women.40.50.M.15.25,
-                                                  tree.trans.true.age.str.prop.women.15.25.M.25.40, tree.trans.true.age.str.prop.women.25.40.M.25.40, tree.trans.true.age.str.prop.women.40.50.M.25.40,
-                                                  tree.trans.true.age.str.prop.women.15.25.M.40.50, tree.trans.true.age.str.prop.women.25.40.M.40.50, tree.trans.true.age.str.prop.women.40.50.M.40.50)
-    
-    names(table.tree.trans.true.age.str.prop.women) <- c("tree.trans.true.prop.women15.25.M.15.25", "tree.trans.true.prop.women25.40.M.15.25", "tree.trans.true.prop.women40.50.M.15.25",
-                                                         "tree.trans.true.prop.women15.25.M.25.40", "tree.trans.true.prop.women25.40.M.25.40", "tree.trans.true.prop.women40.50.M.25.40",
-                                                         "tree.trans.true.prop.women15.25.M.40.50", "tree.trans.true.prop.women25.40.M.40.50", "tree.trans.true.prop.women40.50.M.40.50")
-    
-    
-    
-    table.tree.trans.true.age.str.prop.women <- NA.handle.fun(input = table.tree.trans.true.age.str.prop.women)
-    
+    # 3. True age structure in transmission transmission network for selected individuals ---------------------------------
     
     # 
+    # age.groups.filtered.transmission.net.fun <- function(table.transmission.net.cov = table.simpact.trans.net.cov,
+    #                                                      age.group.15.25 = c(15,25),
+    #                                                      age.group.25.40 = c(25,40),
+    #                                                      age.group.40.50 = c(40,50)){
+    #   
+    #   num.women.15.25 <- dplyr::filter(table.transmission.net.cov, 
+    #                                    table.transmission.net.cov$GenderRec=="1" & table.transmission.net.cov$ageSampTimeRec >= age.group.15.25[1] & table.transmission.net.cov$ageSampTimeRec < age.group.15.25[2])
+    #   
+    #   num.men.15.25 <- dplyr::filter(table.transmission.net.cov, 
+    #                                  table.transmission.net.cov$GenderRec=="0" & table.transmission.net.cov$ageSampTimeRec >= age.group.15.25[1] & table.transmission.net.cov$ageSampTimeRec < age.group.15.25[2])
+    #   
+    #   
+    #   num.women.25.40 <- dplyr::filter(table.transmission.net.cov, 
+    #                                    table.transmission.net.cov$GenderRec=="1" & table.transmission.net.cov$ageSampTimeRec >= age.group.25.40[1] & table.transmission.net.cov$ageSampTimeRec < age.group.25.40[2])
+    #   
+    #   
+    #   num.men.25.40 <- dplyr::filter(table.transmission.net.cov, 
+    #                                  table.transmission.net.cov$GenderRec=="0" & table.transmission.net.cov$ageSampTimeRec >= age.group.25.40[1] & table.transmission.net.cov$ageSampTimeRec < age.group.25.40[2])
+    #   
+    #   
+    #   
+    #   num.women.40.50 <- dplyr::filter(table.transmission.net.cov, 
+    #                                    table.transmission.net.cov$GenderRec=="1" & table.transmission.net.cov$ageSampTimeRec >= age.group.40.50[1] & table.transmission.net.cov$ageSampTimeRec < age.group.40.50[2])
+    #   
+    #   
+    #   
+    #   num.men.40.50 <- dplyr::filter(table.transmission.net.cov, 
+    #                                  table.transmission.net.cov$GenderRec=="0" & table.transmission.net.cov$ageSampTimeRec >= age.group.40.50[1] & table.transmission.net.cov$ageSampTimeRec < age.group.40.50[2])
+    #   
+    #   
+    #   numbers.indiv.women.15.25 <- nrow(num.women.15.25)
+    #   numbers.indiv.men.15.25 <- nrow(num.men.15.25)
+    #   numbers.indiv.women.25.40 <- nrow(num.women.25.40)
+    #   numbers.indiv.men.25.40 <- nrow(num.men.25.40)
+    #   numbers.indiv.women.40.50 <- nrow(num.women.40.50)
+    #   numbers.indiv.men.40.50 <- nrow(num.men.40.50)
+    #   
+    #   numbers.individuals.age.groups <- c(numbers.indiv.women.15.25, numbers.indiv.men.15.25, 
+    #                                       numbers.indiv.women.25.40, numbers.indiv.men.25.40,
+    #                                       numbers.indiv.women.40.50, numbers.indiv.men.40.50)
+    #   
+    #   names(numbers.individuals.age.groups) <- c("num.women.true.net.15.25", "num.men.true.net.15.25", 
+    #                                              "num.women.true.net.25.40", "num.men.true.net.25.40",
+    #                                              "num.women.true.net.40.50", "num.men.true.net.40.50")
+    #   
+    #   
+    #   
+    #   num.women.15.25$ageSampTimeDon <- num.women.15.25$SampTime - num.women.15.25$TOBDon
+    #   num.men.15.25$ageSampTimeDon <- num.men.15.25$SampTime - num.men.15.25$TOBDon
+    #   
+    #   num.women.25.40$ageSampTimeDon <- num.women.25.40$SampTime - num.women.25.40$TOBDon
+    #   num.men.25.40$ageSampTimeDon <- num.men.25.40$SampTime - num.men.25.40$TOBDon
+    #   
+    #   num.women.40.50$ageSampTimeDon <- num.women.40.50$SampTime - num.women.40.50$TOBDon
+    #   num.men.40.50$ageSampTimeDon <- num.men.40.50$SampTime - num.men.40.50$TOBDon
+    #   
+    #   
+    #   # Age differences
+    #   
+    #   AD.num.women.15.25 <- abs(num.women.15.25$ageSampTimeDon - num.women.15.25$ageSampTimeRec)
+    #   AD.num.men.15.25 <- abs(num.men.15.25$ageSampTimeDon - num.men.15.25$ageSampTimeRec)
+    #   
+    #   AD.num.women.25.40 <- abs(num.women.25.40$ageSampTimeDon - num.women.25.40$ageSampTimeRec)
+    #   AD.num.men.25.40 <- abs(num.men.25.40$ageSampTimeDon - num.men.25.40$ageSampTimeRec)
+    #   
+    #   AD.num.women.40.50 <- abs(num.women.40.50$ageSampTimeDon - num.women.40.50$ageSampTimeRec)
+    #   AD.num.men.40.50 <- abs(num.men.40.50$ageSampTimeDon - num.men.40.50$ageSampTimeRec)
+    #   
+    #   
+    #   mean.AD.num.women.15.25 <- mean(AD.num.women.15.25)
+    #   med.AD.num.women.15.25 <- median(AD.num.women.15.25)
+    #   sd.AD.num.women.15.25 <- sd(AD.num.women.15.25)
+    #   
+    #   mean.AD.num.men.15.25 <- mean(AD.num.men.15.25)
+    #   med.AD.num.men.15.25 <- median(AD.num.men.15.25)
+    #   sd.AD.num.men.15.25 <- sd(AD.num.men.15.25)
+    #   
+    #   
+    #   mean.AD.num.women.25.40 <- mean(AD.num.women.25.40)
+    #   med.AD.num.women.25.40 <- median(AD.num.women.25.40)
+    #   sd.AD.num.women.25.40 <- sd(AD.num.women.25.40)
+    #   
+    #   mean.AD.num.men.25.40 <- mean(AD.num.men.25.40)
+    #   med.AD.num.men.25.40 <- median(AD.num.men.25.40)
+    #   sd.AD.num.men.25.40 <- sd(AD.num.men.25.40)
+    #   
+    #   
+    #   mean.AD.num.women.40.50 <- mean(AD.num.women.40.50)
+    #   med.AD.num.women.40.50 <- median(AD.num.women.40.50)
+    #   sd.AD.num.women.40.50 <- sd(AD.num.women.40.50)
+    #   
+    #   mean.AD.num.men.40.50 <- mean(AD.num.men.40.50)
+    #   med.AD.num.men.40.50 <- median(AD.num.men.40.50)
+    #   sd.AD.num.men.40.50 <- sd(AD.num.men.40.50)
+    #   
+    #   
+    #   mean.AD.age.groups <- c(mean.AD.num.women.15.25, mean.AD.num.men.15.25,
+    #                           mean.AD.num.women.25.40, mean.AD.num.men.25.40,
+    #                           mean.AD.num.women.40.50, mean.AD.num.men.40.50)
+    #   
+    #   names(mean.AD.age.groups) <- c("mean.AD.num.women.true.net.15.25", "mean.AD.num.men.true.net.15.25",
+    #                                  "mean.AD.num.women.true.net.25.40", "mean.AD.num.men.true.net.25.40",
+    #                                  "mean.AD.num.women.true.net.40.50", "mean.AD.num.men.true.net.40.50")
+    #   
+    #   
+    #   
+    #   med.AD.age.groups <- c(med.AD.num.women.15.25, med.AD.num.men.15.25,
+    #                          med.AD.num.women.25.40, med.AD.num.men.25.40,
+    #                          med.AD.num.women.40.50, med.AD.num.men.40.50)
+    #   
+    #   names(med.AD.age.groups) <- c("med.AD.num.women.true.net.15.25", "med.AD.num.men.true.net.15.25",
+    #                                 "med.AD.num.women.true.net.25.40", "med.AD.num.men.true.net.25.40",
+    #                                 "med.AD.num.women.true.net.40.50", "med.AD.num.men.true.net.40.50")
+    #   
+    #   
+    #   
+    #   sd.AD.age.groups <- c(sd.AD.num.women.15.25, sd.AD.num.men.15.25,
+    #                         sd.AD.num.women.25.40, sd.AD.num.men.25.40,
+    #                         sd.AD.num.women.40.50, sd.AD.num.men.40.50)
+    #   
+    #   names(sd.AD.age.groups) <- c("sd.AD.num.women.true.net.15.25", "sd.AD.num.men.true.net.15.25",
+    #                                "sd.AD.num.women.true.net.25.40", "sd.AD.num.men.true.net.25.40",
+    #                                "sd.AD.num.women.true.net.40.50", "sd.AD.num.men.true.net.40.50")
+    #   
+    #   
+    #   table.transmission.net.cov$ageSampTimeDon <- table.transmission.net.cov$SampTime - table.transmission.net.cov$TOBDon
+    #   
+    #   men.df <- dplyr::filter(table.transmission.net.cov, table.transmission.net.cov$GenderDon=="0")
+    #   women.df <- dplyr::filter(table.transmission.net.cov, table.transmission.net.cov$GenderDon=="1")
+    #   
+    #   Age.groups.table <- NULL
+    #   
+    #   filter.dat <- function(table.dat.fr = table.dat.fr){
+    #     v1.dat <- vector()
+    #     v2.dat <- vector()
+    #     age1.dat <- vector()
+    #     age2.dat <- vector()
+    #     gender1.dat <- vector()
+    #     gender2.dat <- vector()
+    #     
+    #     for(i in 1:nrow(table.dat.fr)){
+    #       
+    #       v1 <- table.dat.fr$RecId[i]
+    #       v2 <- table.dat.fr$DonId[i]
+    #       
+    #       index.v1 <- which(table.dat.fr$RecId == v1)
+    #       
+    #       age1 <- table.dat.fr$ageSampTimeRec[index.v1]
+    #       age2 <- table.dat.fr$ageSampTimeDon[index.v1]
+    #       
+    #       gender1 <- table.dat.fr$GenderRec[index.v1]
+    #       gender2 <- table.dat.fr$GenderDon[index.v1]
+    #       
+    #       v1.dat <- c(v1.dat, v1)
+    #       v2.dat <- c(v2.dat, v2)
+    #       age1.dat <- c(age1.dat, age1)
+    #       age2.dat <- c(age2.dat, age2)
+    #       gender1.dat <- c(gender1.dat, gender1)
+    #       gender2.dat <- c(gender2.dat, gender2)
+    #       
+    #     }
+    #     
+    #     age.table <- data.frame(v1.dat, gender1.dat, age1.dat, v2.dat, gender2.dat, age2.dat)
+    #     
+    #     return(age.table)
+    #     
+    #   }
+    #   
+    #   age.table <-   filter.dat(table.dat.fr = table.transmission.net.cov)
+    #   
+    #   # men as donors
+    #   men.age.table.1 <-  filter.dat(table.dat.fr = men.df) # dplyr::filter(age.table, age.table$gender1.dat==0)
+    #   
+    #   # women as donors
+    #   women.age.table.1 <-   filter.dat(table.dat.fr = women.df) # dplyr::filter(age.table, age.table$gender1.dat==1)
+    #   
+    #   
+    #   # men 15.25 and women
+    #   
+    #   men.15.25.women.15.25.1 <- vector()
+    #   men.15.25.women.25.40.1 <- vector()
+    #   men.15.25.women.40.50.1 <- vector()
+    #   
+    #   if(nrow(men.age.table.1) >1 ){
+    #     
+    #     for (j in 1:nrow(men.age.table.1)) {
+    #       
+    #       
+    #       if(men.age.table.1$age1.dat[j] >= age.group.15.25[1] & men.age.table.1$age1.dat[j] < age.group.15.25[2]){
+    #         
+    #         if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
+    #           
+    #           men.15.25.women.15.25.1 <- c(men.15.25.women.15.25.1, men.age.table.1$age2.dat[j])
+    #           
+    #         }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
+    #           
+    #           men.15.25.women.25.40.1 <- c(men.15.25.women.25.40.1, men.age.table.1$age2.dat[j])
+    #           
+    #         }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
+    #           
+    #           men.15.25.women.40.50.1 <- c(men.15.25.women.40.50.1, men.age.table.1$age2.dat[j])
+    #         }
+    #         
+    #       }
+    #       
+    #       
+    #     }
+    #     
+    #   }
+    #   
+    #   
+    #   # women 15.25 and men
+    #   
+    #   women.15.25.men.15.25.2 <- vector()
+    #   women.15.25.men.25.40.2 <- vector()
+    #   women.15.25.men.40.50.2 <- vector()
+    #   
+    #   if(nrow(women.age.table.1) >1 ){
+    #     
+    #     for (j in 1:nrow(women.age.table.1)) {
+    #       
+    #       
+    #       if(women.age.table.1$age1.dat[j] >= age.group.15.25[1] & women.age.table.1$age1.dat[j] < age.group.15.25[2]){
+    #         
+    #         if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
+    #           
+    #           women.15.25.men.15.25.2 <- c(women.15.25.men.15.25.2, women.age.table.1$age2.dat[j])
+    #           
+    #         }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
+    #           
+    #           women.15.25.men.25.40.2 <- c(women.15.25.men.25.40.2, women.age.table.1$age2.dat[j])
+    #           
+    #         }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
+    #           
+    #           women.15.25.men.40.50.2 <- c(women.15.25.men.40.50.2, women.age.table.1$age2.dat[j])
+    #         }
+    #         
+    #       }
+    #       
+    #       
+    #     }
+    #     
+    #   }
+    #   
+    #   
+    #   
+    #   # men 25.40 and women
+    #   
+    #   men.25.40.women.15.25.1 <- vector()
+    #   men.25.40.women.25.40.1 <- vector()
+    #   men.25.40.women.40.50.1 <- vector()
+    #   
+    #   if(nrow(men.age.table.1) > 1 ){
+    #     
+    #     for (j in 1:nrow(men.age.table.1)) {
+    #       
+    #       
+    #       if(men.age.table.1$age1.dat[j] >= age.group.25.40[1] & men.age.table.1$age1.dat[j] < age.group.25.40[2]){
+    #         
+    #         if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
+    #           
+    #           men.25.40.women.15.25.1 <- c(men.25.40.women.15.25.1, men.age.table.1$age2.dat[j])
+    #           
+    #         }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
+    #           
+    #           men.25.40.women.25.40.1 <- c(men.25.40.women.25.40.1, men.age.table.1$age2.dat[j])
+    #           
+    #         }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
+    #           
+    #           men.25.40.women.40.50.1 <- c(men.25.40.women.40.50.1, men.age.table.1$age2.dat[j])
+    #         }
+    #         
+    #       }
+    #       
+    #     }
+    #     
+    #   }
+    #   
+    #   
+    #   
+    #   
+    #   
+    #   # women 25.40 and men
+    #   
+    #   women.25.40.men.15.25.2 <- vector()
+    #   women.25.40.men.25.40.2 <- vector()
+    #   women.25.40.men.40.50.2 <- vector()
+    #   
+    #   if(nrow(women.age.table.1) >1 ){
+    #     
+    #     for (j in 1:nrow(women.age.table.1)) {
+    #       
+    #       
+    #       if(women.age.table.1$age1.dat[j] >= age.group.25.40[1] & women.age.table.1$age1.dat[j] < age.group.25.40[2]){
+    #         
+    #         if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
+    #           
+    #           women.25.40.men.15.25.2 <- c(women.25.40.men.15.25.2, women.age.table.1$age2.dat[j])
+    #           
+    #         }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
+    #           
+    #           women.25.40.men.25.40.2 <- c(women.25.40.men.25.40.2, women.age.table.1$age2.dat[j])
+    #           
+    #         }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
+    #           
+    #           women.25.40.men.40.50.2 <- c(women.25.40.men.40.50.2, women.age.table.1$age2.dat[j])
+    #         }
+    #         
+    #       }
+    #       
+    #       
+    #     }
+    #     
+    #   }
+    #   
+    #   
+    #   
+    #   
+    #   # men 40.50 and women
+    #   
+    #   men.40.50.women.15.25.1 <- vector()
+    #   men.40.50.women.25.40.1 <- vector()
+    #   men.40.50.women.40.50.1 <- vector()
+    #   
+    #   
+    #   if(nrow(men.age.table.1) >1 ){
+    #     
+    #     for (j in 1:nrow(men.age.table.1)) {
+    #       
+    #       
+    #       if(men.age.table.1$age1.dat[j] >= age.group.40.50[1] & men.age.table.1$age1.dat[j] < age.group.40.50[2]){
+    #         
+    #         if(men.age.table.1$age2.dat[j] >= age.group.15.25[1] & men.age.table.1$age2.dat[j] < age.group.15.25[2]){
+    #           
+    #           men.40.50.women.15.25.1 <- c(men.40.50.women.15.25.1, men.age.table.1$age2.dat[j])
+    #           
+    #         }else if(men.age.table.1$age2.dat[j] >= age.group.25.40[1] & men.age.table.1$age2.dat[j] < age.group.25.40[2]){
+    #           
+    #           men.40.50.women.25.40.1 <- c(men.40.50.women.25.40.1, men.age.table.1$age2.dat[j])
+    #           
+    #         }else if (men.age.table.1$age2.dat[j] >= age.group.40.50[1] & men.age.table.1$age2.dat[j] < age.group.40.50[2]){
+    #           
+    #           men.40.50.women.40.50.1 <- c(men.40.50.women.40.50.1, men.age.table.1$age2.dat[j])
+    #         }
+    #         
+    #       }
+    #       
+    #       
+    #     }
+    #   }
+    #   
+    #   
+    #   
+    #   
+    #   
+    #   # women 40.50 and men
+    #   
+    #   women.40.50.men.15.25.2 <- vector()
+    #   women.40.50.men.25.40.2 <- vector()
+    #   women.40.50.men.40.50.2 <- vector()
+    #   
+    #   
+    #   if(nrow(women.age.table.1) > 1 ){
+    #     
+    #     for (j in 1:nrow(women.age.table.1)) {
+    #       
+    #       
+    #       if(women.age.table.1$age1.dat[j] >= age.group.40.50[1] & women.age.table.1$age1.dat[j] < age.group.40.50[2]){
+    #         
+    #         if(women.age.table.1$age2.dat[j] >= age.group.15.25[1] & women.age.table.1$age2.dat[j] < age.group.15.25[2]){
+    #           
+    #           women.40.50.men.15.25.2 <- c(women.40.50.men.15.25.2, women.age.table.1$age2.dat[j])
+    #           
+    #         }else if(women.age.table.1$age2.dat[j] >= age.group.25.40[1] & women.age.table.1$age2.dat[j] < age.group.25.40[2]){
+    #           
+    #           women.40.50.men.25.40.2 <- c(women.40.50.men.25.40.2, women.age.table.1$age2.dat[j])
+    #           
+    #         }else if (women.age.table.1$age2.dat[j] >= age.group.40.50[1] & women.age.table.1$age2.dat[j] < age.group.40.50[2]){
+    #           
+    #           women.40.50.men.40.50.2 <- c(women.40.50.men.40.50.2, women.age.table.1$age2.dat[j])
+    #         }
+    #         
+    #       }
+    #       
+    #       
+    #     }
+    #     
+    #   }
+    #   
+    #   
+    #   
+    #   
+    #   
+    #   men.15.25.women.15.25 <- c(men.15.25.women.15.25.1, women.15.25.men.15.25.2)
+    #   
+    #   men.15.25.women.25.40 <- c(men.15.25.women.25.40.1, women.25.40.men.15.25.2)
+    #   
+    #   men.15.25.women.40.50 <- c(men.15.25.women.40.50.1, women.40.50.men.15.25.2)
+    #   
+    #   men.25.40.women.15.25 <- c(men.25.40.women.15.25.1, women.15.25.men.25.40.2)
+    #   
+    #   men.25.40.women.25.40 <- c(men.25.40.women.25.40.1, women.25.40.men.25.40.2)
+    #   
+    #   men.25.40.women.40.50 <- c(men.25.40.women.40.50.1, women.40.50.men.25.40.2)
+    #   
+    #   men.40.50.women.15.25 <- c(men.40.50.women.15.25.1, women.15.25.men.40.50.2)
+    #   
+    #   men.40.50.women.25.40 <- c(men.40.50.women.25.40.1, women.25.40.men.40.50.2)
+    #   
+    #   men.40.50.women.40.50 <- c(men.40.50.women.40.50.1, women.40.50.men.40.50.2)
+    #   
+    #   
+    #   Age.groups.table <- matrix(c(length(men.15.25.women.15.25), length(men.15.25.women.25.40), length(men.15.25.women.40.50),
+    #                                length(men.25.40.women.15.25), length(men.25.40.women.25.40), length(men.25.40.women.40.50),
+    #                                length(men.40.50.women.15.25), length(men.40.50.women.25.40), length(men.40.50.women.40.50)),
+    #                              ncol = 3,
+    #                              byrow = TRUE)
+    #   
+    #   colnames(Age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+    #   rownames(Age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+    #   
+    #   Age.groups.table <- as.table(Age.groups.table)
+    #   
+    #   
+    #   men.15.25.T <- sum(length(men.15.25.women.15.25), length(men.15.25.women.25.40), length(men.15.25.women.40.50))
+    #   men.25.40.T <- sum(length(men.25.40.women.15.25), length(men.25.40.women.25.40), length(men.25.40.women.40.50))
+    #   men.40.50.T <- sum(length(men.40.50.women.15.25), length(men.40.50.women.25.40), length(men.40.50.women.40.50))
+    #   
+    #   prop.men.age.groups.table <- matrix(c(length(men.15.25.women.15.25)/men.15.25.T, length(men.15.25.women.25.40)/men.15.25.T, length(men.15.25.women.40.50)/men.15.25.T,
+    #                                         length(men.25.40.women.15.25)/men.25.40.T, length(men.25.40.women.25.40)/men.25.40.T, length(men.25.40.women.40.50)/men.25.40.T,
+    #                                         length(men.40.50.women.15.25)/men.40.50.T, length(men.40.50.women.25.40)/men.40.50.T, length(men.40.50.women.40.50)/men.40.50.T),
+    #                                       ncol = 3,
+    #                                       byrow = TRUE)
+    #   
+    #   colnames(prop.men.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+    #   rownames(prop.men.age.groups.table) <- c("prop.Male.15.25", "prop.Male.25.40", "prop.Male.40.50")
+    #   
+    #   
+    #   
+    #   
+    #   women.15.25.T <- sum(length(men.15.25.women.15.25), length(men.25.40.women.15.25), length(men.40.50.women.15.25))
+    #   women.25.40.T <- sum(length(men.15.25.women.25.40), length(men.25.40.women.25.40), length(men.40.50.women.25.40))
+    #   women.40.50.T <- sum(length(men.15.25.women.40.50), length(men.25.40.women.40.50), length(men.40.50.women.40.50))
+    #   
+    #   prop.women.age.groups.table <- matrix(c(length(men.15.25.women.15.25)/women.15.25.T, length(men.25.40.women.15.25)/women.15.25.T, length(men.40.50.women.15.25)/women.15.25.T,
+    #                                           length(men.15.25.women.25.40)/women.25.40.T, length(men.25.40.women.25.40)/women.25.40.T, length(men.40.50.women.25.40)/women.25.40.T,
+    #                                           length(men.15.25.women.40.50)/women.40.50.T, length(men.25.40.women.40.50)/women.40.50.T, length(men.40.50.women.40.50)/women.40.50.T),
+    #                                         ncol = 3,
+    #                                         byrow = TRUE)
+    #   
+    #   colnames(prop.women.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+    #   rownames(prop.women.age.groups.table) <- c("prop.Female.15.25", "prop.Female.25.40", "prop.Female.40.50")
+    #   
+    #   
+    #   # Directionality
+    #   
+    #   men.15.25.women.15.25.MtoW <- c(men.15.25.women.15.25.1)
+    #   
+    #   men.15.25.women.25.40.MtoW <- c(men.15.25.women.25.40.1)
+    #   
+    #   men.15.25.women.40.50.MtoW <- c(men.15.25.women.40.50.1)
+    #   
+    #   men.25.40.women.15.25.MtoW <- c(men.25.40.women.15.25.1)
+    #   
+    #   men.25.40.women.25.40.MtoW <- c(men.25.40.women.25.40.1)
+    #   
+    #   men.25.40.women.40.50.MtoW <- c(men.25.40.women.40.50.1)
+    #   
+    #   men.40.50.women.15.25.MtoW <- c(men.40.50.women.15.25.1)
+    #   
+    #   men.40.50.women.25.40.MtoW <- c(men.40.50.women.25.40.1)
+    #   
+    #   men.40.50.women.40.50.MtoW <- c(men.40.50.women.40.50.1)
+    #   
+    #   
+    #   Age.groups.table.MtoW <- matrix(c(length(men.15.25.women.15.25.MtoW), length(men.15.25.women.25.40.MtoW), length(men.15.25.women.40.50.MtoW),
+    #                                     length(men.25.40.women.15.25.MtoW), length(men.25.40.women.25.40.MtoW), length(men.25.40.women.40.50.MtoW),
+    #                                     length(men.40.50.women.15.25.MtoW), length(men.40.50.women.25.40.MtoW), length(men.40.50.women.40.50.MtoW)),
+    #                                   ncol = 3,
+    #                                   byrow = TRUE)
+    #   
+    #   colnames(Age.groups.table.MtoW) <- c("Female.15.25.MtoW", "Female.25.40.MtoW", "Female.40.50.MtoW")
+    #   rownames(Age.groups.table.MtoW) <- c("Male.15.25.MtoW", "Male.25.40.MtoW", "Male.40.50.MtoW")
+    #   
+    #   Age.groups.table.MtoW <- as.table(Age.groups.table.MtoW)
+    #   
+    #   
+    #   men.15.25.T.MtoW <- sum(length(men.15.25.women.15.25.MtoW), length(men.15.25.women.25.40.MtoW), length(men.15.25.women.40.50.MtoW))
+    #   men.25.40.T.MtoW <- sum(length(men.25.40.women.15.25.MtoW), length(men.25.40.women.25.40.MtoW), length(men.25.40.women.40.50.MtoW))
+    #   men.40.50.T.MtoW <- sum(length(men.40.50.women.15.25.MtoW), length(men.40.50.women.25.40.MtoW), length(men.40.50.women.40.50.MtoW))
+    #   
+    #   prop.men.age.groups.table.MtoW <- matrix(c(length(men.15.25.women.15.25.MtoW)/men.15.25.T.MtoW, length(men.15.25.women.25.40.MtoW)/men.15.25.T.MtoW, length(men.15.25.women.40.50.MtoW)/men.15.25.T.MtoW,
+    #                                              length(men.25.40.women.15.25.MtoW)/men.25.40.T.MtoW, length(men.25.40.women.25.40.MtoW)/men.25.40.T.MtoW, length(men.25.40.women.40.50.MtoW)/men.25.40.T.MtoW,
+    #                                              length(men.40.50.women.15.25.MtoW)/men.40.50.T.MtoW, length(men.40.50.women.25.40.MtoW)/men.40.50.T.MtoW, length(men.40.50.women.40.50.MtoW)/men.40.50.T.MtoW),
+    #                                            ncol = 3,
+    #                                            byrow = TRUE)
+    #   
+    #   colnames(prop.men.age.groups.table.MtoW) <- c("Female.15.25.MtoW", "Female.25.40.MtoW", "Female.40.50.MtoW")
+    #   rownames(prop.men.age.groups.table.MtoW) <- c("prop.Male.15.25.MtoW", "prop.Male.25.40.MtoW", "prop.Male.40.50.MtoW")
+    #   
+    #   
+    #   
+    #   men.15.25.women.15.25.WtoM <- c(women.15.25.men.15.25.2)
+    #   
+    #   men.15.25.women.25.40.WtoM <- c(women.25.40.men.15.25.2)
+    #   
+    #   men.15.25.women.40.50.WtoM <- c(women.40.50.men.15.25.2)
+    #   
+    #   men.25.40.women.15.25.WtoM <- c( women.15.25.men.25.40.2)
+    #   
+    #   men.25.40.women.25.40.WtoM <- c(women.25.40.men.25.40.2)
+    #   
+    #   men.25.40.women.40.50.WtoM <- c(women.40.50.men.25.40.2)
+    #   
+    #   men.40.50.women.15.25.WtoM <- c(women.15.25.men.40.50.2)
+    #   
+    #   men.40.50.women.25.40.WtoM <- c(women.25.40.men.40.50.2)
+    #   
+    #   men.40.50.women.40.50.WtoM <- c(women.40.50.men.40.50.2)
+    #   
+    #   Age.groups.table.WtoM <- matrix(c(length(men.15.25.women.15.25.WtoM), length(men.15.25.women.25.40.WtoM), length(men.15.25.women.40.50.WtoM),
+    #                                     length(men.25.40.women.15.25.WtoM), length(men.25.40.women.25.40.WtoM), length(men.25.40.women.40.50.WtoM),
+    #                                     length(men.40.50.women.15.25.WtoM), length(men.40.50.women.25.40.WtoM), length(men.40.50.women.40.50.WtoM)),
+    #                                   ncol = 3,
+    #                                   byrow = TRUE)
+    #   
+    #   colnames(Age.groups.table.WtoM) <- c("Female.15.25.WtoM", "Female.25.40.WtoM", "Female.40.50.WtoM")
+    #   rownames(Age.groups.table.WtoM) <- c("Male.15.25.WtoM", "Male.25.40.WtoM", "Male.40.50.WtoM")
+    #   
+    #   Age.groups.table.WtoM <- as.table(Age.groups.table.WtoM)
+    #   
+    #   
+    #   men.15.25.T.WtoM <- sum(length(men.15.25.women.15.25.WtoM), length(men.15.25.women.25.40.WtoM), length(men.15.25.women.40.50.WtoM))
+    #   men.25.40.T.WtoM <- sum(length(men.25.40.women.15.25.WtoM), length(men.25.40.women.25.40.WtoM), length(men.25.40.women.40.50.WtoM))
+    #   men.40.50.T.WtoM <- sum(length(men.40.50.women.15.25.WtoM), length(men.40.50.women.25.40.WtoM), length(men.40.50.women.40.50.WtoM))
+    #   
+    #   prop.men.age.groups.table.WtoM <- matrix(c(length(men.15.25.women.15.25.WtoM)/men.15.25.T.WtoM, length(men.15.25.women.25.40.WtoM)/men.15.25.T.WtoM, length(men.15.25.women.40.50.WtoM)/men.15.25.T.WtoM,
+    #                                              length(men.25.40.women.15.25.WtoM)/men.25.40.T.WtoM, length(men.25.40.women.25.40.WtoM)/men.25.40.T.WtoM, length(men.25.40.women.40.50.WtoM)/men.25.40.T.WtoM,
+    #                                              length(men.40.50.women.15.25.WtoM)/men.40.50.T.WtoM, length(men.40.50.women.25.40.WtoM)/men.40.50.T.WtoM, length(men.40.50.women.40.50.WtoM)/men.40.50.T.WtoM),
+    #                                            ncol = 3,
+    #                                            byrow = TRUE)
+    #   
+    #   colnames(prop.men.age.groups.table.WtoM) <- c("Female.15.25.WtoM", "Female.25.40.WtoM", "Female.40.50.WtoM")
+    #   rownames(prop.men.age.groups.table.WtoM) <- c("prop.Male.15.25.WtoM", "prop.Male.25.40.WtoM", "prop.Male.40.50.WtoM")
+    #   
+    #   
+    #   
+    #   outputlist <- NULL
+    #   outputlist$Age.groups.table <- Age.groups.table
+    #   outputlist$prop.men.age.groups.table <- prop.men.age.groups.table
+    #   outputlist$prop.women.age.groups.table <- prop.women.age.groups.table
+    #   
+    #   outputlist$Age.groups.table.MtoW <- Age.groups.table.MtoW
+    #   outputlist$prop.men.age.groups.table.MtoW <- prop.men.age.groups.table.MtoW
+    #   outputlist$Age.groups.table.WtoM <- Age.groups.table.WtoM
+    #   outputlist$prop.men.age.groups.table.WtoM <- prop.men.age.groups.table.WtoM
+    #   
+    #   
+    #   outputlist$numbers.individuals.age.groups <- numbers.individuals.age.groups
+    #   outputlist$mean.AD.age.groups <- mean.AD.age.groups
+    #   outputlist$med.AD.age.groups <- med.AD.age.groups
+    #   outputlist$sd.AD.age.groups <- sd.AD.age.groups
+    #   
+    #   
+    #   return(outputlist)
+    #   
+    # }
+    # 
+    # 
+    # 
+    # 
+    # # 3. Results: true age structure table from transmission network of all selected individuals (people in the phylogenetic tree)
+    # 
+    # age.structure.transm.net.true.List <- age.groups.filtered.transmission.net.fun(table.transmission.net.cov = table.simpact.trans.net.cov,
+    #                                                                                age.group.15.25 = c(15,25),
+    #                                                                                age.group.25.40 = c(25,40),
+    #                                                                                age.group.40.50 = c(40,50))
+    # # (i) Aggregated tables of pairings
+    # 
+    # age.structure.transm.net.true <- age.structure.transm.net.true.List$Age.groups.table
+    # 
+    # tree.tra.age.str.M.15.25.F.15.25 <- age.structure.transm.net.true[1,][1]
+    # tree.tra.age.str.M.25.40.F.15.25 <- age.structure.transm.net.true[2,][1]
+    # tree.tra.age.str.M.40.50.F.15.25 <- age.structure.transm.net.true[3,][1]
+    # 
+    # tree.tra.age.str.M.15.25.F.25.40 <- age.structure.transm.net.true[1,][2]
+    # tree.tra.age.str.M.25.40.F.25.40 <- age.structure.transm.net.true[2,][2]
+    # tree.tra.age.str.M.40.50.F.25.40 <- age.structure.transm.net.true[3,][2]
+    # 
+    # tree.tra.age.str.M.15.25.F.40.50 <- age.structure.transm.net.true[1,][3]
+    # tree.tra.age.str.M.25.40.F.40.50 <- age.structure.transm.net.true[2,][3]
+    # tree.tra.age.str.M.40.50.F.40.50 <- age.structure.transm.net.true[3,][3]
+    # 
+    # table.tree.tra.age.str <- c(tree.tra.age.str.M.15.25.F.15.25, tree.tra.age.str.M.25.40.F.15.25, tree.tra.age.str.M.40.50.F.15.25,
+    #                             tree.tra.age.str.M.15.25.F.25.40, tree.tra.age.str.M.25.40.F.25.40, tree.tra.age.str.M.40.50.F.25.40,
+    #                             tree.tra.age.str.M.15.25.F.40.50, tree.tra.age.str.M.25.40.F.40.50, tree.tra.age.str.M.40.50.F.40.50)
+    # 
+    # 
+    # names(table.tree.tra.age.str) <- c("tree.tra.M.15.25.F.15.25", "tree.tra.M.25.40.F.15.25", "tree.tra.M.40.50.F.15.25",
+    #                                    "tree.tra.M.15.25.F.25.40", "tree.tra.M.25.40.F.25.40", "tree.tra.M.40.50.F.25.40",
+    #                                    "tree.tra.M.15.25.F.40.50", "tree.tra.M.25.40.F.40.50", "tree.tra.M.40.50.F.40.50")
+    # 
+    # 
+    # 
+    # # (ii) Pairings table with men to women infection: directionality
+    # 
+    # age.structure.transm.net.true.MtoW <- age.structure.transm.net.true.List$Age.groups.table.MtoW
+    # 
+    # tree.tra.age.str.MtoW.M.15.25.F.15.25 <- age.structure.transm.net.true.MtoW[1,][1]
+    # tree.tra.age.str.MtoW.M.25.40.F.15.25 <- age.structure.transm.net.true.MtoW[2,][1]
+    # tree.tra.age.str.MtoW.M.40.50.F.15.25 <- age.structure.transm.net.true.MtoW[3,][1]
+    # 
+    # tree.tra.age.str.MtoW.M.15.25.F.25.40 <- age.structure.transm.net.true.MtoW[1,][2]
+    # tree.tra.age.str.MtoW.M.25.40.F.25.40 <- age.structure.transm.net.true.MtoW[2,][2]
+    # tree.tra.age.str.MtoW.M.40.50.F.25.40 <- age.structure.transm.net.true.MtoW[3,][2]
+    # 
+    # tree.tra.age.str.MtoW.M.15.25.F.40.50 <- age.structure.transm.net.true.MtoW[1,][3]
+    # tree.tra.age.str.MtoW.M.25.40.F.40.50 <- age.structure.transm.net.true.MtoW[2,][3]
+    # tree.tra.age.str.MtoW.M.40.50.F.40.50 <- age.structure.transm.net.true.MtoW[3,][3]
+    # 
+    # table.tree.tra.age.str.MtoW <- c(tree.tra.age.str.MtoW.M.15.25.F.15.25, tree.tra.age.str.MtoW.M.25.40.F.15.25, tree.tra.age.str.MtoW.M.40.50.F.15.25,
+    #                                  tree.tra.age.str.MtoW.M.15.25.F.25.40, tree.tra.age.str.MtoW.M.25.40.F.25.40, tree.tra.age.str.MtoW.M.40.50.F.25.40,
+    #                                  tree.tra.age.str.MtoW.M.15.25.F.40.50, tree.tra.age.str.MtoW.M.25.40.F.40.50, tree.tra.age.str.MtoW.M.40.50.F.40.50)
+    # 
+    # 
+    # names(table.tree.tra.age.str.MtoW) <- c("tree.tra.MtoW.M.15.25.F.15.25", "tree.tra.MtoW.M.25.40.F.15.25", "tree.tra.MtoW.M.40.50.F.15.25",
+    #                                         "tree.tra.MtoW.M.15.25.F.25.40", "tree.tra.MtoW.M.25.40.F.25.40", "tree.tra.MtoW.M.40.50.F.25.40",
+    #                                         "tree.tra.MtoW.M.15.25.F.40.50", "tree.tra.MtoW.M.25.40.F.40.50", "tree.tra.MtoW.M.40.50.F.40.50")
+    # 
+    # 
+    # 
+    # # (iii) Pairings table with women to men infection: directionality
+    # 
+    # age.structure.transm.net.true.WtoM <- age.structure.transm.net.true.List$Age.groups.table.WtoM
+    # 
+    # tree.tra.age.str.WtoM.M.15.25.F.15.25 <- age.structure.transm.net.true.WtoM[1,][1]
+    # tree.tra.age.str.WtoM.M.25.40.F.15.25 <- age.structure.transm.net.true.WtoM[2,][1]
+    # tree.tra.age.str.WtoM.M.40.50.F.15.25 <- age.structure.transm.net.true.WtoM[3,][1]
+    # 
+    # tree.tra.age.str.WtoM.M.15.25.F.25.40 <- age.structure.transm.net.true.WtoM[1,][2]
+    # tree.tra.age.str.WtoM.M.25.40.F.25.40 <- age.structure.transm.net.true.WtoM[2,][2]
+    # tree.tra.age.str.WtoM.M.40.50.F.25.40 <- age.structure.transm.net.true.WtoM[3,][2]
+    # 
+    # tree.tra.age.str.WtoM.M.15.25.F.40.50 <- age.structure.transm.net.true.WtoM[1,][3]
+    # tree.tra.age.str.WtoM.M.25.40.F.40.50 <- age.structure.transm.net.true.WtoM[2,][3]
+    # tree.tra.age.str.WtoM.M.40.50.F.40.50 <- age.structure.transm.net.true.WtoM[3,][3]
+    # 
+    # table.tree.tra.age.str.WtoM <- c(tree.tra.age.str.WtoM.M.15.25.F.15.25, tree.tra.age.str.WtoM.M.25.40.F.15.25, tree.tra.age.str.WtoM.M.40.50.F.15.25,
+    #                                  tree.tra.age.str.WtoM.M.15.25.F.25.40, tree.tra.age.str.WtoM.M.25.40.F.25.40, tree.tra.age.str.WtoM.M.40.50.F.25.40,
+    #                                  tree.tra.age.str.WtoM.M.15.25.F.40.50, tree.tra.age.str.WtoM.M.25.40.F.40.50, tree.tra.age.str.WtoM.M.40.50.F.40.50)
+    # 
+    # 
+    # names(table.tree.tra.age.str.WtoM) <- c("tree.tra.WtoM.M.15.25.F.15.25", "tree.tra.WtoM.M.25.40.F.15.25", "tree.tra.WtoM.M.40.50.F.15.25",
+    #                                         "tree.tra.WtoM.M.15.25.F.25.40", "tree.tra.WtoM.M.25.40.F.25.40", "tree.tra.WtoM.M.40.50.F.25.40",
+    #                                         "tree.tra.WtoM.M.15.25.F.40.50", "tree.tra.WtoM.M.25.40.F.40.50", "tree.tra.WtoM.M.40.50.F.40.50")
+    # 
+    # 
+    # 
+    # # (iv) Men's pairings proportions in aggregated table
+    # 
+    # 
+    # age.structure.transm.net.true.prop.men <- age.structure.transm.net.true.List$prop.men.age.groups.table
+    # 
+    # tree.trans.true.age.str.prop.men.15.25.F.15.25 <- age.structure.transm.net.true.prop.men[1,][1]
+    # tree.trans.true.age.str.prop.men.25.40.F.15.25 <- age.structure.transm.net.true.prop.men[2,][1]
+    # tree.trans.true.age.str.prop.men.40.50.F.15.25 <- age.structure.transm.net.true.prop.men[3,][1]
+    # 
+    # tree.trans.true.age.str.prop.men.15.25.F.25.40 <- age.structure.transm.net.true.prop.men[1,][2]
+    # tree.trans.true.age.str.prop.men.25.40.F.25.40 <- age.structure.transm.net.true.prop.men[2,][2]
+    # tree.trans.true.age.str.prop.men.40.50.F.25.40 <- age.structure.transm.net.true.prop.men[3,][2]
+    # 
+    # tree.trans.true.age.str.prop.men.15.25.F.40.50 <- age.structure.transm.net.true.prop.men[1,][3]
+    # tree.trans.true.age.str.prop.men.25.40.F.40.50 <- age.structure.transm.net.true.prop.men[2,][3]
+    # tree.trans.true.age.str.prop.men.40.50.F.40.50 <- age.structure.transm.net.true.prop.men[3,][3]
+    # 
+    # table.tree.trans.true.age.str.prop.men <- c(tree.trans.true.age.str.prop.men.15.25.F.15.25, tree.trans.true.age.str.prop.men.25.40.F.15.25, tree.trans.true.age.str.prop.men.40.50.F.15.25,
+    #                                             tree.trans.true.age.str.prop.men.15.25.F.25.40, tree.trans.true.age.str.prop.men.25.40.F.25.40, tree.trans.true.age.str.prop.men.40.50.F.25.40,
+    #                                             tree.trans.true.age.str.prop.men.15.25.F.40.50, tree.trans.true.age.str.prop.men.25.40.F.40.50, tree.trans.true.age.str.prop.men.40.50.F.40.50)
+    # 
+    # names(table.tree.trans.true.age.str.prop.men) <- c("tree.trans.true.prop.men15.25.F.15.25", "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25",
+    #                                                    "tree.trans.true.prop.men15.25.F.25.40", "tree.trans.true.prop.men25.40.F.25.40", "tree.trans.true.prop.men40.50.F.25.40",
+    #                                                    "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50", "tree.trans.true.prop.men40.50.F.40.50")
+    # 
+    # 
+    # table.tree.trans.true.age.str.prop.men <- NA.handle.fun(input = table.tree.trans.true.age.str.prop.men)
+    # 
+    # 
+    # # (v) Men's pairings proportions in men to women infection: directionality
+    # 
+    # age.structure.transm.net.true.prop.men.MtoW <- age.structure.transm.net.true.List$prop.men.age.groups.table.MtoW
+    # 
+    # tree.trans.true.age.str.MtoW.prop.men.15.25.F.15.25 <- age.structure.transm.net.true.prop.men.MtoW[1,][1]
+    # tree.trans.true.age.str.MtoW.prop.men.25.40.F.15.25 <- age.structure.transm.net.true.prop.men.MtoW[2,][1]
+    # tree.trans.true.age.str.MtoW.prop.men.40.50.F.15.25 <- age.structure.transm.net.true.prop.men.MtoW[3,][1]
+    # 
+    # tree.trans.true.age.str.MtoW.prop.men.15.25.F.25.40 <- age.structure.transm.net.true.prop.men.MtoW[1,][2]
+    # tree.trans.true.age.str.MtoW.prop.men.25.40.F.25.40 <- age.structure.transm.net.true.prop.men.MtoW[2,][2]
+    # tree.trans.true.age.str.MtoW.prop.men.40.50.F.25.40 <- age.structure.transm.net.true.prop.men.MtoW[3,][2]
+    # 
+    # tree.trans.true.age.str.MtoW.prop.men.15.25.F.40.50 <- age.structure.transm.net.true.prop.men.MtoW[1,][3]
+    # tree.trans.true.age.str.MtoW.prop.men.25.40.F.40.50 <- age.structure.transm.net.true.prop.men.MtoW[2,][3]
+    # tree.trans.true.age.str.MtoW.prop.men.40.50.F.40.50 <- age.structure.transm.net.true.prop.men.MtoW[3,][3]
+    # 
+    # table.tree.trans.true.age.str.MtoW.prop.men <- c(tree.trans.true.age.str.MtoW.prop.men.15.25.F.15.25, tree.trans.true.age.str.MtoW.prop.men.25.40.F.15.25, tree.trans.true.age.str.MtoW.prop.men.40.50.F.15.25,
+    #                                                  tree.trans.true.age.str.MtoW.prop.men.15.25.F.25.40, tree.trans.true.age.str.MtoW.prop.men.25.40.F.25.40, tree.trans.true.age.str.MtoW.prop.men.40.50.F.25.40,
+    #                                                  tree.trans.true.age.str.MtoW.prop.men.15.25.F.40.50, tree.trans.true.age.str.MtoW.prop.men.25.40.F.40.50, tree.trans.true.age.str.MtoW.prop.men.40.50.F.40.50)
+    # 
+    # names(table.tree.trans.true.age.str.MtoW.prop.men) <- paste0("MtoW.", c("tree.trans.true.prop.men15.25.F.15.25", "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25",
+    #                                                                         "tree.trans.true.prop.men15.25.F.25.40", "tree.trans.true.prop.men25.40.F.25.40", "tree.trans.true.prop.men40.50.F.25.40",
+    #                                                                         "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50", "tree.trans.true.prop.men40.50.F.40.50"))
+    # 
+    # table.tree.trans.true.age.str.MtoW.prop.men <- NA.handle.fun(input = table.tree.trans.true.age.str.MtoW.prop.men)
+    # 
+    # 
+    # 
+    # # (vi) Men's pairings proportions in women to men infection: directionality
+    # 
+    # age.structure.transm.net.true.prop.men.WtoM <- age.structure.transm.net.true.List$prop.men.age.groups.table.WtoM
+    # 
+    # tree.trans.true.age.str.WtoM.prop.men.15.25.F.15.25 <- age.structure.transm.net.true.prop.men.WtoM[1,][1]
+    # tree.trans.true.age.str.WtoM.prop.men.25.40.F.15.25 <- age.structure.transm.net.true.prop.men.WtoM[2,][1]
+    # tree.trans.true.age.str.WtoM.prop.men.40.50.F.15.25 <- age.structure.transm.net.true.prop.men.WtoM[3,][1]
+    # 
+    # tree.trans.true.age.str.WtoM.prop.men.15.25.F.25.40 <- age.structure.transm.net.true.prop.men.WtoM[1,][2]
+    # tree.trans.true.age.str.WtoM.prop.men.25.40.F.25.40 <- age.structure.transm.net.true.prop.men.WtoM[2,][2]
+    # tree.trans.true.age.str.WtoM.prop.men.40.50.F.25.40 <- age.structure.transm.net.true.prop.men.WtoM[3,][2]
+    # 
+    # tree.trans.true.age.str.WtoM.prop.men.15.25.F.40.50 <- age.structure.transm.net.true.prop.men.WtoM[1,][3]
+    # tree.trans.true.age.str.WtoM.prop.men.25.40.F.40.50 <- age.structure.transm.net.true.prop.men.WtoM[2,][3]
+    # tree.trans.true.age.str.WtoM.prop.men.40.50.F.40.50 <- age.structure.transm.net.true.prop.men.WtoM[3,][3]
+    # 
+    # table.tree.trans.true.age.str.WtoM.prop.men <- c(tree.trans.true.age.str.WtoM.prop.men.15.25.F.15.25, tree.trans.true.age.str.WtoM.prop.men.25.40.F.15.25, tree.trans.true.age.str.WtoM.prop.men.40.50.F.15.25,
+    #                                                  tree.trans.true.age.str.WtoM.prop.men.15.25.F.25.40, tree.trans.true.age.str.WtoM.prop.men.25.40.F.25.40, tree.trans.true.age.str.WtoM.prop.men.40.50.F.25.40,
+    #                                                  tree.trans.true.age.str.WtoM.prop.men.15.25.F.40.50, tree.trans.true.age.str.WtoM.prop.men.25.40.F.40.50, tree.trans.true.age.str.WtoM.prop.men.40.50.F.40.50)
+    # 
+    # names(table.tree.trans.true.age.str.WtoM.prop.men) <- paste0("WtoM.", c("tree.trans.true.prop.men15.25.F.15.25", "tree.trans.true.prop.men25.40.F.15.25", "tree.trans.true.prop.men40.50.F.15.25",
+    #                                                                         "tree.trans.true.prop.men15.25.F.25.40", "tree.trans.true.prop.men25.40.F.25.40", "tree.trans.true.prop.men40.50.F.25.40",
+    #                                                                         "tree.trans.true.prop.men15.25.F.40.50", "tree.trans.true.prop.men25.40.F.40.50", "tree.trans.true.prop.men40.50.F.40.50"))
+    # 
+    # 
+    # table.tree.trans.true.age.str.WtoM.prop.men <- NA.handle.fun(input = table.tree.trans.true.age.str.WtoM.prop.men)
+    # 
+    # 
+    # 
+    # # (vii) Womens'  pairings proportions in aggregated table
+    # 
+    # 
+    # age.structure.transm.clust.true.prop.women <- age.structure.transm.net.true.List$prop.women.age.groups.table
+    # 
+    # tree.trans.true.age.str.prop.women.15.25.M.15.25 <- age.structure.transm.clust.true.prop.women[1,][1]
+    # tree.trans.true.age.str.prop.women.25.40.M.15.25 <- age.structure.transm.clust.true.prop.women[2,][1]
+    # tree.trans.true.age.str.prop.women.40.50.M.15.25 <- age.structure.transm.clust.true.prop.women[3,][1]
+    # 
+    # tree.trans.true.age.str.prop.women.15.25.M.25.40 <- age.structure.transm.clust.true.prop.women[1,][2]
+    # tree.trans.true.age.str.prop.women.25.40.M.25.40 <- age.structure.transm.clust.true.prop.women[2,][2]
+    # tree.trans.true.age.str.prop.women.40.50.M.25.40 <- age.structure.transm.clust.true.prop.women[3,][2]
+    # 
+    # tree.trans.true.age.str.prop.women.15.25.M.40.50 <- age.structure.transm.clust.true.prop.women[1,][3]
+    # tree.trans.true.age.str.prop.women.25.40.M.40.50 <- age.structure.transm.clust.true.prop.women[2,][3]
+    # tree.trans.true.age.str.prop.women.40.50.M.40.50 <- age.structure.transm.clust.true.prop.women[3,][3]
+    # 
+    # table.tree.trans.true.age.str.prop.women <- c(tree.trans.true.age.str.prop.women.15.25.M.15.25, tree.trans.true.age.str.prop.women.25.40.M.15.25, tree.trans.true.age.str.prop.women.40.50.M.15.25,
+    #                                               tree.trans.true.age.str.prop.women.15.25.M.25.40, tree.trans.true.age.str.prop.women.25.40.M.25.40, tree.trans.true.age.str.prop.women.40.50.M.25.40,
+    #                                               tree.trans.true.age.str.prop.women.15.25.M.40.50, tree.trans.true.age.str.prop.women.25.40.M.40.50, tree.trans.true.age.str.prop.women.40.50.M.40.50)
+    # 
+    # names(table.tree.trans.true.age.str.prop.women) <- c("tree.trans.true.prop.women15.25.M.15.25", "tree.trans.true.prop.women25.40.M.15.25", "tree.trans.true.prop.women40.50.M.15.25",
+    #                                                      "tree.trans.true.prop.women15.25.M.25.40", "tree.trans.true.prop.women25.40.M.25.40", "tree.trans.true.prop.women40.50.M.25.40",
+    #                                                      "tree.trans.true.prop.women15.25.M.40.50", "tree.trans.true.prop.women25.40.M.40.50", "tree.trans.true.prop.women40.50.M.40.50")
+    # 
+    # 
+    # 
+    # table.tree.trans.true.age.str.prop.women <- NA.handle.fun(input = table.tree.trans.true.age.str.prop.women)
+    # 
+    # 
+    # # 
+    # 
+    # numbers.individuals.age.groups.net <- age.structure.transm.net.true.List$numbers.individuals.age.groups
+    # mean.AD.age.groups.net <- age.structure.transm.net.true.List$mean.AD.age.groups 
+    # med.AD.age.groups.net <- age.structure.transm.net.true.List$med.AD.age.groups 
+    # sd.AD.age.groups.net <- age.structure.transm.net.true.List$sd.AD.age.groups 
+    # 
+    # names(numbers.individuals.age.groups.net) <- paste0("tree.trans.", names(numbers.individuals.age.groups.net))
+    # names(mean.AD.age.groups.net) <- paste0("tree.trans.", names(mean.AD.age.groups.net))
+    # names(med.AD.age.groups.net) <- paste0("tree.trans.", names(med.AD.age.groups.net))
+    # names(sd.AD.age.groups.net) <- paste0("tree.trans.", names(sd.AD.age.groups.net))
+    # 
+    # 
+    # 
+    # res3 <- c(table.tree.tra.age.str, table.tree.tra.age.str.MtoW, table.tree.tra.age.str.WtoM,
+    #           table.tree.trans.true.age.str.prop.men, table.tree.trans.true.age.str.MtoW.prop.men,
+    #           table.tree.trans.true.age.str.WtoM.prop.men, table.tree.trans.true.age.str.prop.women,
+    #           numbers.individuals.age.groups.net, mean.AD.age.groups.net, med.AD.age.groups.net, sd.AD.age.groups.net)
     
-    numbers.individuals.age.groups.net <- age.structure.transm.net.true.List$numbers.individuals.age.groups
-    mean.AD.age.groups.net <- age.structure.transm.net.true.List$mean.AD.age.groups 
-    med.AD.age.groups.net <- age.structure.transm.net.true.List$med.AD.age.groups 
-    sd.AD.age.groups.net <- age.structure.transm.net.true.List$sd.AD.age.groups 
     
-    names(numbers.individuals.age.groups.net) <- paste0("tree.trans.", names(numbers.individuals.age.groups.net))
-    names(mean.AD.age.groups.net) <- paste0("tree.trans.", names(mean.AD.age.groups.net))
-    names(med.AD.age.groups.net) <- paste0("tree.trans.", names(med.AD.age.groups.net))
-    names(sd.AD.age.groups.net) <- paste0("tree.trans.", names(sd.AD.age.groups.net))
-    
-    
-    
-    res3 <- c(table.tree.tra.age.str, table.tree.tra.age.str.MtoW, table.tree.tra.age.str.WtoM,
-              table.tree.trans.true.age.str.prop.men, table.tree.trans.true.age.str.MtoW.prop.men,
-              table.tree.trans.true.age.str.WtoM.prop.men, table.tree.trans.true.age.str.prop.women,
-              numbers.individuals.age.groups.net, mean.AD.age.groups.net, med.AD.age.groups.net, sd.AD.age.groups.net)
-
-    
-    
-    
-    # Clusters statistics
+    # Clusters statistics ------------------------------
     
     mean.clust.size <- mean(clust.size)
     median.clust.size <- median(clust.size)
@@ -3070,12 +3177,12 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     
     
-    # Binding everuthing together
+    # Binding everything together --------------------------
     
-    output.num.vec <- as.numeric(c(res1, res2, res3, mix.rels.transm.dat, clust.size.stat))
+    output.num.vec <- as.numeric(c(res1, res2, mix.rels.transm.dat, clust.size.stat)) #  res3,
     
     
-    names.output.vec <- names(c(res1, res2, res3, mix.rels.transm.dat, clust.size.stat))
+    names.output.vec <- names(c(res1, res2, mix.rels.transm.dat, clust.size.stat)) # res3,
     
     
     names(output.num.vec) <- names.output.vec
@@ -3085,7 +3192,7 @@ age.mixing.MAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
   }else{
     
-    output.num.vec <- rep(NA, 198)
+    output.num.vec <- rep(NA, 111)
     
     
     
