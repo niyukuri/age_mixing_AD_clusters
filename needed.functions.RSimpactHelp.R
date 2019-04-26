@@ -495,3 +495,29 @@ colMedians <- function(matrixdata){
 }
 
 
+
+concurr.pointprev.calculator <- function(datalist = datalist,
+                                         timepoint = datalist$itable$population.simtime[1] - 0.5){
+  
+  #  output <- data.table()
+  
+  DTalive.infected <- alive.infected(datalist = datalist,
+                                     timepoint = timepoint, site = "All") # First we only take the data of people who were alive at time_i
+  
+  agemix.df <- agemix.df.maker(datalist)
+  
+  degrees.df <- degree.df.maker(df = agemix.df,
+                                agegroup = c(15, 50),
+                                hivstatus = 2,
+                                survey.time = 40, # timepoint,
+                                window.width = 1,
+                                gender.degree = "male",
+                                only.new = FALSE)
+  
+  number.people.with.cps <- sum(degrees.df$Degree > 1)
+  popsize <- nrow(DTalive.infected)
+  concurr.pointprevalence <- number.people.with.cps / popsize
+  
+  return(concurr.pointprevalence)
+}
+
