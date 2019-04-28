@@ -1,0 +1,2989 @@
+---
+title: "Inferring age mixing from transmission clusters"
+author: "David Niyukuri"
+date: "28 April 2019"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+    code_folding: hide
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading packages
+
+Load required packages for the analysis.
+
+```{r packages}
+
+library(dplyr)
+library(ggplot2)
+
+```
+
+# Functions
+
+Functions to summarise and to compute goodness of fit.
+
+```{r functions}
+
+# Function to summarised outputs 
+
+
+# library(gmodels) # no more use of ci()
+
+quant.med <- function(input){
+  
+  input <- na.omit(input)
+  
+  quantirles.v <- quantile(input, probs = seq(0, 1, 0.25))
+  
+  quantirles.25.50.75 <- as.numeric(quantirles.v)[2:4]
+  
+  return(quantirles.25.50.75)
+  
+}
+
+
+min.max.sd.mean <- function(input){
+  
+  input <- na.omit(input)
+  
+  min.v <- min(input)
+  max.v <- max(input)
+  mean.v <- mean(input)
+  sd.v <- sd(input)
+  
+  
+  min.max.sd.mean.v <- c(min.v, max.v, mean.v, sd.v)
+  
+  return(min.max.sd.mean.v)
+  
+}
+
+
+# Function for Average Root Mean Squared Error
+ARMSE <- function(v1=v1, v2=v2) {
+  d <- data.frame(v1,v2)
+  r <- na.omit(d)
+  y1 <- r[,1]
+  y2 <- r[,2]
+  error.na <- (y1-y2)/y2
+  armse <- sqrt(mean(error.na^2)) 
+  return(armse)}
+
+
+
+# Function for Root Mean Squared Error
+RMSE <- function(error) {
+  error <- as.numeric(na.omit(error))
+  rmse <- sqrt(mean(error^2)) 
+  return(rmse)}
+
+# Function for Mean Absolute Error
+MAE <- function(error) { 
+  error <- as.numeric(na.omit(error))
+  mae <- mean(abs(error)) 
+  return(mae)
+}
+
+
+# Function for Mean Realative Error
+MRE <- function(error) { 
+  error <- as.numeric(na.omit(error))
+  mae <- mean(error) 
+  return(mae)
+}
+
+
+```
+
+# Read the data
+
+Read the simulation outputs.
+
+```{r read_data}
+
+dr1 <- read.csv("/home/david/Desktop/Results.mcarmar.large.AD_280_777.csv")
+
+dr <- dr1
+
+```
+
+
+# Epidemic characteristics
+
+
+## Prevalence
+
+```{r HIV_prev}
+
+hiv.prev <- dr %>% 
+  select(starts_with("prev.")) 
+
+prev.m.15.24 <- quant.med(hiv.prev$prev.m.15.24)
+prev.m.25.29 <- quant.med(hiv.prev$prev.m.25.29)
+prev.m.30.34 <- quant.med(hiv.prev$prev.m.30.34)
+prev.m.35.39 <- quant.med(hiv.prev$prev.m.35.39)
+prev.m.40.44 <- quant.med(hiv.prev$prev.m.40.44)
+prev.m.45.49 <- quant.med(hiv.prev$prev.m.45.49)
+
+prev.w.15.24 <- quant.med(hiv.prev$prev.w.15.24)
+prev.w.25.29 <- quant.med(hiv.prev$prev.w.25.29)
+prev.w.30.34 <- quant.med(hiv.prev$prev.w.30.34)
+prev.w.35.39 <- quant.med(hiv.prev$prev.w.35.39)
+prev.w.40.44 <- quant.med(hiv.prev$prev.w.40.44)
+prev.w.45.49 <- quant.med(hiv.prev$prev.w.45.49)
+
+val.prev.F <- c(prev.m.15.24[2], prev.m.25.29[2], prev.m.30.34[2], prev.m.35.39[2], prev.m.40.44[2], prev.m.45.49[2], 
+                prev.w.15.24[2], prev.w.25.29[2], prev.w.30.34[2], prev.w.35.39[2], prev.w.40.44[2], prev.w.45.49[2])
+
+val.prev.L <- c(prev.m.15.24[1], prev.m.25.29[1], prev.m.30.34[1], prev.m.35.39[1], prev.m.40.44[1], prev.m.45.49[1], 
+                prev.w.15.24[1], prev.w.25.29[1], prev.w.30.34[1], prev.w.35.39[1], prev.w.40.44[1], prev.w.45.49[1])
+
+val.prev.U <- c(prev.m.15.24[3], prev.m.25.29[3], prev.m.30.34[3], prev.m.35.39[3], prev.m.40.44[3], prev.m.45.49[3], 
+                prev.w.15.24[3], prev.w.25.29[3], prev.w.30.34[3], prev.w.35.39[3], prev.w.40.44[3], prev.w.45.49[3])
+
+
+par.gender <- c(rep("men", 6), rep("women", 6))
+agegroup <- rep(c("15-24", "25-29", "30-34", "35-39", "40-44", "45-49"), 2)
+
+val.prev <- data.frame(val.prev.L, val.prev.F, val.prev.U, par.gender, agegroup)
+
+plot.prev.men.women <- ggplot(val.prev, aes(x=agegroup, y=val.prev.F, colour=par.gender, group = par.gender)) + 
+  geom_errorbar(aes(ymin=val.prev.L, ymax=val.prev.U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Age groups") + ylab("HIV prevalence")
+
+plot.prev.men.women
+
+
+```
+
+## Incidence
+
+
+```{r HIV_incidence}
+
+hiv.inc <- dr %>% 
+  select(starts_with("R.inc.")) 
+
+inc.15.25.m <- quant.med(hiv.inc$R.inc.15.25.m)
+inc.25.40.m <- quant.med(hiv.inc$R.inc.25.40.m)
+inc.40.50.m <- quant.med(hiv.inc$R.inc.40.50.m)
+
+inc.15.25.w <- quant.med(hiv.inc$R.inc.15.25.w)
+inc.25.40.w <- quant.med(hiv.inc$R.inc.25.40.w)
+inc.40.50.w <- quant.med(hiv.inc$R.inc.40.50.w)
+
+gender <- c(rep("men", 3), rep("women", 3))
+age_group <- rep(c("15-24", "25-39", "40-49"), 2)
+
+val.inc.F <- c(inc.15.25.m[2], inc.25.40.m[2], inc.40.50.m[2],
+               inc.15.25.w[2], inc.25.40.w[2], inc.40.50.w[2])
+val.inc.L <- c(inc.15.25.m[1], inc.25.40.m[1], inc.40.50.m[1],
+               inc.15.25.w[1], inc.25.40.w[1], inc.40.50.w[1])
+val.inc.U <- c(inc.15.25.m[3], inc.25.40.m[3], inc.40.50.m[3],
+               inc.15.25.w[3], inc.25.40.w[3], inc.40.50.w[3])
+
+val.inc <- data.frame(val.inc.L, val.inc.F, val.inc.U, gender, age_group)
+
+plot.inc.men.women <- ggplot(val.inc, aes(x=age_group, y=val.inc.F, colour=gender, group = gender)) + 
+  geom_errorbar(aes(ymin=val.inc.L, ymax=val.inc.U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Age groups") + ylab("HIV incidence")
+
+plot.inc.men.women
+
+
+```
+
+
+## Sexual behaviour
+
+
+
+### Point prevalence of concurrent  partnerships
+
+
+```{r concurrent_partners}
+
+prev.conc.p <- dr %>% 
+  select(start("R.p.prev.")) 
+
+```
+
+### Age mixing in partnership
+
+#### Population level
+
+Popultion level age mixing measurements.
+
+```{r age_mix_rels}
+
+dr.agemixstat <- dr %>% 
+  select("R.AAD.male", "R.SDAD.male",  "R.slope.male",  "R.WSD.male", "R.BSD.male" , "R.intercept.male" )
+
+pop.R.AAD.male <- round(quant.med(dr.agemixstat$R.AAD.male), digits = 3) 
+pop.R.SDAD.male <- round(quant.med(dr.agemixstat$R.SDAD.male), digits = 3) 
+pop.R.slope.male <- round(quant.med(dr.agemixstat$R.slope.male), digits = 3) 
+pop.R.WSD.male <- round(quant.med(dr.agemixstat$R.WSD.male), digits = 3) 
+pop.R.BSD.male <- round(quant.med(dr.agemixstat$R.BSD.male), digits = 3) 
+pop.R.intercept.male <- round(quant.med(dr.agemixstat$R.intercept.male), digits = 3) 
+
+age.mix.F <- c(pop.R.AAD.male[2], pop.R.SDAD.male[2], pop.R.BSD.male[2],
+               pop.R.WSD.male[2], pop.R.slope.male[2], pop.R.intercept.male[2])
+
+age.mix.L <- c(pop.R.AAD.male[1], pop.R.SDAD.male[1], pop.R.BSD.male[1],
+               pop.R.WSD.male[1], pop.R.slope.male[1], pop.R.intercept.male[1])
+
+age.mix.U <- c(pop.R.AAD.male[3], pop.R.SDAD.male[3], pop.R.BSD.male[3],
+               pop.R.WSD.male[3], pop.R.slope.male[3], pop.R.intercept.male[3])
+
+param.name <- c("R.AAD.male", "R.SDAD.male", "R.BSD.male" , "R.WSD.male", "R.slope.male",   "R.intercept.male" ) 
+
+age.mixing.pop <- data.frame(param.name, age.mix.L, age.mix.F, age.mix.U)
+
+age.mixing.pop
+
+```
+
+
+
+#### Sequence coverage scenarios and age mixing
+
+
+Age mixing patterns (in relationships) of selected indiviuals in difference sequence coverage scenarios. These selecetd individuals are HIV positive, the measurement below assess their age mixing pattenrs withn theier sexual partnerships.
+
+```{r age_mixng_scenarios}
+# MCAR
+
+
+d.MCAR <- dr %>%
+  select(contains("MCAR."))
+
+
+# length(names(dr1)[72:10170]) 
+# 1st : "cov.MCAR.35.cl.M.15.25.F.15.25"
+# last: "cov.MAR.c.95.sd.cl.size"
+
+d.MCAR.cov.35 <- d.MCAR %>%
+  select(contains("cov.MCAR.35.")) 
+d.MCAR.cov.40 <- d.MCAR %>%
+  select(contains("cov.MCAR.40.")) 
+d.MCAR.cov.45 <- d.MCAR %>%
+  select(contains("cov.MCAR.45.")) 
+d.MCAR.cov.50 <- d.MCAR %>%
+  select(contains("cov.MCAR.50.")) 
+d.MCAR.cov.55 <- d.MCAR %>%
+  select(contains("cov.MCAR.55.")) 
+d.MCAR.cov.60 <- d.MCAR %>%
+  select(contains("cov.MCAR.60.")) 
+d.MCAR.cov.65 <- d.MCAR %>%
+  select(contains("cov.MCAR.65.")) 
+d.MCAR.cov.70 <- d.MCAR %>%
+  select(contains("cov.MCAR.70.")) 
+d.MCAR.cov.75 <- d.MCAR %>%
+  select(contains("cov.MCAR.75.")) 
+d.MCAR.cov.80 <- d.MCAR %>%
+  select(contains("cov.MCAR.80.")) 
+d.MCAR.cov.85 <- d.MCAR %>%
+  select(contains("cov.MCAR.85.")) 
+d.MCAR.cov.90 <- d.MCAR %>%
+  select(contains("cov.MCAR.90.")) 
+d.MCAR.cov.95 <- d.MCAR %>%
+  select(contains("cov.MCAR.95.")) 
+d.MCAR.cov.100 <- d.MCAR %>%
+  select(contains("cov.MCAR.100.")) 
+
+
+# Age mixing statistics in transmission networks --------------------------
+
+
+# True age mix in different age mix scenarios
+
+dr.trans.agemix.MCAR.cov.35 <- d.MCAR.cov.35 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.40 <- d.MCAR.cov.40 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.45 <- d.MCAR.cov.45 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.50 <- d.MCAR.cov.50 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.55 <- d.MCAR.cov.55 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.60 <- d.MCAR.cov.60 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.65 <- d.MCAR.cov.65 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.70 <- d.MCAR.cov.70 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.75 <- d.MCAR.cov.75 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.80 <- d.MCAR.cov.80 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.85 <- d.MCAR.cov.85 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.90 <- d.MCAR.cov.90 %>% 
+  select(contains(".T."))
+dr.trans.agemix.MCAR.cov.95 <- d.MCAR.cov.95 %>% 
+  select(contains(".T."))
+
+
+# Age mixing in transmission 
+
+T.35.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.35[,1]) 
+T.35.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.35[,2])
+T.35.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.35[,3])
+T.35.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.35[,4])
+T.35.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.35[,5])
+T.35.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.35[,6])
+
+T.40.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.40[,1]) 
+T.40.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.40[,2])
+T.40.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.40[,3])
+T.40.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.40[,4])
+T.40.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.40[,5])
+T.40.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.40[,6])
+
+T.45.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.45[,1]) 
+T.45.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.45[,2])
+T.45.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.45[,3])
+T.45.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.45[,4])
+T.45.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.45[,5])
+T.45.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.45[,6])
+
+T.50.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.50[,1]) 
+T.50.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.50[,2])
+T.50.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.50[,3])
+T.50.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.50[,4])
+T.50.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.50[,5])
+T.50.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.50[,6])
+
+T.55.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.55[,1]) 
+T.55.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.55[,2])
+T.55.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.55[,3])
+T.55.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.55[,4])
+T.55.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.55[,5])
+T.55.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.55[,6])
+
+T.60.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.60[,1]) 
+T.60.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.60[,2])
+T.60.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.60[,3])
+T.60.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.60[,4])
+T.60.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.60[,5])
+T.60.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.60[,6])
+
+T.65.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.65[,1]) 
+T.65.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.65[,2])
+T.65.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.65[,3])
+T.65.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.65[,4])
+T.65.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.65[,5])
+T.65.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.65[,6])
+
+T.70.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.70[,1]) 
+T.70.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.70[,2])
+T.70.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.70[,3])
+T.70.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.70[,4])
+T.70.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.70[,5])
+T.70.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.70[,6])
+
+T.75.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.75[,1]) 
+T.75.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.75[,2])
+T.75.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.75[,3])
+T.75.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.75[,4])
+T.75.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.75[,5])
+T.75.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.75[,6])
+
+T.80.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.80[,1]) 
+T.80.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.80[,2])
+T.80.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.80[,3])
+T.80.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.80[,4])
+T.80.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.80[,5])
+T.80.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.80[,6])
+
+T.85.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.85[,1]) 
+T.85.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.85[,2])
+T.85.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.85[,3])
+T.85.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.85[,4])
+T.85.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.85[,5])
+T.85.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.85[,6])
+
+T.90.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.90[,1]) 
+T.90.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.90[,2])
+T.90.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.90[,3])
+T.90.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.90[,4])
+T.90.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.90[,5])
+T.90.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.90[,6])
+
+T.95.AAD.male <- quant.med(dr.trans.agemix.MCAR.cov.95[,1]) 
+T.95.SDAD.male <- quant.med(dr.trans.agemix.MCAR.cov.95[,2])
+T.95.slope.male <- quant.med(dr.trans.agemix.MCAR.cov.95[,3])
+T.95.WSD.male <- quant.med(dr.trans.agemix.MCAR.cov.95[,4])
+T.95.BSD.male <- quant.med(dr.trans.agemix.MCAR.cov.95[,5])
+T.95.intercept.male <- quant.med(dr.trans.agemix.MCAR.cov.95[,6])
+
+
+
+age.mix.stats <- matrix(c(T.35.AAD.male[2], T.40.AAD.male[2], 
+                          T.45.AAD.male[2], T.50.AAD.male[2], 
+                          T.55.AAD.male[2], T.60.AAD.male[2], 
+                          T.65.AAD.male[2], T.70.AAD.male[2], 
+                          T.75.AAD.male[2], T.80.AAD.male[2], 
+                          T.85.AAD.male[2], T.90.AAD.male[2], 
+                          T.95.AAD.male[2], pop.R.AAD.male[2],
+                          
+                          T.35.SDAD.male[2], T.40.SDAD.male[2], 
+                          T.45.SDAD.male[2], T.50.SDAD.male[2], 
+                          T.55.SDAD.male[2], T.60.SDAD.male[2], 
+                          T.65.SDAD.male[2], T.70.SDAD.male[2], 
+                          T.75.SDAD.male[2], T.80.SDAD.male[2], 
+                          T.85.SDAD.male[2], T.90.SDAD.male[2], 
+                          T.95.SDAD.male[2], pop.R.SDAD.male[2],
+                          
+                          T.35.BSD.male[2], T.40.BSD.male[2], 
+                          T.45.BSD.male[2], T.50.BSD.male[2], 
+                          T.55.BSD.male[2], T.60.BSD.male[2], 
+                          T.65.BSD.male[2], T.70.BSD.male[2], 
+                          T.75.BSD.male[2], T.80.BSD.male[2], 
+                          T.85.BSD.male[2], T.90.BSD.male[2], 
+                          T.95.BSD.male[2], pop.R.BSD.male[2],
+                          
+                          T.35.WSD.male[2], T.40.WSD.male[2], 
+                          T.45.WSD.male[2], T.50.WSD.male[2], 
+                          T.55.WSD.male[2], T.60.WSD.male[2], 
+                          T.65.WSD.male[2], T.70.WSD.male[2], 
+                          T.75.WSD.male[2], T.80.WSD.male[2], 
+                          T.85.WSD.male[2], T.90.WSD.male[2], 
+                          T.95.WSD.male[2], pop.R.WSD.male[2],
+                          
+                          T.35.slope.male[2], T.40.slope.male[2], 
+                          T.45.slope.male[2], T.50.slope.male[2], 
+                          T.55.slope.male[2], T.60.slope.male[2], 
+                          T.65.slope.male[2], T.70.slope.male[2], 
+                          T.75.slope.male[2], T.80.slope.male[2], 
+                          T.85.slope.male[2], T.90.slope.male[2], 
+                          T.95.slope.male[2], pop.R.slope.male[2],
+                          
+                          T.35.intercept.male[2], T.40.intercept.male[2], 
+                          T.45.intercept.male[2], T.50.intercept.male[2], 
+                          T.55.intercept.male[2], T.60.intercept.male[2], 
+                          T.65.intercept.male[2], T.70.intercept.male[2], 
+                          T.75.intercept.male[2], T.80.intercept.male[2], 
+                          T.85.intercept.male[2], T.90.intercept.male[2], 
+                          T.95.intercept.male[2], pop.R.intercept.male[2]
+),
+
+ncol = 14,
+byrow = TRUE)
+
+age.mix.stats <- round(age.mix.stats, digits = 2)
+
+colnames(age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
+                             "cov.50", "cov.55", "cov.60",
+                             "cov.65", "cov.70", "cov.75",
+                             "cov.80", "cov.85", "cov.90",
+                             "cov.95", "pop.lev")
+
+rownames(age.mix.stats) <- c("AAD.male", "SDAD.male", "BSD.male",  "WSD.male", "slope.male", "intercept.male") 
+
+age.mix.stats
+
+
+````
+
+#### Difference between true values and values at different sampling scenarios in MCAR
+
+```{r age_mixing_diff}
+
+d.AAD.male <- (age.mix.stats[1,14] - age.mix.stats[1,])/age.mix.stats[1,14]
+d.SDAD.male <- (age.mix.stats[2,14] - age.mix.stats[2,])/age.mix.stats[2,14]
+d.slope.male <- (age.mix.stats[3,14] - age.mix.stats[3,])/age.mix.stats[3,14]
+d.WSD.male <- (age.mix.stats[4,14] - age.mix.stats[4,])/age.mix.stats[4,14]
+d.BSD.male <- (age.mix.stats[5,14] - age.mix.stats[5,])/age.mix.stats[5,14]
+d.interc.male <- (age.mix.stats[6,14] - age.mix.stats[6,])/age.mix.stats[6,14]
+
+diff.cov.true.age.mix.stats <- matrix(c(d.AAD.male, d.SDAD.male, d.BSD.male,
+                                        d.WSD.male, d.slope.male, d.interc.male),
+                                      ncol = 14,
+                                      byrow = TRUE)
+
+colnames(diff.cov.true.age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
+                                           "cov.50", "cov.55", "cov.60",
+                                           "cov.65", "cov.70", "cov.75",
+                                           "cov.80", "cov.85", "cov.90",
+                                           "cov.95", "pop.lev")
+
+rownames(diff.cov.true.age.mix.stats) <- c("d.AAD.male", "d.SDAD.male", "d.BSD.male", "d.WSD.male", "d.slope.male",   "d.intercept.male") 
+
+
+
+error.age.mix.AAD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                     
+                                     F = c(as.numeric(diff.cov.true.age.mix.stats[1,])))
+error.age.mix.AAD.male$parameter <- "AAD.male"
+
+error.age.mix.SDAD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                      
+                                      F = c(as.numeric(diff.cov.true.age.mix.stats[2,])))
+error.age.mix.SDAD.male$parameter <- "SDAD.male"
+
+
+error.age.mix.slope.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                       
+                                       F = c(as.numeric(diff.cov.true.age.mix.stats[3,])))
+error.age.mix.slope.male$parameter <- "slope.male"
+
+error.age.mix.WSD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                     
+                                     F = c(as.numeric(diff.cov.true.age.mix.stats[4,])))
+error.age.mix.WSD.male$parameter <- "WSD.male"
+
+
+error.age.mix.BSD.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                     
+                                     F = c(as.numeric(diff.cov.true.age.mix.stats[5,])))
+error.age.mix.BSD.male$parameter <- "BSD.male"
+
+
+error.age.mix.intercept.male <- data.frame(x=c(seq(from=35, to=95, by=5), "pop"),
+                                           
+                                           F = c(as.numeric(diff.cov.true.age.mix.stats[6,])))
+error.age.mix.intercept.male$parameter <- "intercept.male"
+
+
+errors.age.mixing <- rbind(error.age.mix.AAD.male, error.age.mix.BSD.male,
+                           error.age.mix.SDAD.male,error.age.mix.WSD.male,
+                           error.age.mix.intercept.male, error.age.mix.slope.male)
+
+
+plots.errors.age.mix  <- ggplot(errors.age.mixing, aes(x=x, y=F, colour=parameter, group = parameter)) + 
+  # geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sequence coverage") + ylab("Error") 
+
+plots.errors.age.mix
+
+```
+
+
+# Transmission clusters
+
+## Statistics of size of transmission clusters
+
+Mean, median, and standard deviation of transmission clusters.
+
+```{r transm_clusters}
+
+# Cluster sizes
+
+dr.cl.size.MCAR.cov.35 <- d.MCAR.cov.35 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.40 <- d.MCAR.cov.40 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.45 <- d.MCAR.cov.45 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.50 <- d.MCAR.cov.50 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.55 <- d.MCAR.cov.55 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.60 <- d.MCAR.cov.60 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.65 <- d.MCAR.cov.65 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.70 <- d.MCAR.cov.70 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.75 <- d.MCAR.cov.75 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.80 <- d.MCAR.cov.80 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.85 <- d.MCAR.cov.85 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.90 <- d.MCAR.cov.90 %>% 
+  select(contains("cl.size"))
+dr.cl.size.MCAR.cov.95 <- d.MCAR.cov.95 %>% 
+  select(contains("cl.size"))
+
+dr.cl.size.MCAR.cov.100 <- d.MCAR.cov.100 %>% 
+  select(contains("cl.size"))
+
+
+cl.size.mean.35 <- quant.med(dr.cl.size.MCAR.cov.35$cov.MCAR.35.mean.cl.size)
+cl.size.med.35 <- quant.med(dr.cl.size.MCAR.cov.35$cov.MCAR.35.med.cl.size)
+cl.size.sd.35 <- quant.med(dr.cl.size.MCAR.cov.35$cov.MCAR.35.sd.cl.size)
+
+cl.size.mean.40 <- quant.med(dr.cl.size.MCAR.cov.40$cov.MCAR.40.mean.cl.size)
+cl.size.med.40 <- quant.med(dr.cl.size.MCAR.cov.40$cov.MCAR.40.med.cl.size)
+cl.size.sd.40 <- quant.med(dr.cl.size.MCAR.cov.40$cov.MCAR.40.sd.cl.size)
+
+cl.size.mean.45 <- quant.med(dr.cl.size.MCAR.cov.45$cov.MCAR.45.mean.cl.size)
+cl.size.med.45 <- quant.med(dr.cl.size.MCAR.cov.45$cov.MCAR.45.med.cl.size)
+cl.size.sd.45 <- quant.med(dr.cl.size.MCAR.cov.45$cov.MCAR.45.sd.cl.size)
+
+cl.size.mean.50 <- quant.med(dr.cl.size.MCAR.cov.50$cov.MCAR.50.mean.cl.size)
+cl.size.med.50 <- quant.med(dr.cl.size.MCAR.cov.50$cov.MCAR.50.med.cl.size)
+cl.size.sd.50 <- quant.med(dr.cl.size.MCAR.cov.50$cov.MCAR.50.sd.cl.size)
+
+cl.size.mean.55 <- quant.med(dr.cl.size.MCAR.cov.55$cov.MCAR.55.mean.cl.size)
+cl.size.med.55 <- quant.med(dr.cl.size.MCAR.cov.55$cov.MCAR.55.med.cl.size)
+cl.size.sd.55 <- quant.med(dr.cl.size.MCAR.cov.55$cov.MCAR.55.sd.cl.size)
+
+cl.size.mean.60 <- quant.med(dr.cl.size.MCAR.cov.60$cov.MCAR.60.mean.cl.size)
+cl.size.med.60 <- quant.med(dr.cl.size.MCAR.cov.60$cov.MCAR.60.med.cl.size)
+cl.size.sd.60 <- quant.med(dr.cl.size.MCAR.cov.60$cov.MCAR.60.sd.cl.size)
+
+cl.size.mean.65 <- quant.med(dr.cl.size.MCAR.cov.65$cov.MCAR.65.mean.cl.size)
+cl.size.med.65 <- quant.med(dr.cl.size.MCAR.cov.65$cov.MCAR.65.med.cl.size)
+cl.size.sd.65 <- quant.med(dr.cl.size.MCAR.cov.65$cov.MCAR.65.sd.cl.size)
+
+cl.size.mean.70 <- quant.med(dr.cl.size.MCAR.cov.70$cov.MCAR.70.mean.cl.size)
+cl.size.med.70 <- quant.med(dr.cl.size.MCAR.cov.70$cov.MCAR.70.med.cl.size)
+cl.size.sd.70 <- quant.med(dr.cl.size.MCAR.cov.70$cov.MCAR.70.sd.cl.size)
+
+cl.size.mean.75 <- quant.med(dr.cl.size.MCAR.cov.75$cov.MCAR.75.mean.cl.size)
+cl.size.med.75 <- quant.med(dr.cl.size.MCAR.cov.75$cov.MCAR.75.med.cl.size)
+cl.size.sd.75 <- quant.med(dr.cl.size.MCAR.cov.75$cov.MCAR.75.sd.cl.size)
+
+cl.size.mean.80 <- quant.med(dr.cl.size.MCAR.cov.80$cov.MCAR.80.mean.cl.size)
+cl.size.med.80 <- quant.med(dr.cl.size.MCAR.cov.80$cov.MCAR.80.med.cl.size)
+cl.size.sd.80 <- quant.med(dr.cl.size.MCAR.cov.80$cov.MCAR.80.sd.cl.size)
+
+cl.size.mean.85 <- quant.med(dr.cl.size.MCAR.cov.85$cov.MCAR.85.mean.cl.size)
+cl.size.med.85 <- quant.med(dr.cl.size.MCAR.cov.85$cov.MCAR.85.med.cl.size)
+cl.size.sd.85 <- quant.med(dr.cl.size.MCAR.cov.85$cov.MCAR.85.sd.cl.size)
+
+cl.size.mean.90 <- quant.med(dr.cl.size.MCAR.cov.90$cov.MCAR.90.mean.cl.size)
+cl.size.med.90 <- quant.med(dr.cl.size.MCAR.cov.90$cov.MCAR.90.med.cl.size)
+cl.size.sd.90 <- quant.med(dr.cl.size.MCAR.cov.90$cov.MCAR.90.sd.cl.size)
+
+cl.size.mean.95 <- quant.med(dr.cl.size.MCAR.cov.95$cov.MCAR.95.mean.cl.size)
+cl.size.med.95 <- quant.med(dr.cl.size.MCAR.cov.95$cov.MCAR.95.med.cl.size)
+cl.size.sd.95 <- quant.med(dr.cl.size.MCAR.cov.95$cov.MCAR.95.sd.cl.size)
+
+
+cl.size.mean.100 <- quant.med(dr.cl.size.MCAR.cov.100$cov.MCAR.100.mean.cl.size)
+cl.size.med.100 <- quant.med(dr.cl.size.MCAR.cov.100$cov.MCAR.100.med.cl.size)
+cl.size.sd.100 <- quant.med(dr.cl.size.MCAR.cov.100$cov.MCAR.100.sd.cl.size)
+
+
+cl.size.mean.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
+                                  "cov.50", "cov.55", "cov.60",
+                                  "cov.65", "cov.70", "cov.75",
+                                  "cov.80", "cov.85", "cov.90",
+                                  "cov.95", "cov.100"),
+                              
+                              F = c(cl.size.mean.35[2], cl.size.mean.40[2], 
+                                    cl.size.mean.45[2], cl.size.mean.50[2], 
+                                    cl.size.mean.55[2], cl.size.mean.60[2], 
+                                    cl.size.mean.65[2], cl.size.mean.70[2], 
+                                    cl.size.mean.75[2], cl.size.mean.80[2], 
+                                    cl.size.mean.85[2], cl.size.mean.90[2], 
+                                    cl.size.mean.95[2], cl.size.mean.100[2]),
+                              
+                              L = c(cl.size.mean.35[1], cl.size.mean.40[1], 
+                                    cl.size.mean.45[1], cl.size.mean.50[1], 
+                                    cl.size.mean.55[1], cl.size.mean.60[1], 
+                                    cl.size.mean.65[1], cl.size.mean.70[1], 
+                                    cl.size.mean.75[1], cl.size.mean.80[1], 
+                                    cl.size.mean.85[1], cl.size.mean.90[1], 
+                                    cl.size.mean.95[1], cl.size.mean.100[1]),
+                              
+                              U = c(cl.size.mean.35[3], cl.size.mean.40[3], 
+                                    cl.size.mean.45[3], cl.size.mean.50[3], 
+                                    cl.size.mean.55[3], cl.size.mean.60[3], 
+                                    cl.size.mean.65[3], cl.size.mean.70[3], 
+                                    cl.size.mean.75[3], cl.size.mean.80[3], 
+                                    cl.size.mean.85[3], cl.size.mean.90[3], 
+                                    cl.size.mean.95[3], cl.size.mean.100[3]))
+
+cl.size.mean.df$param <- "mean"
+
+
+cl.size.med.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
+                                 "cov.50", "cov.55", "cov.60",
+                                 "cov.65", "cov.70", "cov.75",
+                                 "cov.80", "cov.85", "cov.90",
+                                 "cov.95", "cov.100"),
+                             
+                             F = c(cl.size.med.35[2], cl.size.med.40[2], 
+                                   cl.size.med.45[2], cl.size.med.50[2], 
+                                   cl.size.med.55[2], cl.size.med.60[2], 
+                                   cl.size.med.65[2], cl.size.med.70[2], 
+                                   cl.size.med.75[2], cl.size.med.80[2], 
+                                   cl.size.med.85[2], cl.size.med.90[2], 
+                                   cl.size.med.95[2], cl.size.med.100[2]),
+                             
+                             L = c(cl.size.med.35[1], cl.size.med.40[1], 
+                                   cl.size.med.45[1], cl.size.med.50[1], 
+                                   cl.size.med.55[1], cl.size.med.60[1], 
+                                   cl.size.med.65[1], cl.size.med.70[1], 
+                                   cl.size.med.75[1], cl.size.med.80[1], 
+                                   cl.size.med.85[1], cl.size.med.90[1], 
+                                   cl.size.med.95[1], cl.size.med.100[1]),
+                             
+                             U = c(cl.size.med.35[3], cl.size.med.40[3], 
+                                   cl.size.med.45[3], cl.size.med.50[3], 
+                                   cl.size.med.55[3], cl.size.med.60[3], 
+                                   cl.size.med.65[3], cl.size.med.70[3], 
+                                   cl.size.med.75[3], cl.size.med.80[3], 
+                                   cl.size.med.85[3], cl.size.med.90[3], 
+                                   cl.size.med.95[3], cl.size.med.100[3]))
+
+cl.size.med.df$param <- "med"
+
+
+cl.size.sd.df <- data.frame(x=c("cov.35", "cov.40", "cov.45",
+                                "cov.50", "cov.55", "cov.60",
+                                "cov.65", "cov.70", "cov.75",
+                                "cov.80", "cov.85", "cov.90",
+                                "cov.95", "cov.100"),
+                            
+                            F = c(cl.size.sd.35[2], cl.size.sd.40[2], 
+                                  cl.size.sd.45[2], cl.size.sd.50[2], 
+                                  cl.size.sd.55[2], cl.size.sd.60[2], 
+                                  cl.size.sd.65[2], cl.size.sd.70[2], 
+                                  cl.size.sd.75[2], cl.size.sd.80[2], 
+                                  cl.size.sd.85[2], cl.size.sd.90[2], 
+                                  cl.size.sd.95[2], cl.size.sd.100[2]),
+                            
+                            L = c(cl.size.sd.35[1], cl.size.sd.40[1], 
+                                  cl.size.sd.45[1], cl.size.sd.50[1], 
+                                  cl.size.sd.55[1], cl.size.sd.60[1], 
+                                  cl.size.sd.65[1], cl.size.sd.70[1], 
+                                  cl.size.sd.75[1], cl.size.sd.80[1], 
+                                  cl.size.sd.85[1], cl.size.sd.90[1], 
+                                  cl.size.sd.95[1], cl.size.sd.100[1]),
+                            
+                            U = c(cl.size.sd.35[3], cl.size.sd.40[3], 
+                                  cl.size.sd.45[3], cl.size.sd.50[3], 
+                                  cl.size.sd.55[3], cl.size.sd.60[3], 
+                                  cl.size.sd.65[3], cl.size.sd.70[3], 
+                                  cl.size.sd.75[3], cl.size.sd.80[3], 
+                                  cl.size.sd.85[3], cl.size.sd.90[3], 
+                                  cl.size.sd.95[3], cl.size.sd.100[3]))
+
+cl.size.sd.df$param <- "sd"
+
+
+clust.size.stats <- rbind(cl.size.mean.df, cl.size.med.df, cl.size.sd.df)
+
+
+plot.clust.size.stats <- ggplot(clust.size.stats, aes(x=x, y=F, colour=param, group = param)) + 
+  geom_errorbar(aes(ymin=L, ymax=U), width=.1) +
+  geom_line(size=.3) +
+  geom_point() + 
+  xlab("Sample size") + ylab("Value")
+# ggtitle("Statistics  of transmission clusters")
+
+
+plot.clust.size.stats
+
+
+```
+
+
+
+# Number of pairings in transmission clusters
+
+
+## True pairings at 100% coverage
+
+```{r pairings_100}
+
+dr.cov.100 <- dr %>% 
+  select(contains(".100"))
+
+M.15.25.F.15.25.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.15.25.F.15.25) # quant.med(dr.cov.100$cov.100.M.15.25.F.15.25)
+M.25.40.F.15.25.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.25.40.F.15.25) # quant.med(dr.cov.100$cov.100.M.25.40.F.15.25)
+M.40.50.F.15.25.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.40.50.F.15.25) # quant.med(dr.cov.100$cov.100.M.40.50.F.15.25)
+
+M.15.25.F.25.40.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.15.25.F.25.40) # quant.med(dr.cov.100$cov.100.M.15.25.F.25.40)
+M.25.40.F.25.40.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.25.40.F.25.40) # quant.med(dr.cov.100$cov.100.M.25.40.F.25.40)
+M.40.50.F.25.40.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.40.50.F.25.40) # quant.med(dr.cov.100$cov.100.M.40.50.F.25.40)
+
+M.15.25.F.40.50.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.15.25.F.40.50) # quant.med(dr.cov.100$cov.100.M.15.25.F.40.50)
+M.25.40.F.40.50.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.25.40.F.40.50) # quant.med(dr.cov.100$cov.100.M.25.40.F.40.50)
+M.40.50.F.40.50.cov.100 <- quant.med(dr.cov.100$cov.MCAR.100.cl.true.M.40.50.F.40.50) # quant.med(dr.cov.100$cov.100.M.40.50.F.40.50)
+
+
+
+cov.100.age.groups.table <- matrix(c((M.15.25.F.15.25.cov.100[2]), (M.15.25.F.25.40.cov.100[2]), (M.15.25.F.40.50.cov.100[2]),
+                                     (M.25.40.F.15.25.cov.100[2]), (M.25.40.F.25.40.cov.100[2]), (M.25.40.F.40.50.cov.100[2]),
+                                     (M.40.50.F.15.25.cov.100[2]), (M.40.50.F.25.40.cov.100[2]), (M.40.50.F.40.50.cov.100[2])),
+                                   ncol = 3,
+                                   byrow = TRUE)
+
+colnames(cov.100.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+cov.100.age.groups.table
+
+```
+
+
+## True pairings at different sequence coverage scenarios
+
+
+```{r pairing_true_scen}
+
+# Cov 35
+
+M.15.25.F.15.25.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.true.M.40.50.F.40.50)
+
+
+# Cov 40
+
+M.15.25.F.15.25.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.true.M.40.50.F.40.50)
+
+# Cov 45
+
+
+M.15.25.F.15.25.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.true.M.40.50.F.40.50)
+
+
+# Cov 50
+
+
+M.15.25.F.15.25.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.true.M.40.50.F.40.50)
+
+
+# Cov 55
+
+
+M.15.25.F.15.25.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.true.M.40.50.F.40.50)
+
+
+# Cov 60
+
+
+M.15.25.F.15.25.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.true.M.40.50.F.40.50)
+
+
+# Cov 65
+
+
+M.15.25.F.15.25.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.true.M.40.50.F.40.50)
+
+# Cov 70
+
+
+M.15.25.F.15.25.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.true.M.40.50.F.40.50)
+
+
+# Cov 75
+
+
+M.15.25.F.15.25.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.true.M.40.50.F.40.50)
+
+
+# Cov 80
+
+
+M.15.25.F.15.25.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.true.M.40.50.F.40.50)
+
+
+# Cov 85
+
+
+M.15.25.F.15.25.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.true.M.40.50.F.40.50)
+
+# Cov 90
+
+
+M.15.25.F.15.25.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.true.M.40.50.F.40.50)
+
+
+# Cov 95
+
+
+M.15.25.F.15.25.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.true.M.40.50.F.40.50)
+
+
+
+# Agregated table of pairings: true 
+
+
+agreggated.pairings.mat <- matrix(c(M.15.25.F.15.25.MCAR.cov.35[2], M.15.25.F.15.25.MCAR.cov.40[2], 
+                                    M.15.25.F.15.25.MCAR.cov.45[2], M.15.25.F.15.25.MCAR.cov.50[2], 
+                                    M.15.25.F.15.25.MCAR.cov.55[2], M.15.25.F.15.25.MCAR.cov.60[2], 
+                                    M.15.25.F.15.25.MCAR.cov.65[2], M.15.25.F.15.25.MCAR.cov.70[2], 
+                                    M.15.25.F.15.25.MCAR.cov.75[2], M.15.25.F.15.25.MCAR.cov.80[2], 
+                                    M.15.25.F.15.25.MCAR.cov.85[2], M.15.25.F.15.25.MCAR.cov.90[2], 
+                                    M.15.25.F.15.25.MCAR.cov.95[2], M.15.25.F.15.25.cov.100[2],
+                                    
+                                    M.25.40.F.15.25.MCAR.cov.35[2], M.25.40.F.15.25.MCAR.cov.40[2], 
+                                    M.25.40.F.15.25.MCAR.cov.45[2], M.25.40.F.15.25.MCAR.cov.50[2], 
+                                    M.25.40.F.15.25.MCAR.cov.55[2], M.25.40.F.15.25.MCAR.cov.60[2], 
+                                    M.25.40.F.15.25.MCAR.cov.65[2], M.25.40.F.15.25.MCAR.cov.70[2], 
+                                    M.25.40.F.15.25.MCAR.cov.75[2], M.25.40.F.15.25.MCAR.cov.80[2], 
+                                    M.25.40.F.15.25.MCAR.cov.85[2], M.25.40.F.15.25.MCAR.cov.90[2], 
+                                    M.25.40.F.15.25.MCAR.cov.95[2], M.25.40.F.15.25.cov.100[2],
+                                    
+                                    M.40.50.F.15.25.MCAR.cov.35[2], M.40.50.F.15.25.MCAR.cov.40[2], 
+                                    M.40.50.F.15.25.MCAR.cov.45[2], M.40.50.F.15.25.MCAR.cov.50[2], 
+                                    M.40.50.F.15.25.MCAR.cov.55[2], M.40.50.F.15.25.MCAR.cov.60[2], 
+                                    M.40.50.F.15.25.MCAR.cov.65[2], M.40.50.F.15.25.MCAR.cov.70[2], 
+                                    M.40.50.F.15.25.MCAR.cov.75[2], M.40.50.F.15.25.MCAR.cov.80[2], 
+                                    M.40.50.F.15.25.MCAR.cov.85[2], M.40.50.F.15.25.MCAR.cov.90[2], 
+                                    M.40.50.F.15.25.MCAR.cov.95[2], M.40.50.F.15.25.cov.100[2],
+                                    
+                                    M.15.25.F.25.40.MCAR.cov.35[2], M.15.25.F.25.40.MCAR.cov.40[2], 
+                                    M.15.25.F.25.40.MCAR.cov.45[2], M.15.25.F.25.40.MCAR.cov.50[2], 
+                                    M.15.25.F.25.40.MCAR.cov.55[2], M.15.25.F.25.40.MCAR.cov.60[2], 
+                                    M.15.25.F.25.40.MCAR.cov.65[2], M.15.25.F.25.40.MCAR.cov.70[2], 
+                                    M.15.25.F.25.40.MCAR.cov.75[2], M.15.25.F.25.40.MCAR.cov.80[2], 
+                                    M.15.25.F.25.40.MCAR.cov.85[2], M.15.25.F.25.40.MCAR.cov.90[2], 
+                                    M.15.25.F.25.40.MCAR.cov.95[2], M.15.25.F.25.40.cov.100[2],
+                                    
+                                    M.25.40.F.25.40.MCAR.cov.35[2], M.25.40.F.25.40.MCAR.cov.40[2], 
+                                    M.25.40.F.25.40.MCAR.cov.45[2], M.25.40.F.25.40.MCAR.cov.50[2], 
+                                    M.25.40.F.25.40.MCAR.cov.55[2], M.25.40.F.25.40.MCAR.cov.60[2], 
+                                    M.25.40.F.25.40.MCAR.cov.65[2], M.25.40.F.25.40.MCAR.cov.70[2], 
+                                    M.25.40.F.25.40.MCAR.cov.75[2], M.25.40.F.25.40.MCAR.cov.80[2], 
+                                    M.25.40.F.25.40.MCAR.cov.85[2], M.25.40.F.25.40.MCAR.cov.90[2], 
+                                    M.25.40.F.25.40.MCAR.cov.95[2], M.25.40.F.25.40.cov.100[2],
+                                    
+                                    M.40.50.F.25.40.MCAR.cov.35[2], M.40.50.F.25.40.MCAR.cov.40[2], 
+                                    M.40.50.F.25.40.MCAR.cov.45[2], M.40.50.F.25.40.MCAR.cov.50[2], 
+                                    M.40.50.F.25.40.MCAR.cov.55[2], M.40.50.F.25.40.MCAR.cov.60[2], 
+                                    M.40.50.F.25.40.MCAR.cov.65[2], M.40.50.F.25.40.MCAR.cov.70[2], 
+                                    M.40.50.F.25.40.MCAR.cov.75[2], M.40.50.F.25.40.MCAR.cov.80[2], 
+                                    M.40.50.F.25.40.MCAR.cov.85[2], M.40.50.F.25.40.MCAR.cov.90[2], 
+                                    M.40.50.F.25.40.MCAR.cov.95[2], M.40.50.F.25.40.cov.100[2],
+                                    
+                                    M.15.25.F.40.50.MCAR.cov.35[2], M.15.25.F.40.50.MCAR.cov.40[2], 
+                                    M.15.25.F.40.50.MCAR.cov.45[2], M.15.25.F.40.50.MCAR.cov.50[2], 
+                                    M.15.25.F.40.50.MCAR.cov.55[2], M.15.25.F.40.50.MCAR.cov.60[2], 
+                                    M.15.25.F.40.50.MCAR.cov.65[2], M.15.25.F.40.50.MCAR.cov.70[2], 
+                                    M.15.25.F.40.50.MCAR.cov.75[2], M.15.25.F.40.50.MCAR.cov.80[2], 
+                                    M.15.25.F.40.50.MCAR.cov.85[2], M.15.25.F.40.50.MCAR.cov.90[2], 
+                                    M.15.25.F.40.50.MCAR.cov.95[2], M.15.25.F.40.50.cov.100[2],
+                                    
+                                    M.25.40.F.40.50.MCAR.cov.35[2], M.25.40.F.40.50.MCAR.cov.40[2], 
+                                    M.25.40.F.40.50.MCAR.cov.45[2], M.25.40.F.40.50.MCAR.cov.50[2], 
+                                    M.25.40.F.40.50.MCAR.cov.55[2], M.25.40.F.40.50.MCAR.cov.60[2], 
+                                    M.25.40.F.40.50.MCAR.cov.65[2], M.25.40.F.40.50.MCAR.cov.70[2], 
+                                    M.25.40.F.40.50.MCAR.cov.75[2], M.25.40.F.40.50.MCAR.cov.80[2], 
+                                    M.25.40.F.40.50.MCAR.cov.85[2], M.25.40.F.40.50.MCAR.cov.90[2], 
+                                    M.25.40.F.40.50.MCAR.cov.95[2], M.25.40.F.40.50.cov.100[2],
+                                    
+                                    M.40.50.F.40.50.MCAR.cov.35[2], M.40.50.F.40.50.MCAR.cov.40[2], 
+                                    M.40.50.F.40.50.MCAR.cov.45[2], M.40.50.F.40.50.MCAR.cov.50[2], 
+                                    M.40.50.F.40.50.MCAR.cov.55[2], M.40.50.F.40.50.MCAR.cov.60[2], 
+                                    M.40.50.F.40.50.MCAR.cov.65[2], M.40.50.F.40.50.MCAR.cov.70[2], 
+                                    M.40.50.F.40.50.MCAR.cov.75[2], M.40.50.F.40.50.MCAR.cov.80[2], 
+                                    M.40.50.F.40.50.MCAR.cov.85[2], M.40.50.F.40.50.MCAR.cov.90[2], 
+                                    M.40.50.F.40.50.MCAR.cov.95[2], M.40.50.F.40.50.cov.100[2]),
+                                  
+                                  ncol = 14,
+                                  byrow = TRUE)
+
+colnames(agreggated.pairings.mat) <- c("Cov.35", "Cov.40", "Cov.45",
+                                       "Cov.50", "Cov.55", "Cov.60",
+                                       "Cov.65", "Cov.70", "Cov.75",
+                                       "Cov.80", "Cov.85", "Cov.90",
+                                       "Cov.95", "Cov.100")
+
+rownames(agreggated.pairings.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", "M.40.50.F.15.25",
+                                       "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
+                                       "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
+agreggated.pairings.mat
+
+```
+
+
+
+## Pairings  inferred from transmission clusters
+
+```{r pairing_clust_inf}
+
+
+# Cov 35
+
+M.15.25.F.15.25.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.35 <- quant.med(d.MCAR.cov.35$cov.MCAR.35.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.35.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.35[2]), (M.15.25.F.25.40.MCAR.cov.cl.35[2]), (M.15.25.F.40.50.MCAR.cov.cl.35[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.35[2]), (M.25.40.F.25.40.MCAR.cov.cl.35[2]), (M.25.40.F.40.50.MCAR.cov.cl.35[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.35[2]), (M.40.50.F.25.40.MCAR.cov.cl.35[2]), (M.40.50.F.40.50.MCAR.cov.cl.35[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.35.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.35.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+
+
+# Cov 40
+
+M.15.25.F.15.25.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.40 <- quant.med(d.MCAR.cov.40$cov.MCAR.40.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.40.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.40[2]), (M.15.25.F.25.40.MCAR.cov.cl.40[2]), (M.15.25.F.40.50.MCAR.cov.cl.40[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.40[2]), (M.25.40.F.25.40.MCAR.cov.cl.40[2]), (M.25.40.F.40.50.MCAR.cov.cl.40[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.40[2]), (M.40.50.F.25.40.MCAR.cov.cl.40[2]), (M.40.50.F.40.50.MCAR.cov.cl.40[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.40.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.40.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+
+
+# Cov 45
+
+M.15.25.F.15.25.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.45 <- quant.med(d.MCAR.cov.45$cov.MCAR.45.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.45.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.45[2]), (M.15.25.F.25.40.MCAR.cov.cl.45[2]), (M.15.25.F.40.50.MCAR.cov.cl.45[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.45[2]), (M.25.40.F.25.40.MCAR.cov.cl.45[2]), (M.25.40.F.40.50.MCAR.cov.cl.45[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.45[2]), (M.40.50.F.25.40.MCAR.cov.cl.45[2]), (M.40.50.F.40.50.MCAR.cov.cl.45[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.45.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.45.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+# Cov 50
+
+M.15.25.F.15.25.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.50 <- quant.med(d.MCAR.cov.50$cov.MCAR.50.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.50.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.50[2]), (M.15.25.F.25.40.MCAR.cov.cl.50[2]), (M.15.25.F.40.50.MCAR.cov.cl.50[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.50[2]), (M.25.40.F.25.40.MCAR.cov.cl.50[2]), (M.25.40.F.40.50.MCAR.cov.cl.50[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.50[2]), (M.40.50.F.25.40.MCAR.cov.cl.50[2]), (M.40.50.F.40.50.MCAR.cov.cl.50[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.50.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.50.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+
+# Cov 55
+
+M.15.25.F.15.25.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.55 <- quant.med(d.MCAR.cov.55$cov.MCAR.55.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.55.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.55[2]), (M.15.25.F.25.40.MCAR.cov.cl.55[2]), (M.15.25.F.40.50.MCAR.cov.cl.55[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.55[2]), (M.25.40.F.25.40.MCAR.cov.cl.55[2]), (M.25.40.F.40.50.MCAR.cov.cl.55[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.55[2]), (M.40.50.F.25.40.MCAR.cov.cl.55[2]), (M.40.50.F.40.50.MCAR.cov.cl.55[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.55.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.55.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+# Cov 60
+
+M.15.25.F.15.25.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.60 <- quant.med(d.MCAR.cov.60$cov.MCAR.60.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.60.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.60[2]), (M.15.25.F.25.40.MCAR.cov.cl.60[2]), (M.15.25.F.40.50.MCAR.cov.cl.60[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.60[2]), (M.25.40.F.25.40.MCAR.cov.cl.60[2]), (M.25.40.F.40.50.MCAR.cov.cl.60[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.60[2]), (M.40.50.F.25.40.MCAR.cov.cl.60[2]), (M.40.50.F.40.50.MCAR.cov.cl.60[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.60.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.60.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+
+# Cov 65
+
+M.15.25.F.15.25.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.65 <- quant.med(d.MCAR.cov.65$cov.MCAR.65.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.65.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.65[2]), (M.15.25.F.25.40.MCAR.cov.cl.65[2]), (M.15.25.F.40.50.MCAR.cov.cl.65[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.65[2]), (M.25.40.F.25.40.MCAR.cov.cl.65[2]), (M.25.40.F.40.50.MCAR.cov.cl.65[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.65[2]), (M.40.50.F.25.40.MCAR.cov.cl.65[2]), (M.40.50.F.40.50.MCAR.cov.cl.65[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.65.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.65.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+# Cov 70
+
+M.15.25.F.15.25.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.70 <- quant.med(d.MCAR.cov.70$cov.MCAR.70.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.70.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.70[2]), (M.15.25.F.25.40.MCAR.cov.cl.70[2]), (M.15.25.F.40.50.MCAR.cov.cl.70[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.70[2]), (M.25.40.F.25.40.MCAR.cov.cl.70[2]), (M.25.40.F.40.50.MCAR.cov.cl.70[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.70[2]), (M.40.50.F.25.40.MCAR.cov.cl.70[2]), (M.40.50.F.40.50.MCAR.cov.cl.70[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.70.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.70.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+# Cov 75
+
+M.15.25.F.15.25.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.75 <- quant.med(d.MCAR.cov.75$cov.MCAR.75.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.75.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.75[2]), (M.15.25.F.25.40.MCAR.cov.cl.75[2]), (M.15.25.F.40.50.MCAR.cov.cl.75[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.75[2]), (M.25.40.F.25.40.MCAR.cov.cl.75[2]), (M.25.40.F.40.50.MCAR.cov.cl.75[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.75[2]), (M.40.50.F.25.40.MCAR.cov.cl.75[2]), (M.40.50.F.40.50.MCAR.cov.cl.75[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.75.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.75.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+
+# Cov 80
+
+M.15.25.F.15.25.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.80 <- quant.med(d.MCAR.cov.80$cov.MCAR.80.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.80.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.80[2]), (M.15.25.F.25.40.MCAR.cov.cl.80[2]), (M.15.25.F.40.50.MCAR.cov.cl.80[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.80[2]), (M.25.40.F.25.40.MCAR.cov.cl.80[2]), (M.25.40.F.40.50.MCAR.cov.cl.80[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.80[2]), (M.40.50.F.25.40.MCAR.cov.cl.80[2]), (M.40.50.F.40.50.MCAR.cov.cl.80[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.80.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.80.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+
+# Cov 85
+
+M.15.25.F.15.25.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.85 <- quant.med(d.MCAR.cov.85$cov.MCAR.85.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.85.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.85[2]), (M.15.25.F.25.40.MCAR.cov.cl.85[2]), (M.15.25.F.40.50.MCAR.cov.cl.85[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.85[2]), (M.25.40.F.25.40.MCAR.cov.cl.85[2]), (M.25.40.F.40.50.MCAR.cov.cl.85[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.85[2]), (M.40.50.F.25.40.MCAR.cov.cl.85[2]), (M.40.50.F.40.50.MCAR.cov.cl.85[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.85.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.85.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+# Cov 90
+
+M.15.25.F.15.25.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.90 <- quant.med(d.MCAR.cov.90$cov.MCAR.90.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.90.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.90[2]), (M.15.25.F.25.40.MCAR.cov.cl.90[2]), (M.15.25.F.40.50.MCAR.cov.cl.90[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.90[2]), (M.25.40.F.25.40.MCAR.cov.cl.90[2]), (M.25.40.F.40.50.MCAR.cov.cl.90[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.90[2]), (M.40.50.F.25.40.MCAR.cov.cl.90[2]), (M.40.50.F.40.50.MCAR.cov.cl.90[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.90.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.90.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+# Cov 95
+
+M.15.25.F.15.25.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.15.25.F.15.25)
+M.25.40.F.15.25.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.25.40.F.15.25)
+M.40.50.F.15.25.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.40.50.F.15.25)
+
+M.15.25.F.25.40.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.15.25.F.25.40)
+M.25.40.F.25.40.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.25.40.F.25.40)
+M.40.50.F.25.40.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.40.50.F.25.40)
+
+M.15.25.F.40.50.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.15.25.F.40.50)
+M.25.40.F.40.50.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.25.40.F.40.50)
+M.40.50.F.40.50.MCAR.cov.cl.95 <- quant.med(d.MCAR.cov.95$cov.MCAR.95.cl.M.40.50.F.40.50)
+
+
+
+MCAR.cov.95.cl.age.groups.table <- matrix(c((M.15.25.F.15.25.MCAR.cov.cl.95[2]), (M.15.25.F.25.40.MCAR.cov.cl.95[2]), (M.15.25.F.40.50.MCAR.cov.cl.95[2]),
+                                            (M.25.40.F.15.25.MCAR.cov.cl.95[2]), (M.25.40.F.25.40.MCAR.cov.cl.95[2]), (M.25.40.F.40.50.MCAR.cov.cl.95[2]),
+                                            (M.40.50.F.15.25.MCAR.cov.cl.95[2]), (M.40.50.F.25.40.MCAR.cov.cl.95[2]), (M.40.50.F.40.50.MCAR.cov.cl.95[2])),
+                                          ncol = 3,
+                                          byrow = TRUE)
+
+colnames(MCAR.cov.95.cl.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
+rownames(MCAR.cov.95.cl.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
+
+
+
+# Agregated table of pairings in transmission clusters  
+
+agreggated.pairings.cl.mat <- matrix(c(M.15.25.F.15.25.MCAR.cov.cl.35[2], M.15.25.F.15.25.MCAR.cov.cl.40[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.45[2], M.15.25.F.15.25.MCAR.cov.cl.50[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.55[2], M.15.25.F.15.25.MCAR.cov.cl.60[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.65[2], M.15.25.F.15.25.MCAR.cov.cl.70[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.75[2], M.15.25.F.15.25.MCAR.cov.cl.80[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.85[2], M.15.25.F.15.25.MCAR.cov.cl.90[2], 
+                                       M.15.25.F.15.25.MCAR.cov.cl.95[2], M.15.25.F.15.25.cov.100[2],
+                                       
+                                       M.25.40.F.15.25.MCAR.cov.cl.35[2], M.25.40.F.15.25.MCAR.cov.cl.40[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.45[2], M.25.40.F.15.25.MCAR.cov.cl.50[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.55[2], M.25.40.F.15.25.MCAR.cov.cl.60[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.65[2], M.25.40.F.15.25.MCAR.cov.cl.70[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.75[2], M.25.40.F.15.25.MCAR.cov.cl.80[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.85[2], M.25.40.F.15.25.MCAR.cov.cl.90[2], 
+                                       M.25.40.F.15.25.MCAR.cov.cl.95[2], M.25.40.F.15.25.cov.100[2],
+                                       
+                                       M.40.50.F.15.25.MCAR.cov.cl.35[2], M.40.50.F.15.25.MCAR.cov.cl.40[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.45[2], M.40.50.F.15.25.MCAR.cov.cl.50[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.55[2], M.40.50.F.15.25.MCAR.cov.cl.60[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.65[2], M.40.50.F.15.25.MCAR.cov.cl.70[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.75[2], M.40.50.F.15.25.MCAR.cov.cl.80[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.85[2], M.40.50.F.15.25.MCAR.cov.cl.90[2], 
+                                       M.40.50.F.15.25.MCAR.cov.cl.95[2], M.40.50.F.15.25.cov.100[2],
+                                       
+                                       M.15.25.F.25.40.MCAR.cov.cl.35[2], M.15.25.F.25.40.MCAR.cov.cl.40[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.45[2], M.15.25.F.25.40.MCAR.cov.cl.50[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.55[2], M.15.25.F.25.40.MCAR.cov.cl.60[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.65[2], M.15.25.F.25.40.MCAR.cov.cl.70[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.75[2], M.15.25.F.25.40.MCAR.cov.cl.80[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.85[2], M.15.25.F.25.40.MCAR.cov.cl.90[2], 
+                                       M.15.25.F.25.40.MCAR.cov.cl.95[2], M.15.25.F.25.40.cov.100[2],
+                                       
+                                       M.25.40.F.25.40.MCAR.cov.cl.35[2], M.25.40.F.25.40.MCAR.cov.cl.40[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.45[2], M.25.40.F.25.40.MCAR.cov.cl.50[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.55[2], M.25.40.F.25.40.MCAR.cov.cl.60[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.65[2], M.25.40.F.25.40.MCAR.cov.cl.70[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.75[2], M.25.40.F.25.40.MCAR.cov.cl.80[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.85[2], M.25.40.F.25.40.MCAR.cov.cl.90[2], 
+                                       M.25.40.F.25.40.MCAR.cov.cl.95[2], M.25.40.F.25.40.cov.100[2],
+                                       
+                                       M.40.50.F.25.40.MCAR.cov.cl.35[2], M.40.50.F.25.40.MCAR.cov.cl.40[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.45[2], M.40.50.F.25.40.MCAR.cov.cl.50[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.55[2], M.40.50.F.25.40.MCAR.cov.cl.60[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.65[2], M.40.50.F.25.40.MCAR.cov.cl.70[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.75[2], M.40.50.F.25.40.MCAR.cov.cl.80[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.85[2], M.40.50.F.25.40.MCAR.cov.cl.90[2], 
+                                       M.40.50.F.25.40.MCAR.cov.cl.95[2], M.40.50.F.25.40.cov.100[2],
+                                       
+                                       M.15.25.F.40.50.MCAR.cov.cl.35[2], M.15.25.F.40.50.MCAR.cov.cl.40[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.45[2], M.15.25.F.40.50.MCAR.cov.cl.50[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.55[2], M.15.25.F.40.50.MCAR.cov.cl.60[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.65[2], M.15.25.F.40.50.MCAR.cov.cl.70[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.75[2], M.15.25.F.40.50.MCAR.cov.cl.80[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.85[2], M.15.25.F.40.50.MCAR.cov.cl.90[2], 
+                                       M.15.25.F.40.50.MCAR.cov.cl.95[2], M.15.25.F.40.50.cov.100[2],
+                                       
+                                       M.25.40.F.40.50.MCAR.cov.cl.35[2], M.25.40.F.40.50.MCAR.cov.cl.40[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.45[2], M.25.40.F.40.50.MCAR.cov.cl.50[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.55[2], M.25.40.F.40.50.MCAR.cov.cl.60[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.65[2], M.25.40.F.40.50.MCAR.cov.cl.70[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.75[2], M.25.40.F.40.50.MCAR.cov.cl.80[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.85[2], M.25.40.F.40.50.MCAR.cov.cl.90[2], 
+                                       M.25.40.F.40.50.MCAR.cov.cl.95[2], M.25.40.F.40.50.cov.100[2],
+                                       
+                                       M.40.50.F.40.50.MCAR.cov.cl.35[2], M.40.50.F.40.50.MCAR.cov.cl.40[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.45[2], M.40.50.F.40.50.MCAR.cov.cl.50[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.55[2], M.40.50.F.40.50.MCAR.cov.cl.60[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.65[2], M.40.50.F.40.50.MCAR.cov.cl.70[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.75[2], M.40.50.F.40.50.MCAR.cov.cl.80[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.85[2], M.40.50.F.40.50.MCAR.cov.cl.90[2], 
+                                       M.40.50.F.40.50.MCAR.cov.cl.95[2], M.40.50.F.40.50.cov.100[2]),
+                                     
+                                     ncol = 14,
+                                     byrow = TRUE)
+
+
+
+colnames(agreggated.pairings.cl.mat) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
+                                          "cl.cov.50", "cl.cov.55", "cl.cov.60",
+                                          "cl.cov.65", "cl.cov.70", "cl.cov.75",
+                                          "cl.cov.80", "cl.cov.85", "cl.cov.90",
+                                          "cl.cov.95", "true.cov.100")
+
+rownames(agreggated.pairings.cl.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", "M.40.50.F.15.25",
+                                          "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
+                                          "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
+
+agreggated.pairings.cl.mat
+
+```
+
+
+# Proportions of pairings across age groups
+
+
+## True proportions at 100% coverage
+
+True proprotions of men/women in pairing at 100 coverage.
+
+```{r prop_pairings}
+
+dr.cov.100 <- dr %>%
+  select(contains(".100"))
+
+d.MCAR.cov.100.prop.men <-  dr.cov.100 %>%
+  select(contains("true.prop.men")) # true proportion of pairings inferred 
+
+d.MCAR.cov.100.prop.women <-  dr.cov.100 %>%
+  select(contains("true.prop.women")) 
+
+
+
+vector.MCAR.true.cov.100.prop.men15.25.F.15.25 <- d.MCAR.cov.100.prop.men[,1]
+vector.MCAR.true.cov.100.prop.women15.25.M.15.25 <- d.MCAR.cov.100.prop.women[,1]
+
+vector.MCAR.true.cov.100.prop.men25.40.F.15.25 <- d.MCAR.cov.100.prop.men[,2]
+vector.MCAR.true.cov.100.prop.women25.40.M.15.25 <- d.MCAR.cov.100.prop.women[,2]
+
+vector.MCAR.true.cov.100.prop.men40.50.F.15.25 <- d.MCAR.cov.100.prop.men[,3]
+vector.MCAR.true.cov.100.prop.women40.50.M.15.25 <- d.MCAR.cov.100.prop.women[,3]
+
+vector.MCAR.true.cov.100.prop.men15.25.F.25.40 <- d.MCAR.cov.100.prop.men[,4]
+vector.MCAR.true.cov.100.prop.women15.25.M.25.40 <- d.MCAR.cov.100.prop.women[,4]
+
+vector.MCAR.true.cov.100.prop.men25.40.F.25.40 <- d.MCAR.cov.100.prop.men[,5]
+vector.MCAR.true.cov.100.prop.women25.40.M.25.40 <- d.MCAR.cov.100.prop.women[,5]
+
+vector.MCAR.true.cov.100.prop.men40.50.F.25.40 <- d.MCAR.cov.100.prop.men[,6]
+vector.MCAR.true.cov.100.prop.women40.50.M.25.40 <- d.MCAR.cov.100.prop.women[,6]
+
+
+vector.MCAR.true.cov.100.prop.men15.25.F.40.50 <- d.MCAR.cov.100.prop.men[,7]
+vector.MCAR.true.cov.100.prop.women15.25.M.40.50 <- d.MCAR.cov.100.prop.women[,7]
+
+vector.MCAR.true.cov.100.prop.men25.40.F.40.50 <- d.MCAR.cov.100.prop.men[,8]
+vector.MCAR.true.cov.100.prop.women25.40.M.40.50 <- d.MCAR.cov.100.prop.women[,8]
+
+vector.MCAR.true.cov.100.prop.men40.50.F.40.50 <- d.MCAR.cov.100.prop.men[,9]
+vector.MCAR.true.cov.100.prop.women40.50.M.40.50 <- d.MCAR.cov.100.prop.women[,9]
+
+
+# Summarrised
+
+d.MCAR.true.cov.100.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.100.prop.men[,1])
+d.MCAR.true.cov.100.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.100.prop.women[,1])
+
+d.MCAR.true.cov.100.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.100.prop.men[,2])
+d.MCAR.true.cov.100.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.100.prop.women[,2])
+
+d.MCAR.true.cov.100.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.100.prop.men[,3])
+d.MCAR.true.cov.100.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.100.prop.women[,3])
+
+d.MCAR.true.cov.100.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.100.prop.men[,4])
+d.MCAR.true.cov.100.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.100.prop.women[,4])
+
+d.MCAR.true.cov.100.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.100.prop.men[,5])
+d.MCAR.true.cov.100.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.100.prop.women[,5])
+
+d.MCAR.true.cov.100.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.100.prop.men[,6])
+d.MCAR.true.cov.100.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.100.prop.women[,6])
+
+
+d.MCAR.true.cov.100.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.100.prop.men[,7])
+d.MCAR.true.cov.100.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.100.prop.women[,7])
+
+d.MCAR.true.cov.100.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.100.prop.men[,8])
+d.MCAR.true.cov.100.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.100.prop.women[,8])
+
+d.MCAR.true.cov.100.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.100.prop.men[,9])
+d.MCAR.true.cov.100.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.100.prop.women[,9])
+
+props.val.F <- c(d.MCAR.true.cov.100.prop.men15.25.F.15.25[2], d.MCAR.true.cov.100.prop.women15.25.M.15.25[2],
+                 d.MCAR.true.cov.100.prop.men25.40.F.15.25[2], d.MCAR.true.cov.100.prop.women25.40.M.15.25[2],
+                 d.MCAR.true.cov.100.prop.men40.50.F.15.25[2], d.MCAR.true.cov.100.prop.women40.50.M.15.25[2],
+                 d.MCAR.true.cov.100.prop.men15.25.F.25.40[2], d.MCAR.true.cov.100.prop.women15.25.M.25.40[2],
+                 d.MCAR.true.cov.100.prop.men25.40.F.25.40[2], d.MCAR.true.cov.100.prop.women25.40.M.25.40[2],
+                 d.MCAR.true.cov.100.prop.men40.50.F.25.40[2], d.MCAR.true.cov.100.prop.women40.50.M.25.40[2],
+                 d.MCAR.true.cov.100.prop.men15.25.F.40.50[2], d.MCAR.true.cov.100.prop.women15.25.M.40.50[2],
+                 d.MCAR.true.cov.100.prop.men25.40.F.40.50[2], d.MCAR.true.cov.100.prop.women25.40.M.40.50[2],
+                 d.MCAR.true.cov.100.prop.men40.50.F.40.50[2], d.MCAR.true.cov.100.prop.women40.50.M.40.50[2])
+
+props.val.U <- c(d.MCAR.true.cov.100.prop.men15.25.F.15.25[3], d.MCAR.true.cov.100.prop.women15.25.M.15.25[3],
+                 d.MCAR.true.cov.100.prop.men25.40.F.15.25[3], d.MCAR.true.cov.100.prop.women25.40.M.15.25[3],
+                 d.MCAR.true.cov.100.prop.men40.50.F.15.25[3], d.MCAR.true.cov.100.prop.women40.50.M.15.25[3],
+                 d.MCAR.true.cov.100.prop.men15.25.F.25.40[3], d.MCAR.true.cov.100.prop.women15.25.M.25.40[3],
+                 d.MCAR.true.cov.100.prop.men25.40.F.25.40[3], d.MCAR.true.cov.100.prop.women25.40.M.25.40[3],
+                 d.MCAR.true.cov.100.prop.men40.50.F.25.40[3], d.MCAR.true.cov.100.prop.women40.50.M.25.40[3],
+                 d.MCAR.true.cov.100.prop.men15.25.F.40.50[3], d.MCAR.true.cov.100.prop.women15.25.M.40.50[3],
+                 d.MCAR.true.cov.100.prop.men25.40.F.40.50[3], d.MCAR.true.cov.100.prop.women25.40.M.40.50[3],
+                 d.MCAR.true.cov.100.prop.men40.50.F.40.50[3], d.MCAR.true.cov.100.prop.women40.50.M.40.50[3])
+
+
+
+props.val.L <- c(d.MCAR.true.cov.100.prop.men15.25.F.15.25[1], d.MCAR.true.cov.100.prop.women15.25.M.15.25[1],
+                 d.MCAR.true.cov.100.prop.men25.40.F.15.25[1], d.MCAR.true.cov.100.prop.women25.40.M.15.25[1],
+                 d.MCAR.true.cov.100.prop.men40.50.F.15.25[1], d.MCAR.true.cov.100.prop.women40.50.M.15.25[1],
+                 d.MCAR.true.cov.100.prop.men15.25.F.25.40[1], d.MCAR.true.cov.100.prop.women15.25.M.25.40[1],
+                 d.MCAR.true.cov.100.prop.men25.40.F.25.40[1], d.MCAR.true.cov.100.prop.women25.40.M.25.40[1],
+                 d.MCAR.true.cov.100.prop.men40.50.F.25.40[1], d.MCAR.true.cov.100.prop.women40.50.M.25.40[1],
+                 d.MCAR.true.cov.100.prop.men15.25.F.40.50[1], d.MCAR.true.cov.100.prop.women15.25.M.40.50[1],
+                 d.MCAR.true.cov.100.prop.men25.40.F.40.50[1], d.MCAR.true.cov.100.prop.women25.40.M.40.50[1],
+                 d.MCAR.true.cov.100.prop.men40.50.F.40.50[1], d.MCAR.true.cov.100.prop.women40.50.M.40.50[1])
+
+names.props <- c("M.15.25.F.15.25", "W.15.25.M.15.25", "M.25.40.F.15.25", "W.25.40.M.15.25",
+                 "M.40.50.F.15.25", "W.40.50.M.15.25", "M.15.25.F.25.40", "W.15.25.M.25.40",
+                 "M.25.40.F.25.40", "W.25.40.M.25.40", "M.40.50.F.25.40", "W.40.50.M.25.40",
+                 "M.15.25.F.40.50", "W.15.25.M.40.50", "M.25.40.F.40.50", "W.25.40.M.40.50",
+                 "M.40.50.F.40.50", "W.40.50.M.40.50")
+
+
+props.table <- data.frame(names.props, props.val.F, props.val.L, props.val.U)
+
+
+
+```
+
+
+## Proportions in different sequence coverage scenarios
+
+Proportions of men/women inferred from pairings in transmission clusters.
+
+
+```{r proprt_seq_cov}
+
+# Extracting data
+
+# Proportions of pairing of men/women across different age groups in three cases
+
+# (i) transmission network built from transmission clusters
+# .cl.prop.men
+# .cl.prop.women
+
+# (ii) true proportions in true transmission network of these individuals in transmission clusters
+# .cl.true.prop.men
+# .cl.true.prop.women
+
+
+# cov 35
+
+d.MCAR.cov.35.cl.prop.men <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.35.cl.prop.women <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.35.cl.true.prop.men <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.35.cl.true.prop.women <-  d.MCAR.cov.35 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 40
+
+d.MCAR.cov.40.cl.prop.men <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.40.cl.prop.women <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.40.cl.true.prop.men <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.40.cl.true.prop.women <-  d.MCAR.cov.40 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+# cov 45
+
+d.MCAR.cov.45.cl.prop.men <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.45.cl.prop.women <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.45.cl.true.prop.men <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.45.cl.true.prop.women <-  d.MCAR.cov.45 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 50
+
+d.MCAR.cov.50.cl.prop.men <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.50.cl.prop.women <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.50.cl.true.prop.men <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.50.cl.true.prop.women <-  d.MCAR.cov.50 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 55
+
+d.MCAR.cov.55.cl.prop.men <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.55.cl.prop.women <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.55.cl.true.prop.men <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.55.cl.true.prop.women <-  d.MCAR.cov.55 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 60
+
+d.MCAR.cov.60.cl.prop.men <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.60.cl.prop.women <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.60.cl.true.prop.men <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.60.cl.true.prop.women <-  d.MCAR.cov.60 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# 65
+
+d.MCAR.cov.65.cl.prop.men <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.65.cl.prop.women <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.65.cl.true.prop.men <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.65.cl.true.prop.women <-  d.MCAR.cov.65 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# 70
+
+d.MCAR.cov.70.cl.prop.men <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.70.cl.prop.women <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.70.cl.true.prop.men <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.70.cl.true.prop.women <-  d.MCAR.cov.70 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# 75
+
+d.MCAR.cov.75.cl.prop.men <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.75.cl.prop.women <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.75.cl.true.prop.men <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.75.cl.true.prop.women <-  d.MCAR.cov.75 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 80
+
+d.MCAR.cov.80.cl.prop.men <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.80.cl.prop.women <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.80.cl.true.prop.men <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.80.cl.true.prop.women <-  d.MCAR.cov.80 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 85
+
+d.MCAR.cov.85.cl.prop.men <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.85.cl.prop.women <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.85.cl.true.prop.men <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.85.cl.true.prop.women <-  d.MCAR.cov.85 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 90
+
+d.MCAR.cov.90.cl.prop.men <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.90.cl.prop.women <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.90.cl.true.prop.men <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.90.cl.true.prop.women <-  d.MCAR.cov.90 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+# cov 95
+
+
+d.MCAR.cov.95.cl.prop.men <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.prop.men")) # proportion of pairings inferred from transmission clusters
+
+d.MCAR.cov.95.cl.prop.women <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.prop.women")) 
+
+d.MCAR.cov.95.cl.true.prop.men <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.true.prop.men"))  # true proportion of pairings in transmission clusters
+
+d.MCAR.cov.95.cl.true.prop.women <-  d.MCAR.cov.95 %>%
+  select(contains(".cl.true.prop.women")) 
+
+
+
+
+# proportions computation
+
+
+# Cov 35
+
+
+# Vectors
+
+vector.MCAR.cov.35.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.35.cl.prop.men[,1]
+vector.MCAR.cov.35.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.35.cl.prop.women[,1]
+
+vector.MCAR.cov.35.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.35.cl.prop.men[,2]
+vector.MCAR.cov.35.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.35.cl.prop.women[,2]
+
+vector.MCAR.cov.35.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.35.cl.prop.men[,3]
+vector.MCAR.cov.35.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.35.cl.prop.women[,3]
+
+vector.MCAR.cov.35.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.35.cl.prop.men[,4]
+vector.MCAR.cov.35.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.35.cl.prop.women[,4]
+
+vector.MCAR.cov.35.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.35.cl.prop.men[,5]
+vector.MCAR.cov.35.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.35.cl.prop.women[,5]
+
+vector.MCAR.cov.35.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.35.cl.prop.men[,6]
+vector.MCAR.cov.35.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.35.cl.prop.women[,6]
+
+
+vector.MCAR.cov.35.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.35.cl.prop.men[,7]
+vector.MCAR.cov.35.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.35.cl.prop.women[,7]
+
+vector.MCAR.cov.35.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.35.cl.prop.men[,8]
+vector.MCAR.cov.35.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.35.cl.prop.women[,8]
+
+vector.MCAR.cov.35.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.35.cl.prop.men[,9]
+vector.MCAR.cov.35.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.35.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.35.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.35.cl.prop.men[,1])
+d.MCAR.cov.35.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.35.cl.prop.women[,1])
+
+d.MCAR.cov.35.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.35.cl.prop.men[,2])
+d.MCAR.cov.35.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.35.cl.prop.women[,2])
+
+d.MCAR.cov.35.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.35.cl.prop.men[,3])
+d.MCAR.cov.35.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.35.cl.prop.women[,3])
+
+d.MCAR.cov.35.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.35.cl.prop.men[,4])
+d.MCAR.cov.35.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.35.cl.prop.women[,4])
+
+d.MCAR.cov.35.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.35.cl.prop.men[,5])
+d.MCAR.cov.35.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.35.cl.prop.women[,5])
+
+d.MCAR.cov.35.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.35.cl.prop.men[,6])
+d.MCAR.cov.35.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.35.cl.prop.women[,6])
+
+
+d.MCAR.cov.35.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.35.cl.prop.men[,7])
+d.MCAR.cov.35.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.35.cl.prop.women[,7])
+
+d.MCAR.cov.35.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.35.cl.prop.men[,8])
+d.MCAR.cov.35.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.35.cl.prop.women[,8])
+
+d.MCAR.cov.35.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.35.cl.prop.men[,9])
+d.MCAR.cov.35.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.35.cl.prop.women[,9])
+
+
+# Cov 40
+
+
+# Vector
+
+
+vector.MCAR.cov.40.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.40.cl.prop.men[,1]
+vector.MCAR.cov.40.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.40.cl.prop.women[,1]
+
+vector.MCAR.cov.40.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.40.cl.prop.men[,2]
+vector.MCAR.cov.40.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.40.cl.prop.women[,2]
+
+vector.MCAR.cov.40.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.40.cl.prop.men[,3]
+vector.MCAR.cov.40.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.40.cl.prop.women[,3]
+
+vector.MCAR.cov.40.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.40.cl.prop.men[,4]
+vector.MCAR.cov.40.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.40.cl.prop.women[,4]
+
+vector.MCAR.cov.40.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.40.cl.prop.men[,5]
+vector.MCAR.cov.40.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.40.cl.prop.women[,5]
+
+vector.MCAR.cov.40.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.40.cl.prop.men[,6]
+vector.MCAR.cov.40.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.40.cl.prop.women[,6]
+
+
+vector.MCAR.cov.40.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.40.cl.prop.men[,7]
+vector.MCAR.cov.40.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.40.cl.prop.women[,7]
+
+vector.MCAR.cov.40.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.40.cl.prop.men[,8]
+vector.MCAR.cov.40.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.40.cl.prop.women[,8]
+
+vector.MCAR.cov.40.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.40.cl.prop.men[,9]
+vector.MCAR.cov.40.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.40.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.40.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.40.cl.prop.men[,1])
+d.MCAR.cov.40.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.40.cl.prop.women[,1])
+
+d.MCAR.cov.40.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.40.cl.prop.men[,2])
+d.MCAR.cov.40.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.40.cl.prop.women[,2])
+
+d.MCAR.cov.40.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.40.cl.prop.men[,3])
+d.MCAR.cov.40.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.40.cl.prop.women[,3])
+
+d.MCAR.cov.40.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.40.cl.prop.men[,4])
+d.MCAR.cov.40.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.40.cl.prop.women[,4])
+
+d.MCAR.cov.40.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.40.cl.prop.men[,5])
+d.MCAR.cov.40.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.40.cl.prop.women[,5])
+
+d.MCAR.cov.40.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.40.cl.prop.men[,6])
+d.MCAR.cov.40.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.40.cl.prop.women[,6])
+
+
+d.MCAR.cov.40.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.40.cl.prop.men[,7])
+d.MCAR.cov.40.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.40.cl.prop.women[,7])
+
+d.MCAR.cov.40.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.40.cl.prop.men[,8])
+d.MCAR.cov.40.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.40.cl.prop.women[,8])
+
+d.MCAR.cov.40.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.40.cl.prop.men[,9])
+d.MCAR.cov.40.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.40.cl.prop.women[,9])
+
+
+# Cov 45
+
+
+# Vector
+
+
+vector.MCAR.cov.45.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.45.cl.prop.men[,1]
+vector.MCAR.cov.45.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.45.cl.prop.women[,1]
+
+vector.MCAR.cov.45.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.45.cl.prop.men[,2]
+vector.MCAR.cov.45.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.45.cl.prop.women[,2]
+
+vector.MCAR.cov.45.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.45.cl.prop.men[,3]
+vector.MCAR.cov.45.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.45.cl.prop.women[,3]
+
+vector.MCAR.cov.45.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.45.cl.prop.men[,4]
+vector.MCAR.cov.45.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.45.cl.prop.women[,4]
+
+vector.MCAR.cov.45.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.45.cl.prop.men[,5]
+vector.MCAR.cov.45.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.45.cl.prop.women[,5]
+
+vector.MCAR.cov.45.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.45.cl.prop.men[,6]
+vector.MCAR.cov.45.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.45.cl.prop.women[,6]
+
+
+vector.MCAR.cov.45.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.45.cl.prop.men[,7]
+vector.MCAR.cov.45.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.45.cl.prop.women[,7]
+
+vector.MCAR.cov.45.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.45.cl.prop.men[,8]
+vector.MCAR.cov.45.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.45.cl.prop.women[,8]
+
+vector.MCAR.cov.45.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.45.cl.prop.men[,9]
+vector.MCAR.cov.45.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.45.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.45.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.45.cl.prop.men[,1])
+d.MCAR.cov.45.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.45.cl.prop.women[,1])
+
+d.MCAR.cov.45.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.45.cl.prop.men[,2])
+d.MCAR.cov.45.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.45.cl.prop.women[,2])
+
+d.MCAR.cov.45.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.45.cl.prop.men[,3])
+d.MCAR.cov.45.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.45.cl.prop.women[,3])
+
+d.MCAR.cov.45.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.45.cl.prop.men[,4])
+d.MCAR.cov.45.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.45.cl.prop.women[,4])
+
+d.MCAR.cov.45.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.45.cl.prop.men[,5])
+d.MCAR.cov.45.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.45.cl.prop.women[,5])
+
+d.MCAR.cov.45.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.45.cl.prop.men[,6])
+d.MCAR.cov.45.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.45.cl.prop.women[,6])
+
+
+d.MCAR.cov.45.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.45.cl.prop.men[,7])
+d.MCAR.cov.45.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.45.cl.prop.women[,7])
+
+d.MCAR.cov.45.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.45.cl.prop.men[,8])
+d.MCAR.cov.45.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.45.cl.prop.women[,8])
+
+d.MCAR.cov.45.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.45.cl.prop.men[,9])
+d.MCAR.cov.45.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.45.cl.prop.women[,9])
+
+
+
+
+# Cov 50
+
+
+# Vector
+
+
+vector.MCAR.cov.50.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.50.cl.prop.men[,1]
+vector.MCAR.cov.50.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.50.cl.prop.women[,1]
+
+vector.MCAR.cov.50.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.50.cl.prop.men[,2]
+vector.MCAR.cov.50.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.50.cl.prop.women[,2]
+
+vector.MCAR.cov.50.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.50.cl.prop.men[,3]
+vector.MCAR.cov.50.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.50.cl.prop.women[,3]
+
+vector.MCAR.cov.50.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.50.cl.prop.men[,4]
+vector.MCAR.cov.50.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.50.cl.prop.women[,4]
+
+vector.MCAR.cov.50.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.50.cl.prop.men[,5]
+vector.MCAR.cov.50.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.50.cl.prop.women[,5]
+
+vector.MCAR.cov.50.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.50.cl.prop.men[,6]
+vector.MCAR.cov.50.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.50.cl.prop.women[,6]
+
+
+vector.MCAR.cov.50.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.50.cl.prop.men[,7]
+vector.MCAR.cov.50.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.50.cl.prop.women[,7]
+
+vector.MCAR.cov.50.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.50.cl.prop.men[,8]
+vector.MCAR.cov.50.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.50.cl.prop.women[,8]
+
+vector.MCAR.cov.50.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.50.cl.prop.men[,9]
+vector.MCAR.cov.50.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.50.cl.prop.women[,9]
+
+
+# Summarised
+
+d.MCAR.cov.50.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.50.cl.prop.men[,1])
+d.MCAR.cov.50.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.50.cl.prop.women[,1])
+
+d.MCAR.cov.50.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.50.cl.prop.men[,2])
+d.MCAR.cov.50.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.50.cl.prop.women[,2])
+
+d.MCAR.cov.50.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.50.cl.prop.men[,3])
+d.MCAR.cov.50.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.50.cl.prop.women[,3])
+
+d.MCAR.cov.50.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.50.cl.prop.men[,4])
+d.MCAR.cov.50.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.50.cl.prop.women[,4])
+
+d.MCAR.cov.50.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.50.cl.prop.men[,5])
+d.MCAR.cov.50.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.50.cl.prop.women[,5])
+
+d.MCAR.cov.50.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.50.cl.prop.men[,6])
+d.MCAR.cov.50.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.50.cl.prop.women[,6])
+
+
+d.MCAR.cov.50.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.50.cl.prop.men[,7])
+d.MCAR.cov.50.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.50.cl.prop.women[,7])
+
+d.MCAR.cov.50.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.50.cl.prop.men[,8])
+d.MCAR.cov.50.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.50.cl.prop.women[,8])
+
+d.MCAR.cov.50.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.50.cl.prop.men[,9])
+d.MCAR.cov.50.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.50.cl.prop.women[,9])
+
+
+
+# Cov 55
+
+
+# Vector
+
+
+vector.MCAR.cov.55.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.55.cl.prop.men[,1]
+vector.MCAR.cov.55.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.55.cl.prop.women[,1]
+
+vector.MCAR.cov.55.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.55.cl.prop.men[,2]
+vector.MCAR.cov.55.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.55.cl.prop.women[,2]
+
+vector.MCAR.cov.55.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.55.cl.prop.men[,3]
+vector.MCAR.cov.55.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.55.cl.prop.women[,3]
+
+vector.MCAR.cov.55.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.55.cl.prop.men[,4]
+vector.MCAR.cov.55.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.55.cl.prop.women[,4]
+
+vector.MCAR.cov.55.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.55.cl.prop.men[,5]
+vector.MCAR.cov.55.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.55.cl.prop.women[,5]
+
+vector.MCAR.cov.55.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.55.cl.prop.men[,6]
+vector.MCAR.cov.55.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.55.cl.prop.women[,6]
+
+
+vector.MCAR.cov.55.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.55.cl.prop.men[,7]
+vector.MCAR.cov.55.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.55.cl.prop.women[,7]
+
+vector.MCAR.cov.55.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.55.cl.prop.men[,8]
+vector.MCAR.cov.55.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.55.cl.prop.women[,8]
+
+vector.MCAR.cov.55.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.55.cl.prop.men[,9]
+vector.MCAR.cov.55.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.55.cl.prop.women[,9]
+
+
+# Summarised
+
+d.MCAR.cov.55.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.55.cl.prop.men[,1])
+d.MCAR.cov.55.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.55.cl.prop.women[,1])
+
+d.MCAR.cov.55.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.55.cl.prop.men[,2])
+d.MCAR.cov.55.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.55.cl.prop.women[,2])
+
+d.MCAR.cov.55.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.55.cl.prop.men[,3])
+d.MCAR.cov.55.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.55.cl.prop.women[,3])
+
+d.MCAR.cov.55.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.55.cl.prop.men[,4])
+d.MCAR.cov.55.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.55.cl.prop.women[,4])
+
+d.MCAR.cov.55.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.55.cl.prop.men[,5])
+d.MCAR.cov.55.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.55.cl.prop.women[,5])
+
+d.MCAR.cov.55.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.55.cl.prop.men[,6])
+d.MCAR.cov.55.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.55.cl.prop.women[,6])
+
+
+d.MCAR.cov.55.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.55.cl.prop.men[,7])
+d.MCAR.cov.55.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.55.cl.prop.women[,7])
+
+d.MCAR.cov.55.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.55.cl.prop.men[,8])
+d.MCAR.cov.55.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.55.cl.prop.women[,8])
+
+d.MCAR.cov.55.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.55.cl.prop.men[,9])
+d.MCAR.cov.55.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.55.cl.prop.women[,9])
+
+
+
+# Cov 60
+
+
+# Vector
+
+
+vector.MCAR.cov.60.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.60.cl.prop.men[,1]
+vector.MCAR.cov.60.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.60.cl.prop.women[,1]
+
+vector.MCAR.cov.60.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.60.cl.prop.men[,2]
+vector.MCAR.cov.60.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.60.cl.prop.women[,2]
+
+vector.MCAR.cov.60.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.60.cl.prop.men[,3]
+vector.MCAR.cov.60.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.60.cl.prop.women[,3]
+
+vector.MCAR.cov.60.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.60.cl.prop.men[,4]
+vector.MCAR.cov.60.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.60.cl.prop.women[,4]
+
+vector.MCAR.cov.60.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.60.cl.prop.men[,5]
+vector.MCAR.cov.60.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.60.cl.prop.women[,5]
+
+vector.MCAR.cov.60.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.60.cl.prop.men[,6]
+vector.MCAR.cov.60.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.60.cl.prop.women[,6]
+
+
+vector.MCAR.cov.60.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.60.cl.prop.men[,7]
+vector.MCAR.cov.60.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.60.cl.prop.women[,7]
+
+vector.MCAR.cov.60.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.60.cl.prop.men[,8]
+vector.MCAR.cov.60.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.60.cl.prop.women[,8]
+
+vector.MCAR.cov.60.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.60.cl.prop.men[,9]
+vector.MCAR.cov.60.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.60.cl.prop.women[,9]
+
+
+# Summarised
+
+d.MCAR.cov.60.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.60.cl.prop.men[,1])
+d.MCAR.cov.60.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.60.cl.prop.women[,1])
+
+d.MCAR.cov.60.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.60.cl.prop.men[,2])
+d.MCAR.cov.60.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.60.cl.prop.women[,2])
+
+d.MCAR.cov.60.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.60.cl.prop.men[,3])
+d.MCAR.cov.60.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.60.cl.prop.women[,3])
+
+d.MCAR.cov.60.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.60.cl.prop.men[,4])
+d.MCAR.cov.60.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.60.cl.prop.women[,4])
+
+d.MCAR.cov.60.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.60.cl.prop.men[,5])
+d.MCAR.cov.60.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.60.cl.prop.women[,5])
+
+d.MCAR.cov.60.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.60.cl.prop.men[,6])
+d.MCAR.cov.60.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.60.cl.prop.women[,6])
+
+
+d.MCAR.cov.60.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.60.cl.prop.men[,7])
+d.MCAR.cov.60.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.60.cl.prop.women[,7])
+
+d.MCAR.cov.60.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.60.cl.prop.men[,8])
+d.MCAR.cov.60.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.60.cl.prop.women[,8])
+
+d.MCAR.cov.60.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.60.cl.prop.men[,9])
+d.MCAR.cov.60.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.60.cl.prop.women[,9])
+
+
+
+# Cov 65
+
+
+# Vector
+
+
+vector.MCAR.cov.65.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.65.cl.prop.men[,1]
+vector.MCAR.cov.65.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.65.cl.prop.women[,1]
+
+vector.MCAR.cov.65.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.65.cl.prop.men[,2]
+vector.MCAR.cov.65.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.65.cl.prop.women[,2]
+
+vector.MCAR.cov.65.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.65.cl.prop.men[,3]
+vector.MCAR.cov.65.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.65.cl.prop.women[,3]
+
+vector.MCAR.cov.65.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.65.cl.prop.men[,4]
+vector.MCAR.cov.65.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.65.cl.prop.women[,4]
+
+vector.MCAR.cov.65.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.65.cl.prop.men[,5]
+vector.MCAR.cov.65.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.65.cl.prop.women[,5]
+
+vector.MCAR.cov.65.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.65.cl.prop.men[,6]
+vector.MCAR.cov.65.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.65.cl.prop.women[,6]
+
+
+vector.MCAR.cov.65.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.65.cl.prop.men[,7]
+vector.MCAR.cov.65.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.65.cl.prop.women[,7]
+
+vector.MCAR.cov.65.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.65.cl.prop.men[,8]
+vector.MCAR.cov.65.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.65.cl.prop.women[,8]
+
+vector.MCAR.cov.65.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.65.cl.prop.men[,9]
+vector.MCAR.cov.65.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.65.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.65.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.65.cl.prop.men[,1])
+d.MCAR.cov.65.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.65.cl.prop.women[,1])
+
+d.MCAR.cov.65.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.65.cl.prop.men[,2])
+d.MCAR.cov.65.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.65.cl.prop.women[,2])
+
+d.MCAR.cov.65.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.65.cl.prop.men[,3])
+d.MCAR.cov.65.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.65.cl.prop.women[,3])
+
+d.MCAR.cov.65.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.65.cl.prop.men[,4])
+d.MCAR.cov.65.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.65.cl.prop.women[,4])
+
+d.MCAR.cov.65.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.65.cl.prop.men[,5])
+d.MCAR.cov.65.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.65.cl.prop.women[,5])
+
+d.MCAR.cov.65.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.65.cl.prop.men[,6])
+d.MCAR.cov.65.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.65.cl.prop.women[,6])
+
+
+d.MCAR.cov.65.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.65.cl.prop.men[,7])
+d.MCAR.cov.65.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.65.cl.prop.women[,7])
+
+d.MCAR.cov.65.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.65.cl.prop.men[,8])
+d.MCAR.cov.65.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.65.cl.prop.women[,8])
+
+d.MCAR.cov.65.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.65.cl.prop.men[,9])
+d.MCAR.cov.65.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.65.cl.prop.women[,9])
+
+
+# Cov 70
+
+
+# Vector
+
+
+vector.MCAR.cov.70.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.70.cl.prop.men[,1]
+vector.MCAR.cov.70.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.70.cl.prop.women[,1]
+
+vector.MCAR.cov.70.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.70.cl.prop.men[,2]
+vector.MCAR.cov.70.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.70.cl.prop.women[,2]
+
+vector.MCAR.cov.70.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.70.cl.prop.men[,3]
+vector.MCAR.cov.70.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.70.cl.prop.women[,3]
+
+vector.MCAR.cov.70.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.70.cl.prop.men[,4]
+vector.MCAR.cov.70.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.70.cl.prop.women[,4]
+
+vector.MCAR.cov.70.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.70.cl.prop.men[,5]
+vector.MCAR.cov.70.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.70.cl.prop.women[,5]
+
+vector.MCAR.cov.70.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.70.cl.prop.men[,6]
+vector.MCAR.cov.70.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.70.cl.prop.women[,6]
+
+
+vector.MCAR.cov.70.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.70.cl.prop.men[,7]
+vector.MCAR.cov.70.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.70.cl.prop.women[,7]
+
+vector.MCAR.cov.70.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.70.cl.prop.men[,8]
+vector.MCAR.cov.70.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.70.cl.prop.women[,8]
+
+vector.MCAR.cov.70.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.70.cl.prop.men[,9]
+vector.MCAR.cov.70.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.70.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.70.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.70.cl.prop.men[,1])
+d.MCAR.cov.70.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.70.cl.prop.women[,1])
+
+d.MCAR.cov.70.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.70.cl.prop.men[,2])
+d.MCAR.cov.70.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.70.cl.prop.women[,2])
+
+d.MCAR.cov.70.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.70.cl.prop.men[,3])
+d.MCAR.cov.70.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.70.cl.prop.women[,3])
+
+d.MCAR.cov.70.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.70.cl.prop.men[,4])
+d.MCAR.cov.70.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.70.cl.prop.women[,4])
+
+d.MCAR.cov.70.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.70.cl.prop.men[,5])
+d.MCAR.cov.70.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.70.cl.prop.women[,5])
+
+d.MCAR.cov.70.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.70.cl.prop.men[,6])
+d.MCAR.cov.70.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.70.cl.prop.women[,6])
+
+
+d.MCAR.cov.70.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.men[,7])
+d.MCAR.cov.70.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.women[,7])
+
+d.MCAR.cov.70.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.men[,8])
+d.MCAR.cov.70.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.women[,8])
+
+d.MCAR.cov.70.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.men[,9])
+
+d.MCAR.cov.70.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.70.cl.prop.women[,9])
+
+
+
+# Cov 75
+
+
+# Vector
+
+
+vector.MCAR.cov.75.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.75.cl.prop.men[,1]
+vector.MCAR.cov.75.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.75.cl.prop.women[,1]
+
+vector.MCAR.cov.75.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.75.cl.prop.men[,2]
+vector.MCAR.cov.75.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.75.cl.prop.women[,2]
+
+vector.MCAR.cov.75.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.75.cl.prop.men[,3]
+vector.MCAR.cov.75.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.75.cl.prop.women[,3]
+
+vector.MCAR.cov.75.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.75.cl.prop.men[,4]
+vector.MCAR.cov.75.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.75.cl.prop.women[,4]
+
+vector.MCAR.cov.75.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.75.cl.prop.men[,5]
+vector.MCAR.cov.75.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.75.cl.prop.women[,5]
+
+vector.MCAR.cov.75.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.75.cl.prop.men[,6]
+vector.MCAR.cov.75.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.75.cl.prop.women[,6]
+
+
+vector.MCAR.cov.75.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.75.cl.prop.men[,7]
+vector.MCAR.cov.75.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.75.cl.prop.women[,7]
+
+vector.MCAR.cov.75.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.75.cl.prop.men[,8]
+vector.MCAR.cov.75.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.75.cl.prop.women[,8]
+
+vector.MCAR.cov.75.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.75.cl.prop.men[,9]
+vector.MCAR.cov.75.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.75.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.75.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.75.cl.prop.men[,1])
+d.MCAR.cov.75.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.75.cl.prop.women[,1])
+
+d.MCAR.cov.75.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.75.cl.prop.men[,2])
+d.MCAR.cov.75.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.75.cl.prop.women[,2])
+
+d.MCAR.cov.75.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.75.cl.prop.men[,3])
+d.MCAR.cov.75.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.75.cl.prop.women[,3])
+
+d.MCAR.cov.75.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.75.cl.prop.men[,4])
+d.MCAR.cov.75.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.75.cl.prop.women[,4])
+
+d.MCAR.cov.75.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.75.cl.prop.men[,5])
+d.MCAR.cov.75.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.75.cl.prop.women[,5])
+
+d.MCAR.cov.75.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.75.cl.prop.men[,6])
+d.MCAR.cov.75.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.75.cl.prop.women[,6])
+
+
+d.MCAR.cov.75.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.75.cl.prop.men[,7])
+d.MCAR.cov.75.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.75.cl.prop.women[,7])
+
+d.MCAR.cov.75.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.75.cl.prop.men[,8])
+d.MCAR.cov.75.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.75.cl.prop.women[,8])
+
+d.MCAR.cov.75.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.75.cl.prop.men[,9])
+d.MCAR.cov.75.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.75.cl.prop.women[,9])
+
+
+
+# Cov 80
+
+
+# Vector
+
+
+vector.MCAR.cov.80.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.80.cl.prop.men[,1]
+vector.MCAR.cov.80.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.80.cl.prop.women[,1]
+
+vector.MCAR.cov.80.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.80.cl.prop.men[,2]
+vector.MCAR.cov.80.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.80.cl.prop.women[,2]
+
+vector.MCAR.cov.80.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.80.cl.prop.men[,3]
+vector.MCAR.cov.80.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.80.cl.prop.women[,3]
+
+vector.MCAR.cov.80.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.80.cl.prop.men[,4]
+vector.MCAR.cov.80.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.80.cl.prop.women[,4]
+
+vector.MCAR.cov.80.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.80.cl.prop.men[,5]
+vector.MCAR.cov.80.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.80.cl.prop.women[,5]
+
+vector.MCAR.cov.80.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.80.cl.prop.men[,6]
+vector.MCAR.cov.80.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.80.cl.prop.women[,6]
+
+
+vector.MCAR.cov.80.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.80.cl.prop.men[,7]
+vector.MCAR.cov.80.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.80.cl.prop.women[,7]
+
+vector.MCAR.cov.80.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.80.cl.prop.men[,8]
+vector.MCAR.cov.80.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.80.cl.prop.women[,8]
+
+vector.MCAR.cov.80.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.80.cl.prop.men[,9]
+vector.MCAR.cov.80.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.80.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.80.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.80.cl.prop.men[,1])
+d.MCAR.cov.80.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.80.cl.prop.women[,1])
+
+d.MCAR.cov.80.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.80.cl.prop.men[,2])
+d.MCAR.cov.80.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.80.cl.prop.women[,2])
+
+d.MCAR.cov.80.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.80.cl.prop.men[,3])
+d.MCAR.cov.80.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.80.cl.prop.women[,3])
+
+d.MCAR.cov.80.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.80.cl.prop.men[,4])
+d.MCAR.cov.80.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.80.cl.prop.women[,4])
+
+d.MCAR.cov.80.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.80.cl.prop.men[,5])
+d.MCAR.cov.80.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.80.cl.prop.women[,5])
+
+d.MCAR.cov.80.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.80.cl.prop.men[,6])
+d.MCAR.cov.80.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.80.cl.prop.women[,6])
+
+
+d.MCAR.cov.80.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.80.cl.prop.men[,7])
+d.MCAR.cov.80.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.80.cl.prop.women[,7])
+
+d.MCAR.cov.80.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.80.cl.prop.men[,8])
+d.MCAR.cov.80.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.80.cl.prop.women[,8])
+
+d.MCAR.cov.80.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.80.cl.prop.men[,9])
+d.MCAR.cov.80.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.80.cl.prop.women[,9])
+
+
+
+# Cov 85
+
+
+# Vector
+
+
+vector.MCAR.cov.85.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.85.cl.prop.men[,1]
+vector.MCAR.cov.85.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.85.cl.prop.women[,1]
+
+vector.MCAR.cov.85.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.85.cl.prop.men[,2]
+vector.MCAR.cov.85.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.85.cl.prop.women[,2]
+
+vector.MCAR.cov.85.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.85.cl.prop.men[,3]
+vector.MCAR.cov.85.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.85.cl.prop.women[,3]
+
+vector.MCAR.cov.85.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.85.cl.prop.men[,4]
+vector.MCAR.cov.85.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.85.cl.prop.women[,4]
+
+vector.MCAR.cov.85.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.85.cl.prop.men[,5]
+vector.MCAR.cov.85.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.85.cl.prop.women[,5]
+
+vector.MCAR.cov.85.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.85.cl.prop.men[,6]
+vector.MCAR.cov.85.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.85.cl.prop.women[,6]
+
+
+vector.MCAR.cov.85.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.85.cl.prop.men[,7]
+vector.MCAR.cov.85.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.85.cl.prop.women[,7]
+
+vector.MCAR.cov.85.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.85.cl.prop.men[,8]
+vector.MCAR.cov.85.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.85.cl.prop.women[,8]
+
+vector.MCAR.cov.85.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.85.cl.prop.men[,9]
+vector.MCAR.cov.85.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.85.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.85.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.85.cl.prop.men[,1])
+d.MCAR.cov.85.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.85.cl.prop.women[,1])
+
+d.MCAR.cov.85.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.85.cl.prop.men[,2])
+d.MCAR.cov.85.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.85.cl.prop.women[,2])
+
+d.MCAR.cov.85.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.85.cl.prop.men[,3])
+d.MCAR.cov.85.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.85.cl.prop.women[,3])
+
+d.MCAR.cov.85.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.85.cl.prop.men[,4])
+d.MCAR.cov.85.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.85.cl.prop.women[,4])
+
+d.MCAR.cov.85.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.85.cl.prop.men[,5])
+d.MCAR.cov.85.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.85.cl.prop.women[,5])
+
+d.MCAR.cov.85.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.85.cl.prop.men[,6])
+d.MCAR.cov.85.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.85.cl.prop.women[,6])
+
+
+d.MCAR.cov.85.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.85.cl.prop.men[,7])
+d.MCAR.cov.85.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.85.cl.prop.women[,7])
+
+d.MCAR.cov.85.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.85.cl.prop.men[,8])
+d.MCAR.cov.85.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.85.cl.prop.women[,8])
+
+d.MCAR.cov.85.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.85.cl.prop.men[,9])
+d.MCAR.cov.85.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.85.cl.prop.women[,9])
+
+
+
+# Cov 90
+
+
+# Vector
+
+
+vector.MCAR.cov.90.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.90.cl.prop.men[,1]
+vector.MCAR.cov.90.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.90.cl.prop.women[,1]
+
+vector.MCAR.cov.90.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.90.cl.prop.men[,2]
+vector.MCAR.cov.90.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.90.cl.prop.women[,2]
+
+vector.MCAR.cov.90.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.90.cl.prop.men[,3]
+vector.MCAR.cov.90.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.90.cl.prop.women[,3]
+
+vector.MCAR.cov.90.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.90.cl.prop.men[,4]
+vector.MCAR.cov.90.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.90.cl.prop.women[,4]
+
+vector.MCAR.cov.90.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.90.cl.prop.men[,5]
+vector.MCAR.cov.90.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.90.cl.prop.women[,5]
+
+vector.MCAR.cov.90.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.90.cl.prop.men[,6]
+vector.MCAR.cov.90.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.90.cl.prop.women[,6]
+
+
+vector.MCAR.cov.90.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.90.cl.prop.men[,7]
+vector.MCAR.cov.90.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.90.cl.prop.women[,7]
+
+vector.MCAR.cov.90.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.90.cl.prop.men[,8]
+vector.MCAR.cov.90.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.90.cl.prop.women[,8]
+
+vector.MCAR.cov.90.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.90.cl.prop.men[,9]
+vector.MCAR.cov.90.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.90.cl.prop.women[,9]
+
+
+
+# Summarised
+
+d.MCAR.cov.90.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.90.cl.prop.men[,1])
+d.MCAR.cov.90.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.90.cl.prop.women[,1])
+
+d.MCAR.cov.90.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.90.cl.prop.men[,2])
+d.MCAR.cov.90.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.90.cl.prop.women[,2])
+
+d.MCAR.cov.90.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.90.cl.prop.men[,3])
+d.MCAR.cov.90.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.90.cl.prop.women[,3])
+
+d.MCAR.cov.90.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.90.cl.prop.men[,4])
+d.MCAR.cov.90.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.90.cl.prop.women[,4])
+
+d.MCAR.cov.90.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.90.cl.prop.men[,5])
+d.MCAR.cov.90.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.90.cl.prop.women[,5])
+
+d.MCAR.cov.90.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.90.cl.prop.men[,6])
+d.MCAR.cov.90.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.90.cl.prop.women[,6])
+
+
+d.MCAR.cov.90.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.90.cl.prop.men[,7])
+d.MCAR.cov.90.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.90.cl.prop.women[,7])
+
+d.MCAR.cov.90.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.90.cl.prop.men[,8])
+d.MCAR.cov.90.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.90.cl.prop.women[,8])
+
+d.MCAR.cov.90.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.90.cl.prop.men[,9])
+d.MCAR.cov.90.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.90.cl.prop.women[,9])
+
+
+# Cov 95
+
+
+# Vector
+
+
+vector.MCAR.cov.95.cl.prop.men15.25.F.15.25 <- d.MCAR.cov.95.cl.prop.men[,1]
+vector.MCAR.cov.95.cl.prop.women15.25.M.15.25 <- d.MCAR.cov.95.cl.prop.women[,1]
+
+vector.MCAR.cov.95.cl.prop.men25.40.F.15.25 <- d.MCAR.cov.95.cl.prop.men[,2]
+vector.MCAR.cov.95.cl.prop.women25.40.M.15.25 <- d.MCAR.cov.95.cl.prop.women[,2]
+
+vector.MCAR.cov.95.cl.prop.men40.50.F.15.25 <- d.MCAR.cov.95.cl.prop.men[,3]
+vector.MCAR.cov.95.cl.prop.women40.50.M.15.25 <- d.MCAR.cov.95.cl.prop.women[,3]
+
+vector.MCAR.cov.95.cl.prop.men15.25.F.25.40 <- d.MCAR.cov.95.cl.prop.men[,4]
+vector.MCAR.cov.95.cl.prop.women15.25.M.25.40 <- d.MCAR.cov.95.cl.prop.women[,4]
+
+vector.MCAR.cov.95.cl.prop.men25.40.F.25.40 <- d.MCAR.cov.95.cl.prop.men[,5]
+vector.MCAR.cov.95.cl.prop.women25.40.M.25.40 <- d.MCAR.cov.95.cl.prop.women[,5]
+
+vector.MCAR.cov.95.cl.prop.men40.50.F.25.40 <- d.MCAR.cov.95.cl.prop.men[,6]
+vector.MCAR.cov.95.cl.prop.women40.50.M.25.40 <- d.MCAR.cov.95.cl.prop.women[,6]
+
+
+vector.MCAR.cov.95.cl.prop.men15.25.F.40.50 <- d.MCAR.cov.95.cl.prop.men[,7]
+vector.MCAR.cov.95.cl.prop.women15.25.M.40.50 <- d.MCAR.cov.95.cl.prop.women[,7]
+
+vector.MCAR.cov.95.cl.prop.men25.40.F.40.50 <- d.MCAR.cov.95.cl.prop.men[,8]
+vector.MCAR.cov.95.cl.prop.women25.40.M.40.50 <- d.MCAR.cov.95.cl.prop.women[,8]
+
+vector.MCAR.cov.95.cl.prop.men40.50.F.40.50 <- d.MCAR.cov.95.cl.prop.men[,9]
+vector.MCAR.cov.95.cl.prop.women40.50.M.40.50 <- d.MCAR.cov.95.cl.prop.women[,9]
+
+
+# Summarised
+
+d.MCAR.cov.95.cl.prop.men15.25.F.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.men[,1])
+d.MCAR.cov.95.cl.prop.women15.25.M.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.women[,1])
+
+d.MCAR.cov.95.cl.prop.men25.40.F.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.men[,2])
+
+d.MCAR.cov.95.cl.prop.women25.40.M.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.women[,2])
+
+d.MCAR.cov.95.cl.prop.men40.50.F.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.men[,3])
+d.MCAR.cov.95.cl.prop.women40.50.M.15.25 <- quant.med(d.MCAR.cov.95.cl.prop.women[,3])
+
+d.MCAR.cov.95.cl.prop.men15.25.F.25.40 <- quant.med(d.MCAR.cov.95.cl.prop.men[,4])
+d.MCAR.cov.95.cl.prop.women15.25.M.25.40 <- quant.med(d.MCAR.cov.95.cl.prop.women[,4])
+
+d.MCAR.cov.95.cl.prop.men25.40.F.25.40 <- quant.med(d.MCAR.cov.95.cl.prop.men[,5])
+d.MCAR.cov.95.cl.prop.women25.40.M.25.40 <- quant.med(d.MCAR.cov.95.cl.prop.women[,5])
+
+d.MCAR.cov.95.cl.prop.men40.50.F.25.40 <- quant.med(d.MCAR.cov.95.cl.prop.men[,6])
+d.MCAR.cov.95.cl.prop.women40.50.M.25.40 <- quant.med(d.MCAR.cov.95.cl.prop.women[,6])
+
+
+d.MCAR.cov.95.cl.prop.men15.25.F.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.men[,7])
+d.MCAR.cov.95.cl.prop.women15.25.M.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.women[,7])
+
+d.MCAR.cov.95.cl.prop.men25.40.F.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.men[,8])
+d.MCAR.cov.95.cl.prop.women25.40.M.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.women[,8])
+
+d.MCAR.cov.95.cl.prop.men40.50.F.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.men[,9])
+d.MCAR.cov.95.cl.prop.women40.50.M.40.50 <- quant.med(d.MCAR.cov.95.cl.prop.women[,9])
+
+
+
+props_infer <- matrix(c(d.MCAR.cov.35.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.40.cl.prop.men15.25.F.15.25[2], 
+                  d.MCAR.cov.45.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.50.cl.prop.men15.25.F.15.25[2], 
+                  d.MCAR.cov.55.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.60.cl.prop.men15.25.F.15.25[2], 
+                  d.MCAR.cov.65.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.70.cl.prop.men15.25.F.15.25[2], 
+                  d.MCAR.cov.75.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.80.cl.prop.men15.25.F.15.25[2], 
+                  d.MCAR.cov.85.cl.prop.men15.25.F.15.25[2], d.MCAR.cov.90.cl.prop.men15.25.F.15.25[2], 
+                  d.MCAR.cov.95.cl.prop.men15.25.F.15.25[2], d.MCAR.true.cov.100.prop.men15.25.F.15.25[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.40.cl.prop.women15.25.M.15.25[2], 
+                  d.MCAR.cov.45.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.50.cl.prop.women15.25.M.15.25[2], 
+                  d.MCAR.cov.55.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.60.cl.prop.women15.25.M.15.25[2], 
+                  d.MCAR.cov.65.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.70.cl.prop.women15.25.M.15.25[2], 
+                  d.MCAR.cov.75.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.80.cl.prop.women15.25.M.15.25[2], 
+                  d.MCAR.cov.85.cl.prop.women15.25.M.15.25[2], d.MCAR.cov.90.cl.prop.women15.25.M.15.25[2], 
+                  d.MCAR.cov.95.cl.prop.women15.25.M.15.25[2], d.MCAR.true.cov.100.prop.women15.25.M.15.25[2],
+                  
+                  d.MCAR.cov.35.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.40.cl.prop.men25.40.F.15.25[2], 
+                  d.MCAR.cov.45.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.50.cl.prop.men25.40.F.15.25[2], 
+                  d.MCAR.cov.55.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.60.cl.prop.men25.40.F.15.25[2], 
+                  d.MCAR.cov.65.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.70.cl.prop.men25.40.F.15.25[2], 
+                  d.MCAR.cov.75.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.80.cl.prop.men25.40.F.15.25[2], 
+                  d.MCAR.cov.85.cl.prop.men25.40.F.15.25[2], d.MCAR.cov.90.cl.prop.men25.40.F.15.25[2], 
+                  d.MCAR.cov.95.cl.prop.men25.40.F.15.25[2], d.MCAR.true.cov.100.prop.men25.40.F.15.25[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.40.cl.prop.women25.40.M.15.25[2], 
+                  d.MCAR.cov.45.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.50.cl.prop.women25.40.M.15.25[2], 
+                  d.MCAR.cov.55.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.60.cl.prop.women25.40.M.15.25[2], 
+                  d.MCAR.cov.65.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.70.cl.prop.women25.40.M.15.25[2], 
+                  d.MCAR.cov.75.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.80.cl.prop.women25.40.M.15.25[2], 
+                  d.MCAR.cov.85.cl.prop.women25.40.M.15.25[2], d.MCAR.cov.90.cl.prop.women25.40.M.15.25[2], 
+                  d.MCAR.cov.95.cl.prop.women25.40.M.15.25[2], d.MCAR.true.cov.100.prop.women25.40.M.15.25[2],
+                  
+                  d.MCAR.cov.35.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.40.cl.prop.men40.50.F.15.25[2], 
+                  d.MCAR.cov.45.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.50.cl.prop.men40.50.F.15.25[2], 
+                  d.MCAR.cov.55.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.60.cl.prop.men40.50.F.15.25[2], 
+                  d.MCAR.cov.65.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.70.cl.prop.men40.50.F.15.25[2], 
+                  d.MCAR.cov.75.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.80.cl.prop.men40.50.F.15.25[2], 
+                  d.MCAR.cov.85.cl.prop.men40.50.F.15.25[2], d.MCAR.cov.90.cl.prop.men40.50.F.15.25[2], 
+                  d.MCAR.cov.95.cl.prop.men40.50.F.15.25[2], d.MCAR.true.cov.100.prop.men40.50.F.15.25[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.40.cl.prop.women40.50.M.15.25[2], 
+                  d.MCAR.cov.45.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.50.cl.prop.women40.50.M.15.25[2], 
+                  d.MCAR.cov.55.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.60.cl.prop.women40.50.M.15.25[2], 
+                  d.MCAR.cov.65.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.70.cl.prop.women40.50.M.15.25[2], 
+                  d.MCAR.cov.75.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.80.cl.prop.women40.50.M.15.25[2], 
+                  d.MCAR.cov.85.cl.prop.women40.50.M.15.25[2], d.MCAR.cov.90.cl.prop.women40.50.M.15.25[2], 
+                  d.MCAR.cov.95.cl.prop.women40.50.M.15.25[2], d.MCAR.true.cov.100.prop.women40.50.M.15.25[2],
+                  
+                  d.MCAR.cov.35.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.40.cl.prop.men15.25.F.25.40[2], 
+                  d.MCAR.cov.45.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.50.cl.prop.men15.25.F.25.40[2], 
+                  d.MCAR.cov.55.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.60.cl.prop.men15.25.F.25.40[2], 
+                  d.MCAR.cov.65.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.70.cl.prop.men15.25.F.25.40[2], 
+                  d.MCAR.cov.75.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.80.cl.prop.men15.25.F.25.40[2], 
+                  d.MCAR.cov.85.cl.prop.men15.25.F.25.40[2], d.MCAR.cov.90.cl.prop.men15.25.F.25.40[2], 
+                  d.MCAR.cov.95.cl.prop.men15.25.F.25.40[2], d.MCAR.true.cov.100.prop.men15.25.F.25.40[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.40.cl.prop.women15.25.M.25.40[2], 
+                  d.MCAR.cov.45.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.50.cl.prop.women15.25.M.25.40[2], 
+                  d.MCAR.cov.55.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.60.cl.prop.women15.25.M.25.40[2], 
+                  d.MCAR.cov.65.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.70.cl.prop.women15.25.M.25.40[2], 
+                  d.MCAR.cov.75.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.80.cl.prop.women15.25.M.25.40[2], 
+                  d.MCAR.cov.85.cl.prop.women15.25.M.25.40[2], d.MCAR.cov.90.cl.prop.women15.25.M.25.40[2], 
+                  d.MCAR.cov.95.cl.prop.women15.25.M.25.40[2], d.MCAR.true.cov.100.prop.women15.25.M.25.40[2],
+                  
+                  d.MCAR.cov.35.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.40.cl.prop.men25.40.F.25.40[2], 
+                  d.MCAR.cov.45.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.50.cl.prop.men25.40.F.25.40[2], 
+                  d.MCAR.cov.55.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.60.cl.prop.men25.40.F.25.40[2], 
+                  d.MCAR.cov.65.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.70.cl.prop.men25.40.F.25.40[2], 
+                  d.MCAR.cov.75.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.80.cl.prop.men25.40.F.25.40[2], 
+                  d.MCAR.cov.85.cl.prop.men25.40.F.25.40[2], d.MCAR.cov.90.cl.prop.men25.40.F.25.40[2], 
+                  d.MCAR.cov.95.cl.prop.men25.40.F.25.40[2], d.MCAR.true.cov.100.prop.men25.40.F.25.40[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.40.cl.prop.women25.40.M.25.40[2], 
+                  d.MCAR.cov.45.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.50.cl.prop.women25.40.M.25.40[2], 
+                  d.MCAR.cov.55.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.60.cl.prop.women25.40.M.25.40[2], 
+                  d.MCAR.cov.65.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.70.cl.prop.women25.40.M.25.40[2], 
+                  d.MCAR.cov.75.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.80.cl.prop.women25.40.M.25.40[2], 
+                  d.MCAR.cov.85.cl.prop.women25.40.M.25.40[2], d.MCAR.cov.90.cl.prop.women25.40.M.25.40[2], 
+                  d.MCAR.cov.95.cl.prop.women25.40.M.25.40[2], d.MCAR.true.cov.100.prop.women25.40.M.25.40[2],
+                  
+                  
+                  d.MCAR.cov.35.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.40.cl.prop.men40.50.F.25.40[2], 
+                  d.MCAR.cov.45.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.50.cl.prop.men40.50.F.25.40[2], 
+                  d.MCAR.cov.55.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.60.cl.prop.men40.50.F.25.40[2], 
+                  d.MCAR.cov.65.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.70.cl.prop.men40.50.F.25.40[2], 
+                  d.MCAR.cov.75.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.80.cl.prop.men40.50.F.25.40[2], 
+                  d.MCAR.cov.85.cl.prop.men40.50.F.25.40[2], d.MCAR.cov.90.cl.prop.men40.50.F.25.40[2], 
+                  d.MCAR.cov.95.cl.prop.men40.50.F.25.40[2], d.MCAR.true.cov.100.prop.men40.50.F.25.40[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.40.cl.prop.women40.50.M.25.40[2], 
+                  d.MCAR.cov.45.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.50.cl.prop.women40.50.M.25.40[2], 
+                  d.MCAR.cov.55.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.60.cl.prop.women40.50.M.25.40[2], 
+                  d.MCAR.cov.65.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.70.cl.prop.women40.50.M.25.40[2], 
+                  d.MCAR.cov.75.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.80.cl.prop.women40.50.M.25.40[2], 
+                  d.MCAR.cov.85.cl.prop.women40.50.M.25.40[2], d.MCAR.cov.90.cl.prop.women40.50.M.25.40[2], 
+                  d.MCAR.cov.95.cl.prop.women40.50.M.25.40[2], d.MCAR.true.cov.100.prop.women40.50.M.25.40[2],
+                  
+                  d.MCAR.cov.35.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.40.cl.prop.men15.25.F.40.50[2], 
+                  d.MCAR.cov.45.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.50.cl.prop.men15.25.F.40.50[2], 
+                  d.MCAR.cov.55.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.60.cl.prop.men15.25.F.40.50[2], 
+                  d.MCAR.cov.65.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.70.cl.prop.men15.25.F.40.50[2], 
+                  d.MCAR.cov.75.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.80.cl.prop.men15.25.F.40.50[2], 
+                  d.MCAR.cov.85.cl.prop.men15.25.F.40.50[2], d.MCAR.cov.90.cl.prop.men15.25.F.40.50[2], 
+                  d.MCAR.cov.95.cl.prop.men15.25.F.40.50[2], d.MCAR.true.cov.100.prop.men15.25.F.40.50[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.40.cl.prop.women15.25.M.40.50[2], 
+                  d.MCAR.cov.45.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.50.cl.prop.women15.25.M.40.50[2], 
+                  d.MCAR.cov.55.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.60.cl.prop.women15.25.M.40.50[2], 
+                  d.MCAR.cov.65.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.70.cl.prop.women15.25.M.40.50[2], 
+                  d.MCAR.cov.75.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.80.cl.prop.women15.25.M.40.50[2], 
+                  d.MCAR.cov.85.cl.prop.women15.25.M.40.50[2], d.MCAR.cov.90.cl.prop.women15.25.M.40.50[2], 
+                  d.MCAR.cov.95.cl.prop.women15.25.M.40.50[2], d.MCAR.true.cov.100.prop.women15.25.M.40.50[2],
+                  
+                  d.MCAR.cov.35.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.40.cl.prop.men25.40.F.40.50[2], 
+                  d.MCAR.cov.45.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.50.cl.prop.men25.40.F.40.50[2], 
+                  d.MCAR.cov.55.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.60.cl.prop.men25.40.F.40.50[2], 
+                  d.MCAR.cov.65.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.70.cl.prop.men25.40.F.40.50[2], 
+                  d.MCAR.cov.75.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.80.cl.prop.men25.40.F.40.50[2], 
+                  d.MCAR.cov.85.cl.prop.men25.40.F.40.50[2], d.MCAR.cov.90.cl.prop.men25.40.F.40.50[2], 
+                  d.MCAR.cov.95.cl.prop.men25.40.F.40.50[2], d.MCAR.true.cov.100.prop.men25.40.F.40.50[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.40.cl.prop.women25.40.M.40.50[2], 
+                  d.MCAR.cov.45.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.50.cl.prop.women25.40.M.40.50[2], 
+                  d.MCAR.cov.55.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.60.cl.prop.women25.40.M.40.50[2], 
+                  d.MCAR.cov.65.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.70.cl.prop.women25.40.M.40.50[2], 
+                  d.MCAR.cov.75.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.80.cl.prop.women25.40.M.40.50[2], 
+                  d.MCAR.cov.85.cl.prop.women25.40.M.40.50[2], d.MCAR.cov.90.cl.prop.women25.40.M.40.50[2], 
+                  d.MCAR.cov.95.cl.prop.women25.40.M.40.50[2], d.MCAR.true.cov.100.prop.women25.40.M.40.50[2],
+                  
+                  d.MCAR.cov.35.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.40.cl.prop.men40.50.F.40.50[2], 
+                  d.MCAR.cov.45.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.50.cl.prop.men40.50.F.40.50[2], 
+                  d.MCAR.cov.55.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.60.cl.prop.men40.50.F.40.50[2], 
+                  d.MCAR.cov.65.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.70.cl.prop.men40.50.F.40.50[2], 
+                  d.MCAR.cov.75.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.80.cl.prop.men40.50.F.40.50[2], 
+                  d.MCAR.cov.85.cl.prop.men40.50.F.40.50[2], d.MCAR.cov.90.cl.prop.men40.50.F.40.50[2], 
+                  d.MCAR.cov.95.cl.prop.men40.50.F.40.50[2], d.MCAR.true.cov.100.prop.men40.50.F.40.50[2],
+                  
+                  d.MCAR.cov.35.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.40.cl.prop.women40.50.M.40.50[2], 
+                  d.MCAR.cov.45.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.50.cl.prop.women40.50.M.40.50[2], 
+                  d.MCAR.cov.55.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.60.cl.prop.women40.50.M.40.50[2], 
+                  d.MCAR.cov.65.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.70.cl.prop.women40.50.M.40.50[2], 
+                  d.MCAR.cov.75.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.80.cl.prop.women40.50.M.40.50[2], 
+                  d.MCAR.cov.85.cl.prop.women40.50.M.40.50[2], d.MCAR.cov.90.cl.prop.women40.50.M.40.50[2], 
+                  d.MCAR.cov.95.cl.prop.women40.50.M.40.50[2], d.MCAR.true.cov.100.prop.women40.50.M.40.50[2]
+),
+
+ncol = 14,
+byrow = TRUE)
+
+props <- round(props_infer, digits = 3)
+
+
+colnames(props_infer) <- c("cl.cov.35", "cl.cov.40", "cl.cov.45",
+                     "cl.cov.50", "cl.cov.55", "cl.cov.60",
+                     "cl.cov.65", "cl.cov.70", "cl.cov.75",
+                     "cl.cov.80", "cl.cov.85", "cl.cov.90",
+                     "cl.cov.95", "true.cov.100")
+
+rownames(props_infer) <-  c("M.15.25.F.15.25", "F.15.25.M.15.25", 
+                     "M.25.40.F.15.25", "F.25.40.M.15.25", 
+                     "M.40.50.F.15.25", "F.40.50.M.15.25",
+                     "M.15.25.F.25.40", "F.15.25.M.25.40",
+                     "M.25.40.F.25.40", "F.25.40.M.25.40",
+                     "M.40.50.F.25.40", "F.40.50.M.25.40",
+                     "M.15.25.F.40.50", "F.15.25.M.40.50",
+                     "M.25.40.F.40.50", "F.25.40.M.40.50",
+                     "M.40.50.F.40.50", "F.40.50.M.40.50") 
+
+props_infer
+
+
+```
+
+## Goodness of fit of proportions of pairings
+
+
+
+
+# Age difference in pairings from transmission clusters
+
+
+
+## Goodness of fit of statistics of ge difference in pairings from transmission clusters
+
+
