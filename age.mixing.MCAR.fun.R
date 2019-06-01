@@ -576,7 +576,7 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
     
     # run ClusterPicker
     
-    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.9 0.9 0.045 2 gap"))))
+    system(paste("java -jar ", paste(paste0(work.dir,"/ClusterPicker_1.2.3.jar"), paste0(sub.dir.rename,"/", paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta")), paste0(sub.dir.rename,"/",paste0("cov.",seq.cov, ".mCAr.IDs.C.Epidemic.Fasta.nwk")),  paste0("0.8 0.7 0.045 2 gap"))))
     
     # Read clusters' files
     
@@ -3197,3 +3197,17 @@ age.mixing.MCAR.fun <- function(simpact.trans.net = simpact.trans.net.adv,
   
 }
 
+
+# are identified in trees based on high support for the grouping and low within cluster genetic distance
+
+# initial support threshold (0.9) is used to split the tree into subtrees to reduce the number of computations, this initial support threshold
+# must be ≤ the main support threshold for clusters;
+# 
+# main support threshold for clusters (0.9 - 90% bootstrap support for clusters);
+# 
+# genetic distance threshold for clusters (0.045 - maximum 4.5 substitutions/site within clusters);
+# 
+# an option to output lists of clusters above a certain size (2);
+# 
+# 
+# 

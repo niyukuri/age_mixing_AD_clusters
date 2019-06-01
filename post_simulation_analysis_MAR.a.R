@@ -307,8 +307,8 @@ d.MAR.cov.90 <- d.MAR %>%
   select(contains("cov.MAR.a.90.")) 
 d.MAR.cov.95 <- d.MAR %>%
   select(contains("cov.MAR.a.95.")) 
-d.MAR.cov.100 <- d.MAR %>%
-  select(contains("cov.MAR.a.100")) 
+# d.MAR.cov.100 <- d.MAR %>%
+#   select(contains("cov.MAR.a.100")) 
 
 d.MCAR  <-  dr %>%
   select(contains("MCAR."))

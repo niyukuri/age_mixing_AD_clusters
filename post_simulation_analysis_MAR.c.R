@@ -507,7 +507,7 @@ colnames(age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
 
 rownames(age.mix.stats) <- c("AAD.male", "SDAD.male",  "slope.male",  "WSD.male", "BSD.male" , "intercept.male") 
 
-write.csv(age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/age.mixing.statistics_MAR.csv")
+write.csv(age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/age.mixing.statistics_MAR.csv")
 
 
 CI.age.mix.stats <- matrix(c(paste(T.35.AAD.male[2], "[", T.35.AAD.male[1], "-", T.35.AAD.male[3], "]"), 
@@ -615,7 +615,7 @@ colnames(CI.age.mix.stats) <- c("cov.35", "cov.40", "cov.45",
 rownames(CI.age.mix.stats) <- c("AAD.male", "SDAD.male",  "slope.male",  "WSD.male", "BSD.male" , "intercept.male") 
 
 
-write.csv(CI.age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/age.mixing.statistics_CI_MAR.csv")
+write.csv(CI.age.mix.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/age.mixing.statistics_CI_MAR.csv")
 
 
 
@@ -1369,7 +1369,7 @@ cov.100.age.groups.table <- matrix(c((M.15.25.F.15.25.cov.100[2]), (M.15.25.F.25
 colnames(cov.100.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
 rownames(cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
 
-write.csv(cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.agregated.pairings100.cov_MAR.csv")
+write.csv(cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.agregated.pairings100.cov_MAR.csv")
 
 
 
@@ -1388,7 +1388,7 @@ CI.cov.100.age.groups.table <- matrix(c(paste(M.15.25.F.15.25.cov.100[2], "[", M
 colnames(CI.cov.100.age.groups.table) <- c("Female.15.25", "Female.25.40", "Female.40.50")
 rownames(CI.cov.100.age.groups.table) <- c("Male.15.25", "Male.25.40", "Male.40.50")
 
-write.csv(CI.cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.agregated.pairings100.cov_CI_MAR.csv")
+write.csv(CI.cov.100.age.groups.table, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.agregated.pairings100.cov_CI_MAR.csv")
 
 
 
@@ -1688,7 +1688,7 @@ rownames(agreggated.pairings.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", "M.
                                        "M.15.25.F.25.40", "M.25.40.F.25.40", "M.40.50.F.25.40",
                                        "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
 
-write.csv(agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.agreggated.pairings.phylogeny.MAR.csv")
+write.csv(agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.agreggated.pairings.phylogeny.MAR.csv")
 
 
 
@@ -1842,7 +1842,7 @@ rownames(CI.agreggated.pairings.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", 
                                           "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
 
 
-write.csv(CI.agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.agreggated.pairings.phylogeny_CI.MAR.csv")
+write.csv(CI.agreggated.pairings.mat, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.agreggated.pairings.phylogeny_CI.MAR.csv")
 
 
 
@@ -2276,7 +2276,7 @@ rownames(agreggated.pairings.cl.mat) <- c("M.15.25.F.15.25", "M.25.40.F.15.25", 
                                           "M.15.25.F.40.50", "M.25.40.F.40.50", "M.40.50.F.40.50")
 
 
-write.csv(agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/agreggated.pairings.clusters.MAR.csv")
+write.csv(agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/agreggated.pairings.clusters.MAR.csv")
 
 
 CI.agreggated.pairings.cl.mat <- matrix(c(paste(M.15.25.F.15.25.MAR.cov.cl.35[2], "[", M.15.25.F.15.25.MAR.cov.cl.35[1], "-", M.15.25.F.15.25.MAR.cov.cl.35[3], "]"), 
@@ -2430,7 +2430,7 @@ rownames(CI.agreggated.pairings.cl.mat) <- c("paste(M.15.25.F.15.25", "paste(M.2
                                              "paste(M.15.25.F.40.50", "paste(M.25.40.F.40.50", "paste(M.40.50.F.40.50")
 
 
-write.csv(CI.agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/agreggated.pairings.clusters_CI.MAR.csv")
+write.csv(CI.agreggated.pairings.cl.mat , file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/agreggated.pairings.clusters_CI.MAR.csv")
 
 
 
@@ -3576,7 +3576,7 @@ rownames(props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                      "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                      "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/inferred.proportions.MAR.csv")
+write.csv(props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/inferred.proportions.MAR.csv")
 
 
 CI.props <- matrix(c(paste(d.MAR.cov.35.cl.prop.men15.25.F.15.25[2], "[", d.MAR.cov.35.cl.prop.men15.25.F.15.25[1], "-", d.MAR.cov.35.cl.prop.men15.25.F.15.25[3], "]"), 
@@ -3872,7 +3872,7 @@ rownames(CI.props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                         "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                         "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(CI.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/inferred.proportions_CI.MAR.csv")
+write.csv(CI.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/inferred.proportions_CI.MAR.csv")
 
 
 #  Figures --------------
@@ -5682,7 +5682,7 @@ rownames(true.props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                           "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                           "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(true.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.proportions.MAR.csv")
+write.csv(true.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.proportions.MAR.csv")
 
 
 CI.true.props <- matrix(c(paste(d.MAR.cov.35.cl.true.prop.men15.25.F.15.25[2], "[", d.MAR.cov.35.cl.true.prop.men15.25.F.15.25[1], "-", d.MAR.cov.35.cl.true.prop.men15.25.F.15.25[3], "]"), 
@@ -5978,7 +5978,7 @@ rownames(CI.true.props) <- c("prop.M.15.25.F.15.25", "prop.F.15.25.M.15.25",
                              "prop.M.25.40.F.40.50", "prop.F.25.40.M.40.50",
                              "prop.M.40.50.F.40.50", "prop.F.40.50.M.40.50") 
 
-write.csv(CI.true.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.proportions_CI.MAR.csv")
+write.csv(CI.true.props, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.proportions_CI.MAR.csv")
 
 
 
@@ -8043,7 +8043,7 @@ rownames(AD.stats) <- c("mean.AD.women.cl.15.25", "mean.AD.men.cl.15.25",
                         "sd.AD.women.cl.25.40", "sd.AD.men.cl.25.40",
                         "sd.AD.women.cl.40.50", "sd.AD.men.cl.40.50") 
 
-write.csv(AD.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/inferred.AD.stats.clust.MAR.csv")
+write.csv(AD.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/inferred.AD.stats.clust.MAR.csv")
 
 
 CI.AD.stats <- matrix(c(paste(mean.MAR.cov.35.AD.women.cl.15.25[2], "[", mean.MAR.cov.35.AD.women.cl.15.25[1], "-", mean.MAR.cov.35.AD.women.cl.15.25[3], "]"), 
@@ -8344,7 +8344,7 @@ rownames(CI.AD.stats) <- c("mean.AD.women.cl.15.25", "mean.AD.men.cl.15.25",
                            "sd.AD.women.cl.25.40", "sd.AD.men.cl.25.40",
                            "sd.AD.women.cl.40.50", "sd.AD.men.cl.40.50") 
 
-write.csv(CI.AD.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/inferred.AD.stats.clust_CI.MAR.csv")
+write.csv(CI.AD.stats, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/inferred.AD.stats.clust_CI.MAR.csv")
 
 
 
@@ -10325,7 +10325,7 @@ rownames(AD.stats.true) <- c("mean.AD.women.true.cl.15.25", "mean.AD.men.true.cl
                              "sd.AD.women.true.cl.25.40", "sd.AD.men.true.cl.25.40",
                              "sd.AD.women.true.cl.40.50", "sd.AD.men.true.cl.40.50") 
 
-write.csv(AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.stats.AD.clust.MAR.csv")
+write.csv(AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.stats.AD.clust.MAR.csv")
 
 
 CI.AD.stats.true <- matrix(c(paste(mean.MAR.cov.35.AD.women.true.cl.15.25[2], "[", mean.MAR.cov.35.AD.women.true.cl.15.25[1], "-", mean.MAR.cov.35.AD.women.true.cl.15.25[3], "]"), 
@@ -10626,7 +10626,7 @@ rownames(CI.AD.stats.true) <- c("mean.AD.women.true.cl.15.25", "mean.AD.men.true
                                 "sd.AD.women.true.cl.25.40", "sd.AD.men.true.cl.25.40",
                                 "sd.AD.women.true.cl.40.50", "sd.AD.men.true.cl.40.50") 
 
-write.csv(CI.AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/true.stats.AD.clust_CI.MAR.csv")
+write.csv(CI.AD.stats.true, file = "/home/david/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/true.stats.AD.clust_CI.MAR.csv")
 
 
 
@@ -12070,7 +12070,7 @@ plot.MRE.error.infer.clust.cov.100.prop.men.15.25 <- ggplot(MRE.error.infer.clus
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.men.15.25.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.men.15.25,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -12121,7 +12121,7 @@ plot.MRE.error.infer.clust.cov.100.prop.men.25.40 <- ggplot(MRE.error.infer.clus
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.men.25.40.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.men.25.40,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -12145,7 +12145,7 @@ plot.MRE.error.infer.clust.cov.100.prop.women.25.40 <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.women.25.40.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.women.25.40,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -12169,7 +12169,7 @@ plot.MRE.error.infer.clust.cov.100.prop.men.40.50 <- ggplot(MRE.error.infer.clus
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.men.40.50.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.men.40.50,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -12193,7 +12193,7 @@ plot.MRE.error.infer.clust.cov.100.prop.women.40.50 <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.prop.women.40.50.png",
        plot = plot.MRE.error.infer.clust.cov.100.prop.women.40.50,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14098,7 +14098,7 @@ plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean <- ggplot(MRE.error.infer
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.mean,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14124,7 +14124,7 @@ plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.mean,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14150,7 +14150,7 @@ plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med <- ggplot(MRE.error.infer.
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.med,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14174,7 +14174,7 @@ plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.med,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14198,7 +14198,7 @@ plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.15.25.AD.sd,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14222,7 +14222,7 @@ plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd <- ggplot(MRE.error.infer.clu
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.15.25.AD.sd,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14249,7 +14249,7 @@ plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean <- ggplot(MRE.error.infer
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.mean,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14275,7 +14275,7 @@ plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.mean,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14301,7 +14301,7 @@ plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med <- ggplot(MRE.error.infer.
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.med,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14325,7 +14325,7 @@ plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.med,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14349,7 +14349,7 @@ plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.25.40.AD.sd,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14373,7 +14373,7 @@ plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd <- ggplot(MRE.error.infer.clu
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.25.40.AD.sd,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14400,7 +14400,7 @@ plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean <- ggplot(MRE.error.infer
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.mean,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14426,7 +14426,7 @@ plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.mean,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14452,7 +14452,7 @@ plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med <- ggplot(MRE.error.infer.
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.med,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14476,7 +14476,7 @@ plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med <- ggplot(MRE.error.infer.cl
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.med,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14500,7 +14500,7 @@ plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd <- ggplot(MRE.error.infer.c
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.women.40.50.AD.sd,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 
@@ -14524,7 +14524,7 @@ plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd <- ggplot(MRE.error.infer.clu
 
 ggsave(filename = "plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd.png",
        plot = plot.MRE.error.infer.clust.cov.100.men.40.50.AD.sd,
-       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_b/",
+       path = "~/age_mixing_AD_clusters/results/large_AD/figures_tables_MAR_c/",
        width = 10, height = 8, units = "cm")
 
 

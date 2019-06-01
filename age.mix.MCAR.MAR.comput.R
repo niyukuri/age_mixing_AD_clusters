@@ -91,8 +91,8 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
   
   age.distr <- agedistr.creator(shape = 5, scale = 65)
   #
-  cfg.list <- input.params.creator(population.eyecap.fraction = 0.4,
-                                   population.simtime = 45, 
+  cfg.list <- input.params.creator(population.eyecap.fraction = 0.2,
+                                   population.simtime = 40, 
                                    population.nummen = 20000, 
                                    population.numwomen = 20000,
                                    hivseed.time = 10, 
@@ -100,7 +100,7 @@ age.mix.MCAR.MAR.comput <- function(inputvector=inputvector){
                                    hivseed.amount = 40, 
                                    hivseed.age.min = 20,
                                    hivseed.age.max = 50,
-                                   formation.hazard.agegapry.meanage = -0.04,
+                                   formation.hazard.agegapry.meanage = -0.025,
                                    debut.debutage = 15
   )
   
