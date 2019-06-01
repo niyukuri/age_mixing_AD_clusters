@@ -54,7 +54,7 @@ wrapper.age.mix <- function(inputvector=inputvector){
 
   
   results.f <- tryCatch(age.mix.MCAR.MAR.comput(inputvector = inputvector),
-                        error=function(e) return(rep(NA, 10513)))
+                        error=function(e) return(rep(NA, 5908)))
   
   return(results.f)
   
@@ -74,10 +74,10 @@ inputmatrix <- matrix(rep(inputvector, reps), byrow = TRUE, nrow = reps)
 
 large.AD.age.mix <- simpact.parallel(model = wrapper.age.mix,
                                      actual.input.matrix = inputmatrix,
-                                     seed_count = 777,
+                                     seed_count = 111,
                                      n_cluster = 56)
 
-write.csv(large.AD.age.mix, file = "Results.mcarmar.large.AD_280_777.csv")
+write.csv(large.AD.age.mix, file = "Results.mcarmar.large.AD_280_111.csv")
 
 
 
